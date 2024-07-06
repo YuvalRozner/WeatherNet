@@ -33,8 +33,8 @@ BetterWeather aims to develop an advanced machine learning model to predict weat
 
 ## Team Members
 
-- Dor Shabat
 - Yuval Rozner
+- Dor Shabat
 
 ## Tools and Technologies
 
