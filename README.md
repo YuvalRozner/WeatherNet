@@ -1,4 +1,4 @@
-# BetterWeather
+# WeatherNet
 
 ![Weather Prediction Icon](/readmeLogo.png)
 
