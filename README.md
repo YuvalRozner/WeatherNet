@@ -4,7 +4,7 @@
 
 ## Weather Forecasting Using ML
 
-BetterWeather aims to develop an advanced machine learning model to predict weather conditions using historical weather data. Leveraging high-resolution data from Meteomatics, we seek to enhance the accuracy and reliability of weather forecasts.
+WeatherNet aims to develop an advanced machine learning model to predict weather conditions using historical weather data. Leveraging high-resolution data from Meteomatics, we seek to enhance the accuracy and reliability of weather forecasts.
 
 ## Objectives
 
