@@ -1,6 +1,6 @@
 # WeatherNet
 
-![Weather Prediction Icon](/readmeLogo.png)
+![Weather Prediction Icon](/logo/readmeLogo.png)
 
 ## Weather Forecasting Using ML
 
