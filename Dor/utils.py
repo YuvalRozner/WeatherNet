@@ -36,7 +36,8 @@ import os
 from tqdm import tqdm
 
 
-DATA_DIRECTORY = "../data/"
+FULL_PATH = os.path.dirname(os.path.abspath(__file__))
+DATA_DIRECTORY = os.path.join(FULL_PATH, "../data/")
 na_values = ['None', 'null', '-', '', ' ', 'NaN', 'nan', 'NAN']
 
 # Load all pkl files
@@ -62,7 +63,7 @@ def load_all_csv_files():
         file_path = os.path.join(DATA_DIRECTORY, file)
         df_name = os.path.splitext(file)[0]
         dataframes[df_name] = pd.read_csv(file_path, na_values=na_values)
-    return
+    return dataframes
 
 # load single csv file
 def load_csv_file(file_name):
@@ -106,4 +107,15 @@ def pkl_to_csv(file_name):
     df.to_csv(csv_file_path, index=False)
     print(f"Converted {pkl_file_path} to {csv_file_path}")
 
+# from all pkl to csv
+def all_pkl_to_csv():
+    pkl_files = [f for f in os.listdir(DATA_DIRECTORY) if f.endswith('.pkl')]
+    for file in tqdm(pkl_files, desc="Converting PKL to CSV"):
+        pkl_to_csv(os.path.splitext(file)[0])
+    print("All PKL files converted to CSV")
 
+# main
+if __name__ == "__main__":
+    print("main")
+    #pkl_to_csv('Afeq')
+    #all_pkl_to_csv()
