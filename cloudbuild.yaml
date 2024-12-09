@@ -1,14 +1,32 @@
 steps:
+  # Install dependencies
   - name: "gcr.io/cloud-builders/npm"
     args: ["install"]
     dir: "WeatherNet Website/wheathernet"
+    id: "install"
+
+  # Build the application
   - name: "gcr.io/cloud-builders/npm"
     args: ["run", "build"]
     dir: "WeatherNet Website/wheathernet"
+    id: "build"
+    waitFor: ["install"]
+
+  # Deploy to App Engine
   - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
     entrypoint: "bash"
     args:
-      ["-c", "cd 'WeatherNet Website/wheathernet' && gcloud app deploy --quiet"]
+      - "-c"
+      - |
+        cd 'WeatherNet Website/wheathernet' && \
+        gcloud config set app/cloud_build_timeout 1600 && \
+        gcloud app deploy app.yaml --quiet
+    id: "deploy"
+    waitFor: ["build"]
 
 options:
   logging: CLOUD_LOGGING_ONLY
+  machineType: "N1_HIGHCPU_8"
+  dynamic_substitutions: true
+
+timeout: "1600s"
