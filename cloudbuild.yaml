@@ -1,11 +1,14 @@
 steps:
   - name: "gcr.io/cloud-builders/npm"
     args: ["install"]
+    dir: "WeatherNet Website/wheathernet"
   - name: "gcr.io/cloud-builders/npm"
     args: ["run", "build"]
+    dir: "WeatherNet Website/wheathernet"
   - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
     entrypoint: "bash"
-    args: ["-c", "gcloud app deploy --quiet"]
+    args:
+      ["-c", "cd 'WeatherNet Website/wheathernet' && gcloud app deploy --quiet"]
 
 options:
   logging: CLOUD_LOGGING_ONLY
