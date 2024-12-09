@@ -26,7 +26,7 @@ steps:
 
 options:
   logging: CLOUD_LOGGING_ONLY
-  machineType: "N1_HIGHCPU_8"
+  machineType: "E2_HIGHCPU_8"
   dynamic_substitutions: true
 
 timeout: "1600s"
