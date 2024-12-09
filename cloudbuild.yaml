@@ -11,4 +11,4 @@ options:
   logging: CLOUD_LOGGING_ONLY
 
 # Specify a region that is not restricted
-region: us-central1
+region: europe-west6
