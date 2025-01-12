@@ -17,11 +17,30 @@ export const TopBarContainer = styled.div`
 
 export const Logo = styled.img`
   height: 40px;
-  margin-right: 22px;
+  margin: 0px 22px 0px 6px;
 `;
 
 export const SiteName = styled.h1`
-  color: white;
+  color: ${props => props.theme.text};
   font-size: 1.5rem;
   margin: 0;
+
+  &:hover {
+    color: ${props => props.theme.hoverText};
+  }
+`;
+
+export const ThemeToggleButton = styled.button`
+  margin-left: auto;
+  margin-right: 20px;
+  padding: 5px 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: ${props => props.theme.text};
+  transition: color 0.3s ease;
+
+  &:hover {
+    color: ${props => props.theme.hoverText};
+  }
 `;
