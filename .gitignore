@@ -6,3 +6,5 @@ Dor/talkWithGpt.md
 .firebase/
 .firebaserc
 WeatherNet Website/weathernet/package-lock.json
+node_modules
+/node_modules
