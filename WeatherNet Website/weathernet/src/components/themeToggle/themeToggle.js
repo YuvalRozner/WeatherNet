@@ -1,16 +1,16 @@
 import React from 'react';
-import { ToggleContainer, LightIcon, DarkIcon } from './themeToggle.style';
+import { ToggleContainer, ThemeIcon } from './themeToggle.style';
 import { FaSun, FaMoon } from 'react-icons/fa';
 
 const ThemeToggle = ({ toggleTheme, theme }) => {
   return (
     <ToggleContainer onClick={toggleTheme}>
-      <DarkIcon $isVisible={theme === 'dark'}>
+      <ThemeIcon $isVisible={theme === 'dark'}>
         <FaMoon />
-      </DarkIcon>
-      <LightIcon $isVisible={theme === 'light'}>
+      </ThemeIcon>
+      <ThemeIcon $isVisible={theme === 'light'}>
         <FaSun />
-      </LightIcon>
+      </ThemeIcon>
     </ToggleContainer>
   );
 };
