@@ -17,7 +17,7 @@ export const ToggleContainer = styled.div`
 
 export const DarkIcon = styled.div`
   color: ${(props) => props.theme.text};
-  background: ${(props) => props.isVisible ? 'grey' : 'transparent'};
+  background: ${(props) => props.$isVisible ? 'grey' : 'transparent'};
   transition: color 0.4s ease, background 0.8s ease;
   width: 24px;
   height: 24px;
@@ -34,7 +34,7 @@ export const DarkIcon = styled.div`
 export const LightIcon = styled.div`
   color: ${(props) => props.theme.text};
   transition: color 0.4s ease, background 0.8s ease;
-  background: ${(props) => props.isVisible ? 'grey' : 'transparent'};
+  background: ${(props) => props.$isVisible ? 'grey' : 'transparent'};
   width: 24px;
   height: 24px;
   display: flex;

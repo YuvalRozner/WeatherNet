@@ -5,10 +5,10 @@ import { FaSun, FaMoon } from 'react-icons/fa';
 const ThemeToggle = ({ toggleTheme, theme }) => {
   return (
     <ToggleContainer onClick={toggleTheme}>
-      <DarkIcon isVisible={theme === 'dark'}>
+      <DarkIcon $isVisible={theme === 'dark'}>
         <FaMoon />
       </DarkIcon>
-      <LightIcon isVisible={theme === 'light'}>
+      <LightIcon $isVisible={theme === 'light'}>
         <FaSun />
       </LightIcon>
     </ToggleContainer>
