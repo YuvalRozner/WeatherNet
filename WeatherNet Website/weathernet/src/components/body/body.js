@@ -1,7 +1,7 @@
 import React from 'react';
 import { App, AppHeader, AppLogo } from './body.style.js'; // Import the styled components
 
-function Body() {
+function Body({ isVisible, ...props }) {
   return (
     <App>
       <AppHeader>
