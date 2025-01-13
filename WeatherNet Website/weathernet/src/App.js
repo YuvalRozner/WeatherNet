@@ -3,6 +3,7 @@ import './App.css';
 import TopBar from './components/topBar/topBar';
 import { ThemeProvider } from 'styled-components';
 import { lightTheme, darkTheme } from './utils/theme';
+import Body from './components/body/body';
 
 function App() {
   const [theme, setTheme] = useState(() => {
@@ -23,13 +24,7 @@ function App() {
   return (
     <ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
       <TopBar toggleTheme={toggleTheme} theme={theme} />
-      <div className="App">
-        <header className="App-header">
-          <img src="/logo/compressed_logo.png" className="App-logo" alt="logo" />
-          <h1>This Is WeatherNet!</h1>
-          <p>Your reliable weather forecast source</p>
-        </header>
-      </div>
+      <Body />
     </ThemeProvider>
   );
 }
