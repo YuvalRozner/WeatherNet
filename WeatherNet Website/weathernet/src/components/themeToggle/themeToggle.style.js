@@ -1,15 +1,13 @@
-// ToggleStyles.js
-
 import styled from 'styled-components';
 
 export const ToggleContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: 52px; /* or some fixed width */
-  background: ${(props) => 'darkgrey'};
+  width: 45px;
+  height: 16px;
+  background: darkgrey;
   border-radius: 16px;
-  padding: 4px 5px;
   margin-left: 20px;
   margin-right: 50px;
   cursor: pointer;
@@ -17,16 +15,17 @@ export const ToggleContainer = styled.div`
 
 export const ThemeIcon = styled.div`
   color: ${(props) => props.theme.text};
-  background: ${(props) => props.$isVisible ? 'grey' : 'transparent'};
-  transition: color 0.4s ease, background 0.8s ease;
-  width: 24px;
-  height: 24px;
+  background: grey;
+  transition: transform 0.7s ease;
+  width: 28px;
+  height: 28px;
   display: flex;
   justify-content: center;
   align-items: center;
-  border-radius: 16px;
+  border-radius: 40px;
+  transform: ${(props) => props.$isVisible ? 'translateX(-5px)' : 'translateX(21px)'};
 
   &:hover {
-    color: ${(props) => props.theme.hoverText};
+    background: ${(props) => props.$isVisible ? 'lightgrey' : 'darkgrey'};
   }
 `;

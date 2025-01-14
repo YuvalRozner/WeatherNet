@@ -6,10 +6,8 @@ const ThemeToggle = ({ toggleTheme, theme }) => {
   return (
     <ToggleContainer onClick={toggleTheme}>
       <ThemeIcon $isVisible={theme === 'dark'}>
-        <FaMoon />
-      </ThemeIcon>
-      <ThemeIcon $isVisible={theme === 'light'}>
-        <FaSun />
+        {theme === 'dark' && <FaMoon />}
+        {theme === 'light' && <FaSun />}
       </ThemeIcon>
     </ToggleContainer>
   );
