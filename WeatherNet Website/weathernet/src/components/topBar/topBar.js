@@ -12,7 +12,7 @@ const TopBar = ({ toggleTheme, theme }) => {
       <Logo src="/logo/logo_empty.png" alt="WeatherNet Logo" />
       <SiteName>WeatherNet</SiteName>
       <ShareButtonsContainer>
-        <ShareContainer shareUrl={shareUrl} title={title} />
+        <ShareContainer shareUrl={shareUrl} title={title} theme={theme} />
       </ShareButtonsContainer>
       <ThemeToggle toggleTheme={toggleTheme} theme={theme} />
     </TopBarContainer>

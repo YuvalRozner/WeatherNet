@@ -9,5 +9,5 @@ export const darkTheme = {
   background: '#282c34',
   text: '#ffffff',
   hoverText: '#29b8c8',
-  secondaryBackground: 'lightgrey',
+  secondaryBackground: 'grey',
 }; 
