@@ -12,12 +12,14 @@ import {
   NotesOutlined,
   FileCopyOutlined,
 } from "@mui/icons-material";
+import { Home } from "../components/pages/home/home.js";
 
 export const NavigationList = [
   {
     segment: "Home",
     title: "Home",
     icon: <HomeOutlined />,
+    pageComponent: <Home />,
   },
   {
     kind: "divider",
@@ -41,6 +43,7 @@ export const NavigationList = [
             style={{ height: "38px" }}
           />
         ),
+        pageComponent: <Home />,
       },
       {
         segment: "IMS's",

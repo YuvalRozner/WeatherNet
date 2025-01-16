@@ -1,28 +1,88 @@
-import React, { useState, useMemo } from "react";
+import React, { useMemo } from "react";
 import { AppProvider, DashboardLayout, PageContainer } from "@toolpad/core";
 import { MyTheme } from "./utils/theme";
-import { NavigationList } from "./utils/navigationList.js";
-import { SidebarFooter } from "./utils/navigationList.js";
-import { AppTitle, ToolbarActions } from "./components/topBarContent/topBar.js";
-import { Home } from "./components/pages/home/home.js";
+import { NavigationList, SidebarFooter } from "./utils/navigationList";
+import { AppTitle, ToolbarActions } from "./components/topBarContent/topBar";
+import { Home } from "./components/pages/home/home";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  useLocation,
+  useNavigate,
+  useSearchParams,
+} from "react-router-dom";
 
-function App() {
-  function useRouter(initialPath) {
-    const [pathname, setPathname] = useState(initialPath);
+/**
+ * Builds and returns an array of <Route> elements, one per "segment"
+ * in your NavigationList. (Skipping "divider"/"header" items.)
+ */
+function generateRouteElements(navList) {
+  const routes = [];
 
-    const router = useMemo(
-      () => ({
-        pathname,
-        searchParams: new URLSearchParams(),
-        navigate: (path) => setPathname(String(path)),
-      }),
-      [pathname]
-    );
+  function recurse(prefix, items) {
+    items.forEach((item) => {
+      if (item.kind === "divider" || item.kind === "header") {
+        // skip
+        return;
+      }
+      if (item.segment) {
+        let element;
+        switch (item.segment) {
+          case "":
+            element = <Home />;
+            break;
+          default:
+            element = item.pageComponent;
+            if (!element) {
+              element = <div>{item.segment} Page</div>;
+            }
+            break;
+        }
 
-    return router;
+        routes.push(
+          <Route
+            key={item.segment}
+            path={`${prefix}/${item.segment}`}
+            element={element}
+          />
+        );
+      }
+      // If there are children, recurse
+      if (item.children && item.children.length > 0) {
+        recurse(`${prefix}/${item.segment}`, item.children);
+      }
+    });
   }
 
-  const router = useRouter("/");
+  recurse("", navList);
+  return routes;
+}
+
+/**
+ * A simple custom hook that provides an object compatible with
+ * the `AppProvider`'s 'router' prop.
+ */
+function useRouter() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  return useMemo(
+    () => ({
+      pathname: location.pathname,
+      searchParams,
+      navigate: (path) => navigate(path),
+    }),
+    [location, searchParams, navigate]
+  );
+}
+
+function InnerApp() {
+  const router = useRouter();
+
+  // Generate all <Route> elements from NavigationList
+  const dynamicRoutes = generateRouteElements(NavigationList);
 
   return (
     <AppProvider navigation={NavigationList} router={router} theme={MyTheme}>
@@ -34,11 +94,17 @@ function App() {
         }}
       >
         <PageContainer>
-          <Home />
+          <Routes>{dynamicRoutes}</Routes>
         </PageContainer>
       </DashboardLayout>
     </AppProvider>
   );
 }
 
-export default App;
+export default function App() {
+  return (
+    <BrowserRouter>
+      <InnerApp />
+    </BrowserRouter>
+  );
+}
