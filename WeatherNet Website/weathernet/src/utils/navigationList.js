@@ -43,7 +43,6 @@ export const NavigationList = [
             style={{ height: "38px" }}
           />
         ),
-        pageComponent: <Home />,
       },
       {
         segment: "IMS's",
