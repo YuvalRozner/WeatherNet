@@ -1,6 +1,6 @@
-import styled, { keyframes } from 'styled-components';
+import styled, { keyframes } from "styled-components";
 
-export const App = styled.div`
+export const Appi = styled.div`
   text-align: center;
 `;
 
@@ -16,7 +16,7 @@ const AppLogoSpin = keyframes`
 export const AppLogo = styled.img`
   height: 40vmin;
   pointer-events: none;
-  
+
   @media (prefers-reduced-motion: no-preference) {
     animation: ${AppLogoSpin} infinite 20s linear;
   }
@@ -31,8 +31,4 @@ export const AppHeader = styled.header`
   justify-content: center;
   font-size: calc(10px + 2vmin);
   color: ${({ theme }) => theme.text};
-`;
-
-export const AppLink = styled.a`
-  color: #61dafb;
 `;

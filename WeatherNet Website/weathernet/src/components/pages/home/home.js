@@ -1,16 +1,13 @@
-import React from 'react';
-import { App, AppHeader, AppLogo } from './body.style.js'; // Import the styled components
+import { Appi, AppHeader, AppLogo } from "./home.style.js";
 
-function Body({ isVisible, ...props }) {
+export function Home() {
   return (
-    <App>
+    <Appi>
       <AppHeader>
         <AppLogo src="/logo/compressed_logo.png" alt="logo" />
         <h1>This Is WeatherNet!</h1>
         <p>Your reliable weather forecast source</p>
       </AppHeader>
-    </App>
+    </Appi>
   );
 }
-
-export default Body; 

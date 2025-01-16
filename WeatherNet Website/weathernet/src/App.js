@@ -1,31 +1,44 @@
-import React, { useState, useEffect } from 'react';
-import './App.css';
-import TopBar from './components/topBar/topBar';
-import { ThemeProvider } from 'styled-components';
-import { lightTheme, darkTheme } from './utils/theme';
-import Body from './components/body/body';
+import React, { useState, useMemo } from "react";
+import { AppProvider, DashboardLayout, PageContainer } from "@toolpad/core";
+import { MyTheme } from "./utils/theme";
+import { NavigationList } from "./utils/navigationList.js";
+import { SidebarFooter } from "./utils/navigationList.js";
+import { AppTitle, ToolbarActions } from "./components/topBarContent/topBar.js";
+import { Home } from "./components/pages/home/home.js";
 
 function App() {
-  const [theme, setTheme] = useState(() => {
-    // Check localStorage for a saved theme
-    const savedTheme = localStorage.getItem('theme');
-    return savedTheme ? savedTheme : 'dark'; // Default to 'dark' if no saved theme
-  });
+  function useDemoRouter(initialPath) {
+    const [pathname, setPathname] = useState(initialPath);
 
-  useEffect(() => {
-    // Save the theme to localStorage whenever it changes
-    localStorage.setItem('theme', theme);
-  }, [theme]);
+    const router = useMemo(
+      () => ({
+        pathname,
+        searchParams: new URLSearchParams(),
+        navigate: (path) => setPathname(String(path)),
+      }),
+      [pathname]
+    );
 
-  const toggleTheme = () => {
-    setTheme((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light'));
-  };
+    return router;
+  }
+
+  // Set up a demo router so the dashboard nav items can switch paths
+  const router = useDemoRouter("/dashboard");
 
   return (
-    <ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
-      <TopBar toggleTheme={toggleTheme} theme={theme} />
-      <Body />
-    </ThemeProvider>
+    <AppProvider navigation={NavigationList} router={router} theme={MyTheme}>
+      <DashboardLayout
+        slots={{
+          appTitle: AppTitle,
+          sidebarFooter: SidebarFooter,
+          toolbarActions: ToolbarActions,
+        }}
+      >
+        <PageContainer>
+          <Home />
+        </PageContainer>
+      </DashboardLayout>
+    </AppProvider>
   );
 }
 
