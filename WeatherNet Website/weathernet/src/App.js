@@ -7,7 +7,7 @@ import { AppTitle, ToolbarActions } from "./components/topBarContent/topBar.js";
 import { Home } from "./components/pages/home/home.js";
 
 function App() {
-  function useDemoRouter(initialPath) {
+  function useRouter(initialPath) {
     const [pathname, setPathname] = useState(initialPath);
 
     const router = useMemo(
@@ -22,8 +22,7 @@ function App() {
     return router;
   }
 
-  // Set up a demo router so the dashboard nav items can switch paths
-  const router = useDemoRouter("/dashboard");
+  const router = useRouter("/");
 
   return (
     <AppProvider navigation={NavigationList} router={router} theme={MyTheme}>
