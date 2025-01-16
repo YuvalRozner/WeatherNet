@@ -13,6 +13,7 @@ import {
   FileCopyOutlined,
 } from "@mui/icons-material";
 import { Home } from "../components/pages/home/home.js";
+import Paper from "../components/pages/papers/paper.js";
 
 export const NavigationList = [
   {
@@ -88,6 +89,12 @@ export const NavigationList = [
         segment: "PaperPhaseA",
         title: "Paper Phase A",
         icon: <Description />,
+        pageComponent: (
+          <Paper
+            title="Paper Phase A"
+            fileName="/papers/WeatherNet - Phase A Paper.pdf"
+          />
+        ),
       },
       {
         segment: "PaperPhaseB",
