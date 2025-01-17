@@ -18,6 +18,7 @@ import About from "../components/pages/about/about.js";
 import FilesContainer from "../components/pages/papers/filesContainer.js";
 import Contributors from "../components/pages/contributers/contributors.js";
 import ContactUs from "../components/pages/contactUs/contactUs.js";
+import Architecture from "../components/pages/architecture/architecture.js";
 
 export const NavigationList = [
   {
@@ -78,6 +79,7 @@ export const NavigationList = [
     segment: "Architecture",
     title: "Architecture",
     icon: <InsightsOutlined />,
+    pageComponent: <Architecture />,
   },
   {
     segment: "AboutWeatherNet",
