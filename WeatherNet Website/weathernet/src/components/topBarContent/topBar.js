@@ -7,6 +7,7 @@ import {
 } from "./topBar.style.js";
 import ShareContainer from "./shareContainer.js";
 import { ThemeSwitcher } from "@toolpad/core";
+import GitHubButton from "./githubContainer.js";
 
 export function AppTitle() {
   return (
@@ -25,6 +26,7 @@ export function ToolbarActions() {
   return (
     <>
       <ThemeSwitcher />
+      <GitHubButton />
       <InvisibleDiv />
       <ShareButtonsContainer>
         <ShareContainer shareUrl={shareUrl} title={title} />
