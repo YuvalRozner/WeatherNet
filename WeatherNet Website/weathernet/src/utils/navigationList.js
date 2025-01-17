@@ -17,6 +17,7 @@ import Paper from "../components/pages/papers/paper.js";
 import About from "../components/pages/about/about.js";
 import FilesContainer from "../components/pages/papers/filesContainer.js";
 import Contributors from "../components/pages/contributers/contributors.js";
+import ContactUs from "../components/pages/contactUs/contactUs.js";
 
 export const NavigationList = [
   {
@@ -153,6 +154,7 @@ export const NavigationList = [
     segment: "ContactUs",
     title: "Contact us",
     icon: <ContactSupportOutlined />,
+    pageComponent: <ContactUs />,
   },
 ];
 
