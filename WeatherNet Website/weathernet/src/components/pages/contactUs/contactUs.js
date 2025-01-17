@@ -12,9 +12,11 @@ import {
 } from "./contactUs.style";
 import { BaseLayout } from "../../base/baseLayout";
 import logger from "../../../utils/logger";
+import { useNotifications } from "@toolpad/core/useNotifications";
 
 export default function FormDialog() {
   const [open, setOpen] = React.useState(true);
+  const notifications = useNotifications();
 
   const handleClose = () => {
     setOpen(false);
@@ -36,7 +38,12 @@ export default function FormDialog() {
             const formJson = Object.fromEntries(formData.entries());
             logger.log(`got message from user: ${JSON.stringify(formJson)}`);
             handleClose();
-            alert("Message sent. We will get back to you as soon as possible.");
+            notifications.show(
+              "Message sent. We will get back to you as soon as possible.",
+              {
+                autoHideDuration: 3000,
+              }
+            );
           },
         }}
       >
