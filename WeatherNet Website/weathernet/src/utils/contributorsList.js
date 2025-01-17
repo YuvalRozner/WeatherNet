@@ -2,7 +2,7 @@ export const ContributorsList = [
   {
     name: "Dor Shabat",
     about: "Software Engineer",
-    image: "/contributors/DorShabat.jpeg",
+    image: "/contributors/DorShabat.jpg",
     role: "Lead Contributor",
     email: "dorshabat55@gmail.com",
     linkedin: "https://www.linkedin.com/in/dorshabat/",
@@ -12,7 +12,7 @@ export const ContributorsList = [
   {
     name: "Yuval Rozner",
     about: "Software Engineer",
-    image: "/contributors/YuvalRozner.png",
+    image: "/contributors/YuvalRozner.jpg",
     role: "Lead Contributor",
     email: "yuvalrozner98@gmail.com",
     linkedin: "https://www.linkedin.com/in/yuval-rozner/",

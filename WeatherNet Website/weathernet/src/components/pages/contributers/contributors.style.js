@@ -11,7 +11,7 @@ export const ProfilesCardsContainer = styled.div`
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
-  gap: 36px;
+  gap: 40px;
   margin-top: 40px;
 `;
 
@@ -49,6 +49,6 @@ export const StyledDialogTitle = styled(DialogTitle)`
 `;
 
 export const StyledCard = styled(Card)`
-  max-width: 600px;
+  width: 400px;
   margin-bottom: 2px;
 `;

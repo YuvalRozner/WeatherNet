@@ -48,7 +48,7 @@ export default function Contributors() {
           <CardActionArea onClick={() => handleClickOpen(person)}>
             <CardMedia
               component="img"
-              height="260"
+              height="190"
               image={person.image}
               alt={person.name}
             />
