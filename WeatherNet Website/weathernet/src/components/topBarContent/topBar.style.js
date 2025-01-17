@@ -21,6 +21,7 @@ export const SiteName = styled.h1`
 export const Logo = styled.img`
   height: 60px;
   margin: 0px 22px 0px 6px;
+  padding: 2px 0px;
 `;
 
 export const InvisibleDiv = styled.div`

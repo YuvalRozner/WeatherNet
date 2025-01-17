@@ -12,7 +12,7 @@ import GitHubButton from "./githubContainer.js";
 export function AppTitle() {
   return (
     <>
-      <Logo src="/logo/logo_empty.png" alt="WeatherNet Logo" />
+      <Logo src="/logo/compressed_empty_logo.png" alt="WeatherNet Logo" />
       <SiteNameContainer>
         <SiteName>WeatherNet</SiteName>
       </SiteNameContainer>
