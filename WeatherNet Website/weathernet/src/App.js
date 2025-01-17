@@ -94,7 +94,10 @@ function InnerApp() {
         }}
       >
         <PageContainer>
-          <Routes>{dynamicRoutes}</Routes>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            {dynamicRoutes}
+          </Routes>
         </PageContainer>
       </DashboardLayout>
     </AppProvider>
