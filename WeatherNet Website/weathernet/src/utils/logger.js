@@ -4,6 +4,11 @@ const logger = {
       console.log(...args);
     }
   },
+  info: (...args) => {
+    if (process.env.NODE_ENV === "development") {
+      console.info(...args);
+    }
+  },
   warn: (...args) => {
     if (process.env.NODE_ENV === "development") {
       console.warn(...args);
