@@ -14,6 +14,9 @@ import {
 } from "@mui/icons-material";
 import { Home } from "../components/pages/home/home.js";
 import Paper from "../components/pages/papers/paper.js";
+import About from "../components/pages/about/about.js";
+import FilesContainer from "../components/pages/papers/filesContainer.js";
+import Contributors from "../components/pages/contributers/contributors.js";
 
 export const NavigationList = [
   {
@@ -79,11 +82,13 @@ export const NavigationList = [
     segment: "AboutWeatherNet",
     title: "About WeatherNet",
     icon: <NotesOutlined />,
+    pageComponent: <About />,
   },
   {
     segment: "PapersAndManuals",
     title: "Papers and Manuals",
     icon: <FileCopyOutlined />,
+    pageComponent: <FilesContainer />,
     children: [
       {
         segment: "PaperPhaseA",
@@ -100,16 +105,34 @@ export const NavigationList = [
         segment: "PaperPhaseB",
         title: "Paper Phase B",
         icon: <Description />,
+        pageComponent: (
+          <Paper
+            title="Paper Phase A"
+            fileName="/papers/WeatherNet - Phase A Paper.pdf"
+          />
+        ),
       },
       {
         segment: "UserManual",
         title: "User Manual",
         icon: <AssignmentIndOutlined />,
+        pageComponent: (
+          <Paper
+            title="Paper Phase A"
+            fileName="/papers/WeatherNet - Phase A Paper.pdf"
+          />
+        ),
       },
       {
         segment: "DeveloperManual",
         title: "Developer Manual",
         icon: <IntegrationInstructionsOutlined />,
+        pageComponent: (
+          <Paper
+            title="Developer Manual"
+            fileName="/papers/WeatherNet - Phase A Paper.pdf"
+          />
+        ),
       },
     ],
   },
@@ -121,9 +144,10 @@ export const NavigationList = [
     title: "Who are We?",
   },
   {
-    segment: "profiles",
-    title: "Profiles",
+    segment: "Contributors",
+    title: "Contributors",
     icon: <AccountBoxOutlined />,
+    pageComponent: <Contributors />,
   },
   {
     segment: "ContactUs",
