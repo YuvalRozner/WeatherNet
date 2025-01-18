@@ -1,5 +1,4 @@
 import styled from "styled-components";
-import CardActionArea from "@mui/material/CardActionArea";
 
 export const GridBox = styled.div`
   width: 100%;
