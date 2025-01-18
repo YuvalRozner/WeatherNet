@@ -1,5 +1,6 @@
 import { FacebookIcon, XIcon, LinkedinIcon, WhatsappIcon } from "react-share";
 
+// TODO: add an option to just copy the link.
 export const sharingOptions = [
   {
     name: "Facebook",
