@@ -5,12 +5,15 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
 import CardActionArea from "@mui/material/CardActionArea";
+import { useNavigate } from "react-router-dom";
 
 const FilesPicker = ({ onSelectPaper, selectedCardId }) => {
   const [selectedCard, setSelectedCard] = useState(selectedCardId);
+  const navigate = useNavigate();
 
-  const handleCardClick = (index) => {
+  const handleCardClick = (index, selectedSegment) => {
     setSelectedCard(index);
+    navigate(`/PapersAndManuals/${selectedSegment}`); // Navigate to the segment
   };
 
   // Find the segment in NavigationList
@@ -22,6 +25,7 @@ const FilesPicker = ({ onSelectPaper, selectedCardId }) => {
     return (
       papersAndManuals?.children?.map((child, index) => ({
         id: index,
+        segment: child.segment,
         title: child.title,
         fileName: child.fileName,
         description: `${child.title}.`, // TODO: Add description
@@ -40,7 +44,7 @@ const FilesPicker = ({ onSelectPaper, selectedCardId }) => {
       {cards.map((card, index) => (
         <Card key={card.id}>
           <CardActionArea
-            onClick={() => handleCardClick(index)}
+            onClick={() => handleCardClick(index, card.segment)}
             data-active={selectedCard === index ? "" : undefined}
             sx={{
               height: "100%",
