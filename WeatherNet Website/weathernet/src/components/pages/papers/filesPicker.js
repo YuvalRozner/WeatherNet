@@ -6,8 +6,8 @@ import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
 import CardActionArea from "@mui/material/CardActionArea";
 
-const FilesPicker = ({ onSelectPaper }) => {
-  const [selectedCard, setSelectedCard] = useState(null);
+const FilesPicker = ({ onSelectPaper, selectedCardId }) => {
+  const [selectedCard, setSelectedCard] = useState(selectedCardId);
 
   const handleCardClick = (index) => {
     setSelectedCard(index);

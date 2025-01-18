@@ -101,7 +101,7 @@ export const NavigationList = [
         pageComponent: (
           <PaperContainer
             key="PaperPhaseA"
-            id="PaperPhaseA"
+            index={0}
             title="PaperPhaseA"
             fileName="/papers/WeatherNet - Phase A Paper.pdf"
           />
@@ -115,7 +115,7 @@ export const NavigationList = [
         pageComponent: (
           <PaperContainer
             key="PaperPhaseB"
-            id="PaperPhaseB"
+            index={1}
             title="PaperPhaseB"
             fileName="/papers/WeatherNet - Phase B Paper.pdf"
           />
@@ -129,7 +129,7 @@ export const NavigationList = [
         pageComponent: (
           <PaperContainer
             key="UserManual"
-            id="UserManual"
+            index={2}
             title="UserManual"
             fileName="/papers/WeatherNet - User Manual.pdf"
           />
@@ -143,7 +143,7 @@ export const NavigationList = [
         pageComponent: (
           <PaperContainer
             key="DeveloperManual"
-            id="DeveloperManual"
+            index={3}
             title="DeveloperManual"
             fileName="/papers/WeatherNet - Developer Manual.pdf"
           />
