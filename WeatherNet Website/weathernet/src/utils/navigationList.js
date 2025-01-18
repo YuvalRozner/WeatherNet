@@ -92,6 +92,7 @@ export const NavigationList = [
     segment: "PapersAndManuals",
     title: "Papers and Manuals",
     icon: <FileCopyOutlined />,
+    pageComponent: <PaperContainer key="PapersAndManuals" index={0} />,
     children: [
       {
         segment: "PaperPhaseA",
