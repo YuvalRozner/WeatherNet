@@ -16,6 +16,7 @@ import {
 // TODO: consider add skeltons components.
 // TODO: consider add tooltips components.
 // TODO: make the app responsive.
+// TODO: add note for thanking the IMS.
 
 /**
  * Builds and returns an array of <Route> elements, one per "segment"
