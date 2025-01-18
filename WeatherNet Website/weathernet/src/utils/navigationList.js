@@ -12,13 +12,13 @@ import {
   NotesOutlined,
   FileCopyOutlined,
 } from "@mui/icons-material";
-import { Home } from "../components/pages/home/home.js";
-import Paper from "../components/pages/papers/paper.js";
+import Home from "../components/pages/home/home.js";
+import PaperContainer from "../components/pages/papers/paperContainer.js";
 import About from "../components/pages/about/about.js";
-import FilesContainer from "../components/pages/papers/filesContainer.js";
 import Contributors from "../components/pages/contributers/contributors.js";
 import ContactUs from "../components/pages/contactUs/contactUs.js";
 import Architecture from "../components/pages/architecture/architecture.js";
+import Statistics from "../components/pages/statistics/statistics.js";
 
 export const NavigationList = [
   {
@@ -67,6 +67,7 @@ export const NavigationList = [
     segment: "Statistics",
     title: "Statistics",
     icon: <BarChartOutlined />,
+    pageComponent: <Statistics />,
   },
   {
     kind: "divider",
@@ -91,15 +92,17 @@ export const NavigationList = [
     segment: "PapersAndManuals",
     title: "Papers and Manuals",
     icon: <FileCopyOutlined />,
-    pageComponent: <FilesContainer />,
     children: [
       {
         segment: "PaperPhaseA",
         title: "Paper Phase A",
         icon: <Description />,
+        fileName: "/papers/WeatherNet - Phase A Paper.pdf",
         pageComponent: (
-          <Paper
-            title="Paper Phase A"
+          <PaperContainer
+            key="PaperPhaseA"
+            id="PaperPhaseA"
+            title="PaperPhaseA"
             fileName="/papers/WeatherNet - Phase A Paper.pdf"
           />
         ),
@@ -108,10 +111,13 @@ export const NavigationList = [
         segment: "PaperPhaseB",
         title: "Paper Phase B",
         icon: <Description />,
+        fileName: "/papers/WeatherNet - Phase B Paper.pdf",
         pageComponent: (
-          <Paper
-            title="Paper Phase A"
-            fileName="/papers/WeatherNet - Phase A Paper.pdf"
+          <PaperContainer
+            key="PaperPhaseB"
+            id="PaperPhaseB"
+            title="PaperPhaseB"
+            fileName="/papers/WeatherNet - Phase B Paper.pdf"
           />
         ),
       },
@@ -119,10 +125,13 @@ export const NavigationList = [
         segment: "UserManual",
         title: "User Manual",
         icon: <AssignmentIndOutlined />,
+        fileName: "/papers/WeatherNet - User Manual.pdf",
         pageComponent: (
-          <Paper
-            title="Paper Phase A"
-            fileName="/papers/WeatherNet - Phase A Paper.pdf"
+          <PaperContainer
+            key="UserManual"
+            id="UserManual"
+            title="UserManual"
+            fileName="/papers/WeatherNet - User Manual.pdf"
           />
         ),
       },
@@ -130,10 +139,13 @@ export const NavigationList = [
         segment: "DeveloperManual",
         title: "Developer Manual",
         icon: <IntegrationInstructionsOutlined />,
+        fileName: "/papers/WeatherNet - Developer Manual.pdf",
         pageComponent: (
-          <Paper
-            title="Developer Manual"
-            fileName="/papers/WeatherNet - Phase A Paper.pdf"
+          <PaperContainer
+            key="DeveloperManual"
+            id="DeveloperManual"
+            title="DeveloperManual"
+            fileName="/papers/WeatherNet - Developer Manual.pdf"
           />
         ),
       },
