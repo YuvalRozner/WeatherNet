@@ -13,6 +13,10 @@ import {
   useSearchParams,
 } from "react-router-dom";
 
+// TODO: consider add skeltons components.
+// TODO: consider add tooltips components.
+// TODO: make the app responsive.
+
 /**
  * Builds and returns an array of <Route> elements, one per "segment"
  * in your NavigationList. (Skipping "divider"/"header" items.)
