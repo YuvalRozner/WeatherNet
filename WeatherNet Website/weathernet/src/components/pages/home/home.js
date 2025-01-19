@@ -1,7 +1,7 @@
-import { BaseLayout } from "../../base/baseLayout.js";
+import { WeatherNetLogoLayout } from "../../base/weathenetLogoLayout.js";
 
 export function Home() {
-  return <BaseLayout />;
+  return <WeatherNetLogoLayout />;
 }
 
 export default Home;

@@ -13,7 +13,9 @@ export const MyTheme = extendTheme({
           default: "#282c34",
         },
         action: {
-          hover: "rgba(41, 184, 200, 0.8)",
+          hover: "rgba(41, 184, 200, 0.7)",
+          selected: "rgba(255, 255, 255, 0.9)",
+          disabled: "rgba(255, 255, 255, 0.3)",
         },
       },
     },

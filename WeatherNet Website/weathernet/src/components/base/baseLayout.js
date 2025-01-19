@@ -1,19 +1,24 @@
 import { useState } from "react";
-import { LayoutContainer, AppLogo } from "./baseLayout.style.js";
-import { SkeletonLayout } from "./skeltonLayot.js";
+import { HelpIcon, HelpButtonContainer } from "./baseLayout.style.js";
+import { HelpDialog } from "./helpDialog.js";
 
 export function BaseLayout() {
-  const [imgLoaded, setImgLoaded] = useState(false);
+  const [open, setOpen] = useState(false);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   return (
-    <LayoutContainer>
-      {!imgLoaded && <SkeletonLayout />}
-      <AppLogo
-        src="/logo/compressed_empty_logo.png"
-        alt="logo"
-        onLoad={() => setImgLoaded(true)}
-        style={{ display: imgLoaded ? "block" : "none" }}
-      />
-    </LayoutContainer>
+    <>
+      <HelpButtonContainer onClick={handleClickOpen}>
+        <HelpIcon />
+      </HelpButtonContainer>
+      <HelpDialog open={open} onClose={handleClose} />
+    </>
   );
 }

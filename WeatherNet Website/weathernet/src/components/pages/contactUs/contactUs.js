@@ -10,7 +10,7 @@ import {
   DraggableDialogActions,
   DraggableDialogTitle,
 } from "./contactUs.style";
-import { BaseLayout } from "../../base/baseLayout";
+import { WeatherNetLogoLayout } from "../../base/weathenetLogoLayout";
 import logger from "../../../utils/logger";
 import { useNotifications } from "@toolpad/core/useNotifications";
 
@@ -25,7 +25,7 @@ export default function FormDialog() {
 
   return (
     <React.Fragment>
-      <BaseLayout />
+      <WeatherNetLogoLayout />
       <Dialog
         open={open}
         onClose={handleClose}

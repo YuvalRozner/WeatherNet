@@ -1,4 +1,6 @@
 import styled, { keyframes } from "styled-components";
+import { styled as muiStyled } from "@mui/material/styles";
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 
 const AppLogoSpin = keyframes`
   from {
@@ -23,4 +25,26 @@ export const LayoutContainer = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
+`;
+
+export const HelpButtonContainer = styled.button`
+  margin-top: auto;
+  margin-left: auto;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+`;
+
+export const HelpIcon = muiStyled(HelpOutlineIcon)`
+  font-size: 40px !important;
+  color: ${({ theme }) => theme.palette.action.disabled};
+  &:hover {
+    color: ${({ theme }) => theme.palette.action.selected};
+  }
 `;

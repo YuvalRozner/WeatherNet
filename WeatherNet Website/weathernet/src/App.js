@@ -12,6 +12,7 @@ import {
   useNavigate,
   useSearchParams,
 } from "react-router-dom";
+import { BaseLayout } from "./components/base/baseLayout";
 
 // TODO: consider add skeltons components.
 // TODO: consider add tooltips components.
@@ -35,12 +36,27 @@ function generateRouteElements(navList) {
         let element;
         switch (item.segment) {
           case "":
-            element = <Home />;
+            element = (
+              <>
+                <Home />
+                <BaseLayout />
+              </>
+            );
             break;
           default:
-            element = item.pageComponent;
+            element = (
+              <>
+                {item.pageComponent}
+                <BaseLayout />
+              </>
+            );
             if (!element) {
-              element = <div>{item.segment} Page</div>;
+              element = (
+                <div>
+                  {item.segment} Page
+                  <BaseLayout />
+                </div>
+              );
             }
             break;
         }
