@@ -40,7 +40,7 @@ const FilesPicker = ({ onSelectPaper, selectedCardId }) => {
   }, [selectedCard, cards, onSelectPaper]);
 
   return (
-    <GridBox>
+    <GridBox $columns={cards.length}>
       {cards.map((card, index) => (
         <Card key={card.id}>
           <CardActionArea
