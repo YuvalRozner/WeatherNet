@@ -126,7 +126,7 @@ export const NavigationList = [
         segment: "UserManual",
         title: "User Manual",
         icon: <AssignmentIndOutlined />,
-        fileName: "/papers/WeatherNet - User Manual.pdf", // TODO: update the file User Manual
+        fileName: "/papers/WeatherNet - User Manual.pdf",
         pageComponent: (
           <PaperContainer
             key="UserManual"
