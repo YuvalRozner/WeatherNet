@@ -45,6 +45,6 @@ export const HelpIcon = muiStyled(HelpOutlineIcon)`
   font-size: 40px !important;
   color: ${({ theme }) => theme.palette.action.disabled};
   &:hover {
-    color: ${({ theme }) => theme.palette.action.selected};
+    color: ${({ theme }) => theme.palette.action.helpButtonHover};
   }
 `;

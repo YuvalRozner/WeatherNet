@@ -14,7 +14,7 @@ export const MyTheme = extendTheme({
         },
         action: {
           hover: "rgba(41, 184, 200, 0.7)",
-          selected: "rgba(255, 255, 255, 0.9)",
+          helpButtonHover: "rgba(255, 255, 255, 0.9)",
           disabled: "rgba(255, 255, 255, 0.3)",
         },
       },
