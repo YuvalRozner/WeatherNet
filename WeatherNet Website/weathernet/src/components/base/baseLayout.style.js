@@ -1,6 +1,6 @@
 import styled, { keyframes } from "styled-components";
 import { styled as muiStyled } from "@mui/material/styles";
-import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
+import ContactSupportOutlined from "@mui/icons-material/ContactSupportOutlined";
 
 const AppLogoSpin = keyframes`
   from {
@@ -41,7 +41,7 @@ export const HelpButtonContainer = styled.button`
   border-radius: 50%;
 `;
 
-export const HelpIcon = muiStyled(HelpOutlineIcon)`
+export const HelpIcon = muiStyled(ContactSupportOutlined)`
   font-size: 40px !important;
   color: ${({ theme }) => theme.palette.action.disabled};
   &:hover {

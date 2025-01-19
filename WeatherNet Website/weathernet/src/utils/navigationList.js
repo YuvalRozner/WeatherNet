@@ -5,12 +5,12 @@ import {
   ThermostatOutlined,
   BarChartOutlined,
   AccountBoxOutlined,
-  ContactSupportOutlined,
   IntegrationInstructionsOutlined,
   AssignmentIndOutlined,
   InsightsOutlined,
   NotesOutlined,
   FileCopyOutlined,
+  ForwardToInboxRounded,
 } from "@mui/icons-material";
 import Home from "../components/pages/home/home.js";
 import PaperContainer from "../components/pages/papers/paperContainer.js";
@@ -168,7 +168,7 @@ export const NavigationList = [
   {
     segment: "ContactUs",
     title: "Contact us",
-    icon: <ContactSupportOutlined />,
+    icon: <ForwardToInboxRounded />,
     pageComponent: <ContactUs />,
   },
 ];
