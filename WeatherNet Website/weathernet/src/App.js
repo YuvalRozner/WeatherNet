@@ -29,34 +29,18 @@ function generateRouteElements(navList) {
   function recurse(prefix, items) {
     items.forEach((item) => {
       if (item.kind === "divider" || item.kind === "header") {
-        // skip
-        return;
+        return; // skip
       }
       if (item.segment) {
         let element;
         switch (item.segment) {
           case "":
-            element = (
-              <>
-                <Home />
-                <BaseLayout />
-              </>
-            );
+            element = putInLayout(<Home />);
             break;
           default:
-            element = (
-              <>
-                {item.pageComponent}
-                <BaseLayout />
-              </>
-            );
+            element = putInLayout(item.pageComponent);
             if (!element) {
-              element = (
-                <div>
-                  {item.segment} Page
-                  <BaseLayout />
-                </div>
-              );
+              element = putInLayout(<div>{item.segment} Page</div>);
             }
             break;
         }
@@ -99,6 +83,15 @@ function useRouter() {
   );
 }
 
+const putInLayout = (component) => {
+  return (
+    <>
+      {component}
+      <BaseLayout />
+    </>
+  );
+};
+
 function InnerApp() {
   const router = useRouter();
 
@@ -114,9 +107,14 @@ function InnerApp() {
           toolbarActions: ToolbarActions,
         }}
       >
-        <PageContainer>
+        <PageContainer
+          sx={{
+            maxWidth: "100% !important",
+            margin: "0",
+          }}
+        >
           <Routes>
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={putInLayout(<Home />)} />
             {dynamicRoutes}
           </Routes>
         </PageContainer>
