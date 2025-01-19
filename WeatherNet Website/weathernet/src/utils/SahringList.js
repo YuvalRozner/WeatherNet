@@ -1,25 +1,7 @@
 import { FacebookIcon, XIcon, LinkedinIcon, WhatsappIcon } from "react-share";
+import LaunchRoundedIcon from "@mui/icons-material/LaunchRounded";
 
-// TODO: add an option to just copy the link.
 export const sharingOptions = [
-  {
-    name: "Facebook",
-    IconComponent: FacebookIcon,
-    url: (shareUrl) =>
-      `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
-        shareUrl
-      )}`,
-    windowName: "facebook-share-dialog",
-  },
-  {
-    name: "X",
-    IconComponent: XIcon,
-    url: (shareUrl, title) =>
-      `https://x.com/intent/tweet?text=${encodeURIComponent(
-        title
-      )}&url=${encodeURIComponent(shareUrl)}`,
-    windowName: "x-share-dialog",
-  },
   {
     name: "LinkedIn",
     IconComponent: LinkedinIcon,
@@ -37,5 +19,30 @@ export const sharingOptions = [
         title
       )}%20${encodeURIComponent(shareUrl)}`,
     windowName: "whatsapp-share-dialog",
+  },
+  {
+    name: "X",
+    IconComponent: XIcon,
+    url: (shareUrl, title) =>
+      `https://x.com/intent/tweet?text=${encodeURIComponent(
+        title
+      )}&url=${encodeURIComponent(shareUrl)}`,
+    windowName: "x-share-dialog",
+  },
+  {
+    name: "Facebook",
+    IconComponent: FacebookIcon,
+    url: (shareUrl) =>
+      `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+        shareUrl
+      )}`,
+    windowName: "facebook-share-dialog",
+  },
+  {
+    name: "Copy Link",
+    IconComponent: LaunchRoundedIcon,
+    action: (shareUrl) => {
+      navigator.clipboard.writeText(shareUrl);
+    },
   },
 ];

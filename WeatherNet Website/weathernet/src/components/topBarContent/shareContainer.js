@@ -21,33 +21,43 @@ export default function ControlledOpenSpeedDial({ shareUrl, title }) {
         icon={<ShareIcon style={{ width: "24px", height: "24px" }} />}
         FabProps={{ size: "small" }}
       >
-        {sharingOptions.map(({ name, IconComponent, url, windowName }) => (
-          <SpeedDialAction
-            key={name}
-            icon={
-              <IconComponent
-                style={{
-                  borderRadius: "45px",
-                  width: "100%",
-                  height: "100%",
-                  transition: "transform 0.3s ease",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = "scale(1.1)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = "scale(1)";
-                }}
-              />
-            }
-            tooltipTitle={name}
-            onClick={() => {
-              const shareWindowOptions = "width=800,height=400";
-              window.open(url(shareUrl, title), windowName, shareWindowOptions);
-              handleClose(); // Close the SpeedDial when an action is clicked
-            }}
-          />
-        ))}
+        {sharingOptions.map(
+          ({ name, IconComponent, url, action, windowName }) => (
+            <SpeedDialAction
+              key={name}
+              icon={
+                <IconComponent
+                  style={{
+                    borderRadius: "45px",
+                    width: "100%",
+                    height: "100%",
+                    transition: "transform 0.3s ease",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = "scale(1.1)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = "scale(1)";
+                  }}
+                />
+              }
+              tooltipTitle={name}
+              onClick={() => {
+                if (action) {
+                  action(shareUrl);
+                } else {
+                  const shareWindowOptions = "width=800,height=400";
+                  window.open(
+                    url(shareUrl, title),
+                    windowName,
+                    shareWindowOptions
+                  );
+                }
+                handleClose(); // Close the SpeedDial when an action is clicked
+              }}
+            />
+          )
+        )}
       </SpeedDial>
     </Box>
   );
