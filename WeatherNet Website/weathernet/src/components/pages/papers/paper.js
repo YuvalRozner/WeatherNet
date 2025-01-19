@@ -3,7 +3,7 @@ import { ResizableBox } from "react-resizable";
 import "react-resizable/css/styles.css";
 
 const Paper = ({ title, fileName }) => {
-  const [size, setSize] = useState({ width: "86%", height: 700 });
+  const [size, setSize] = useState({ width: "100%", height: 1300 });
 
   const handleResize = (event, { size: newSize }) => {
     setSize(newSize);
