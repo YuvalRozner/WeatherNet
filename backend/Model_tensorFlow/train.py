@@ -3,7 +3,8 @@
 
 import numpy as np
 import tensorflow as tf
-from tensorflow.keras import layers, Model, Input
+from tensorflow import keras
+from keras import layers, Model, Input
 
 
 ###############################################################################
