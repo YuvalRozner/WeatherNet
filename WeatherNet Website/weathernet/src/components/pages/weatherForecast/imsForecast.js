@@ -12,15 +12,17 @@ const ImsForecast = () => {
   const [data, setData] = useState(null);
 
   useEffect(() => {
-    fetchWeatherData(3).then((data) => setData(data));
+    fetchWeatherData(4).then((data) => setData(data));
   }, []);
 
   if (!data || !data.data) {
     return <div>Loading...</div>;
   }
 
-  const forecast = data.data.forecast_data["2025-01-23"].hourly;
-  // const forecast = data.data.fixed_forecast_data["2025-01-23"].hourly;
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const formattedDate = tomorrow.toISOString().split("T")[0];
+  const forecast = data.data.forecast_data[formattedDate].hourly;
   const dataset = Object.keys(forecast).map((hour) => ({
     temp: parseFloat(forecast[hour].precise_temperature),
     time: hour,
