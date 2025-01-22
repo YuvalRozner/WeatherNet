@@ -1,0 +1,8 @@
+{
+  "scripts": {
+    "start": "cd weathernet && npm run start",
+    "app": "cd weathernet-server && node app",
+    "build": "cd weathernet && npm run build",
+    "deploy": "npm run build && firebase deploy"
+  }
+}
