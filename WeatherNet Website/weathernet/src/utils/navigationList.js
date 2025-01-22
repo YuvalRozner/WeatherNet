@@ -19,6 +19,8 @@ import Contributors from "../components/pages/contributers/contributors.js";
 import ContactUs from "../components/pages/contactUs/contactUs.js";
 import Architecture from "../components/pages/architecture/architecture.js";
 import Statistics from "../components/pages/statistics/statistics.js";
+import ImsForcast from "../components/pages/weatherForecast/imsForecast.js";
+import WeathernetForecast from "../components/pages/weatherForecast/weathenetForecast.js";
 
 export const NavigationList = [
   {
@@ -49,6 +51,7 @@ export const NavigationList = [
             style={{ height: "38px" }}
           />
         ),
+        pageComponent: <WeathernetForecast />,
       },
       {
         segment: "IMS's",
@@ -60,6 +63,7 @@ export const NavigationList = [
             style={{ height: "30px", margin: "0px 6px" }}
           />
         ),
+        pageComponent: <ImsForcast />,
       },
     ],
   },
