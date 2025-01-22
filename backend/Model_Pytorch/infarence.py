@@ -1,3 +1,8 @@
+import os
+import torch
+import numpy as np
+from model import TemperatureForecastModel 
+
 def train_model(
     model,
     train_loader,
@@ -137,7 +142,6 @@ def infer(model, input_window, device='cpu'):
 
 
 if __name__ == "__main__":
-    from my_models import TemperatureForecastModel  # your model class
 
     # Suppose you have a last window of shape (1, num_stations, in_channels, seq_len)
     # or (1, in_channels, seq_len) if single station. Adjust to your model's input shape.
