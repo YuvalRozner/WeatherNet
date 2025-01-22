@@ -1,10 +1,14 @@
 const express = require("express");
 const app = express();
 
-app.get("/imsForecast/:cityId", (req, res) => {
+app.listen(8080, () => {
+  console.log("The WeatherNet server is listening on port 8080");
+});
+
+app.get("/imsForecast", (req, res) => {
   res.set("Access-Control-Allow-Origin", "*");
 
-  const cityId = req.params.cityId; // Get cityId from the request parameters
+  const cityId = req.query.cityId; // Get cityId from the query parameters
 
   fetch(`https://ims.gov.il/he/city_portal/${cityId}`)
     .then((response) => {
@@ -20,8 +24,4 @@ app.get("/imsForecast/:cityId", (req, res) => {
       console.error("Error fetching data from IMS:", error);
       res.status(500).send("Error fetching data from IMS");
     });
-});
-
-app.listen(8080, () => {
-  console.log("The WeatherNet server is listening on port 8080");
 });
