@@ -1,3 +1,3 @@
-# pytorch installation with cuda: 
+# pytorch installation
 
-pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
