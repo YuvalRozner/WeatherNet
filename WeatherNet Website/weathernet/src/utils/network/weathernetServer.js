@@ -1,26 +1,18 @@
 export const local_weathernetServer = "http://localhost:8080";
 export const deployed_weathernetServer =
-  "https://imsforecast-3nuc7rzvbq-uc.a.run.app";
+  "https://getimsforecast-3nuc7rzvbq-ew.a.run.app";
 
-export const request = (request, args) => {
-  switch (request) {
-    case "imsForecast":
-      if (process.env.NODE_ENV === "development") {
-        return fetch(`${local_weathernetServer}?cityId=${args.cityId}`);
-      } else if (process.env.NODE_ENV === "production") {
-        return fetchWeatherData(args.cityId);
-      }
-      break;
-    default:
-      return null;
+export const getImsForecast = (cityId) => {
+  if (process.env.NODE_ENV === "development") {
+    return fetchWeatherData(`${local_weathernetServer}/imsForecast`, cityId);
+  } else if (process.env.NODE_ENV === "production") {
+    return fetchWeatherData(deployed_weathernetServer, cityId);
   }
 };
 
-export const fetchWeatherData = async (cityId) => {
+export const fetchWeatherData = async (requestUrl, cityId) => {
   try {
-    const response = await fetch(
-      `${local_weathernetServer}/imsForecast?cityId=${cityId}`
-    );
+    const response = await fetch(`${requestUrl}?cityId=${cityId}`);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }

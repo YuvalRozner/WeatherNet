@@ -2,7 +2,9 @@ const { onRequest } = require("firebase-functions/v2/https");
 const fetch = require("node-fetch");
 const logger = require("firebase-functions/logger");
 
-exports.imsForecast = onRequest((req, res) => {
+const region = "europe-west1"; // Define the region to deploy to
+
+exports.getImsForecast = onRequest({ region }, (req, res) => {
   res.set("Access-Control-Allow-Origin", "*");
 
   const cityId = req.query.cityId;

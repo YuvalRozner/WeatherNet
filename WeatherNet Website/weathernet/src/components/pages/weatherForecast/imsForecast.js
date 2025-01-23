@@ -6,13 +6,13 @@ import { ChartsXAxis } from "@mui/x-charts/ChartsXAxis";
 import { ChartsYAxis } from "@mui/x-charts/ChartsYAxis";
 import { ChartsGrid } from "@mui/x-charts/ChartsGrid";
 import { ChartsTooltip } from "@mui/x-charts/ChartsTooltip";
-import { fetchWeatherData } from "../../../utils/network/weathernetServer";
+import { getImsForecast } from "../../../utils/network/weathernetServer";
 
 const ImsForecast = () => {
   const [data, setData] = useState(null);
 
   useEffect(() => {
-    fetchWeatherData(4).then((data) => setData(data));
+    getImsForecast(4).then((data) => setData(data));
   }, []);
 
   if (!data || !data.data) {
