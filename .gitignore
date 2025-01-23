@@ -15,3 +15,5 @@ WeatherNet Website/weathernet/package-lock.json
 WeatherNet Website/weathernet/package-lock.json
 WeatherNet Website/weathernet/package-lock.json
 /venv
+/backend/__pycache__
+/backend/Model_Pytorch/__pycache__
