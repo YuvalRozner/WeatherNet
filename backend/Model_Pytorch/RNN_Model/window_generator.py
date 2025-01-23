@@ -42,8 +42,8 @@ class WindowGenerator(Dataset):
         else:
             self.num_label_features = self.data.shape[-1]
 
-        # how many total samples (start points) we can have
-        self.num_samples = len(self.data) - self.total_window_size - (label_width - 1)
+        # Corrected number of samples
+        self.num_samples = len(self.data) - self.total_window_size + 1
 
         if self.num_samples < 1:
             raise ValueError("Not enough data to create windows with these parameters.")
@@ -57,8 +57,8 @@ class WindowGenerator(Dataset):
         x_end = x_start + self.input_width  # not inclusive
 
         # label window range
-        y_start = x_end + (self.shift - self.input_width)
-        y_end = y_start + self.label_width
+        y_start = x_start + self.total_window_size - self.label_width
+        y_end = x_start + self.total_window_size
 
         # slice input
         x = self.data[x_start:x_end]  # shape (input_width, num_features)
@@ -72,3 +72,42 @@ class WindowGenerator(Dataset):
         # x shape => (input_width, num_features)
         # y shape => (label_width, num_label_features)
         return x, y
+
+    def __repr__(self):
+        return '\n'.join([
+            f'Total window size: {self.total_window_size}',
+            f'Input window size: {self.input_width}',
+            f'Label window size: {self.label_width}',
+            f'Shift: {self.shift}',
+            f'Label columns indices: {self.label_columns}'
+        ])
+def test_window_generator():
+    # Sample data: 100 time steps, 3 features
+    data = np.arange(300).reshape(100, 3)
+    input_width = 24
+    label_width = 1
+    shift = 1
+    label_columns = [2]  # Assuming we're predicting the third feature
+
+    dataset = WindowGenerator(
+        data=data,
+        input_width=input_width,
+        label_width=label_width,
+        shift=shift,
+        label_columns=label_columns
+    )
+
+    print(dataset)
+
+    # Fetch a sample
+    x, y = dataset[0]
+    print("Input shape:", x.shape)  # Expected: (24, 3)
+    print("Label shape:", y.shape)  # Expected: (1, 1)
+    print("Label value:", y.item())  # Expected: data[24, 2]
+
+    # Verify alignment
+    assert y.item() == data[24, 2], "Label alignment incorrect!"
+
+    print("Test passed!")
+
+test_window_generator()

@@ -86,7 +86,7 @@ if __name__ == "__main__":
     # 1) Load your single-station data
     df = pd.read_csv("..\\utils\\jena_climate_2009_2016.csv")
     df = preprocessing_df(df)
-    
+
     # 2) Convert to numpy array
     data_np = df.values  # shape (T, in_channels)
     
@@ -97,7 +97,7 @@ if __name__ == "__main__":
     
     # 4) Normalize the data
     train_data_scaled, val_data_scaled, scaler = normalize_data(train_data, val_data, scaler_path='./scaler.pkl')
-    
+
     # 5) Create Datasets
     input_width = 24
     label_width = 1
@@ -111,6 +111,7 @@ if __name__ == "__main__":
     # 6) Instantiate model (LSTM)
     in_channels = df.shape[1]  # number of features
     print(f"Number of features: {in_channels}")
+    print(f"column_indices['T (degC)']: {column_indices['T (degC)']}")
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     print(f"Using device: {device}")
     # Define your LSTM model with desired parameters
