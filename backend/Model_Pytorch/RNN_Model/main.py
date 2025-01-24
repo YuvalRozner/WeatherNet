@@ -8,10 +8,12 @@ from backend.Model_Pytorch.common.data import preprocessing_tensor_df, normalize
 from model import LSTMModel
 from train import train_model
 from parameters import PARAMS, WINDOW_PARAMS, LSTM_MODEL_PARAMS
+import os
+
 
 if __name__ == "__main__":
-
-    df = pd.read_csv(PARAMS['filePah'])
+    path_to_file = os.path.join(os.path.dirname(__file__), PARAMS['filePah'])
+    df = pd.read_csv(path_to_file)
     df = preprocessing_tensor_df(df)
 
     # 2) Convert to numpy array
@@ -23,7 +25,7 @@ if __name__ == "__main__":
     val_data = data_np[train_size:]
     
     # 4) Normalize the data
-    train_data_scaled, val_data_scaled, scaler = normalize_data(train_data, val_data, scaler_path='./scaler.pkl')
+    train_data_scaled, val_data_scaled, scaler = normalize_data(train_data, val_data, scaler_path=os.path.join(os.path.dirname(__file__),'output','scaler.pkl'))
 
     print("split data and normilized")
 
@@ -41,7 +43,7 @@ if __name__ == "__main__":
     # 6) Instantiate model (LSTM)
     in_channels = df.shape[1]  # number of features
 
-    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    device = PARAMS['device']
     print(f"Using device: {device}")
 
     model = LSTMModel(
@@ -59,7 +61,7 @@ if __name__ == "__main__":
         epochs=PARAMS['epochs'],
         batch_size=32,
         lr=1e-3,
-        checkpoint_dir='./checkpoints',
+        checkpoint_dir=os.path.join(os.path.dirname(__file__),'output','checkpoints'),
         resume=False,
         device=device
     )
