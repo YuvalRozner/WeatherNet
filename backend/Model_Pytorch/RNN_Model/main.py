@@ -8,85 +8,12 @@ from window_generator import WindowGenerator
 
 from model import LSTMModel
 from train import train_model
-
-from sklearn.preprocessing import StandardScaler
-import pickle
-
-def preprocessing_df(df):
-    """
-    Apply the same preprocessing steps as during training.
-    """
-    # Slice the DataFrame and create a copy to avoid SettingWithCopyWarning
-    df = df[5::6].copy()
-    date_time = pd.to_datetime(df.pop('Date Time'), format='%d.%m.%Y %H:%M:%S')
-
-    # Handle 'wv (m/s)'
-    wv = df['wv (m/s)']
-    bad_wv = wv == -9999.0
-    df.loc[bad_wv, 'wv (m/s)'] = 0.0  # Use .loc to modify the original DataFrame
-    wv = df.pop('wv (m/s)')
-
-    # Handle 'max. wv (m/s)'
-    max_wv = df['max. wv (m/s)']
-    bad_max_wv = max_wv == -9999.0
-    df.loc[bad_max_wv, 'max. wv (m/s)'] = 0.0  # Use .loc to modify the original DataFrame
-    max_wv = df.pop('max. wv (m/s)')
-
-    # Convert to radians.
-    wd_rad = df.pop('wd (deg)') * np.pi / 180
-
-    # Calculate wind x and y components using .loc
-    df.loc[:, 'Wx'] = wv * np.cos(wd_rad)
-    df.loc[:, 'Wy'] = wv * np.sin(wd_rad)
-    df.loc[:, 'max Wx'] = max_wv * np.cos(wd_rad)
-    df.loc[:, 'max Wy'] = max_wv * np.sin(wd_rad)
-
-    # Time-based features
-    timestamp_s = date_time.map(pd.Timestamp.timestamp)
-    day = 24 * 60 * 60
-    year = 365.2425 * day
-
-    df.loc[:, 'Day sin'] = np.sin(timestamp_s * (2 * np.pi / day))
-    df.loc[:, 'Day cos'] = np.cos(timestamp_s * (2 * np.pi / day))
-    df.loc[:, 'Year sin'] = np.sin(timestamp_s * (2 * np.pi / year))
-    df.loc[:, 'Year cos'] = np.cos(timestamp_s * (2 * np.pi / year))
-
-    return df
-
-def normalize_data(train_data, val_data, scaler_path='./scaler.pkl'):
-    """
-    Fit a StandardScaler on the training data and transform both train and val data.
-    Save the scaler to disk for future use.
-    
-    Args:
-        train_data (np.ndarray): Training data.
-        val_data (np.ndarray): Validation data.
-        scaler_path (str): Path to save the scaler.
-        
-    Returns:
-        train_data_scaled (np.ndarray): Scaled training data.
-        val_data_scaled (np.ndarray): Scaled validation data.
-        scaler (StandardScaler): Fitted scaler object.
-    """
-    scaler = StandardScaler()
-    scaler.fit(train_data)
-    
-    train_data_scaled = scaler.transform(train_data)
-    val_data_scaled = scaler.transform(val_data)
-    
-    # Save the scaler
-    with open(scaler_path, 'wb') as f:
-        pickle.dump(scaler, f)
-    
-    print(f"Scaler saved to {scaler_path}")
-    
-    return train_data_scaled, val_data_scaled, scaler
+from common.data import preprocessing_tensor_df, normalize_data
 
 if __name__ == "__main__":
 
-    # 1) Load your single-station data
-    df = pd.read_csv("..\\utils\\jena_climate_2009_2016.csv")
-    df = preprocessing_df(df)
+    df = pd.read_csv("..\\common\\jena_climate_2009_2016.csv")
+    df = preprocessing_tensor_df(df)
 
     # 2) Convert to numpy array
     data_np = df.values  # shape (T, in_channels)
@@ -100,7 +27,7 @@ if __name__ == "__main__":
     train_data_scaled, val_data_scaled, scaler = normalize_data(train_data, val_data, scaler_path='./scaler.pkl')
 
     # 5) Create Datasets
-    input_width = 4
+    input_width = 24
     label_width = 1
     shift = 1
     column_indices = {name: i for i, name in enumerate(df.columns)}
@@ -116,12 +43,14 @@ if __name__ == "__main__":
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     print(f"Using device: {device}")
     # Define your LSTM model with desired parameters
+
     model = LSTMModel(
         in_channels=in_channels,
         hidden_dim=64,
         num_layers=2,
         label_width=label_width
     )
+
     epochs_ = 20
     # 7) Train
     train_model(

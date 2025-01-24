@@ -10,7 +10,7 @@ import pandas as pd
 
 from window_generator import WindowGenerator
 from model import CNNTransformerModel
-from ..data import load_data
+from ..common.data import load_data
 
 def train_model(
     train_dataset,
@@ -120,48 +120,3 @@ def train_model(
                 'best_val_loss': best_val_loss,
             }, best_ckpt)
             print(f"  -> Best model saved at epoch {epoch+1} (val_loss={val_loss:.4f})")
-
-
-if __name__ == "__main__":
-    # Example usage:
-    
-    # 1) Load your single-station data (NumPy or pandas)
-    #    Suppose data_np is shape (T, in_channels)
-
-    #df = pd.read_csv("target_station.csv")
-    df = load_data("Afeq")[0]
-    
-    # Convert to numpy array
-    data_np = df.values  # shape (T, in_channels)
-    
-    # 2) Create train/val split
-    train_size = int(0.8 * len(data_np))
-    train_data = data_np[:train_size]
-    val_data   = data_np[train_size:]
-    
-    # 3) Create Datasets
-    input_width = 24
-    label_width = 1
-    shift = 1
-    # Suppose the last column is "TD" (temp).
-    # Then label_columns = [df.columns.get_loc("TD")] or just the last column index:
-    label_columns = [-1]  
-    train_dataset = WindowGenerator(train_data, input_width, label_width, shift, label_columns)
-    val_dataset   = WindowGenerator(val_data,   input_width, label_width, shift, label_columns)
-    
-    # 4) Instantiate model
-    in_channels = df.shape[1]  # number of features
-    model = CNNTransformerModel(in_channels=in_channels)
-    
-    # 5) Train
-    train_model(
-        train_dataset,
-        val_dataset,
-        model,
-        epochs=20,
-        batch_size=32,
-        lr=1e-3,
-        checkpoint_dir='./checkpoints',
-        resume=False,
-        device='cpu'
-    )
