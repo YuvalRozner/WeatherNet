@@ -10,7 +10,7 @@ app.get("/imsForecast", (req, res) => {
 
   const cityId = req.query.cityId; // Get cityId from the query parameters
 
-  fetch(`https://ims.gov.il/he/city_portal/${cityId}`)
+  fetch(`https://ims.gov.il/en/city_portal/${cityId}`)
     .then((response) => {
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);

@@ -1,180 +1,138 @@
-import * as React from "react";
-import { Box } from "@mui/material";
-import Autocomplete from "@mui/material/Autocomplete";
-import TextField from "@mui/material/TextField";
-import { LineChart } from "@mui/x-charts/LineChart";
-import { useEffect, useState } from "react";
-import imsStations from "../../../utils/network/imsStations";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+} from "@mui/material";
+import TableContainer from "@mui/material/TableContainer";
+import React, { useEffect, useMemo, useState } from "react";
+import {
+  generateForecastChartSeries,
+  generateFormattedXAxis,
+  generateFormattedYAxis,
+  processForecastData,
+  formatTimeLabel,
+} from "../../../utils/DataManipulations";
 import { getImsForecast } from "../../../utils/network/weathernetServer";
-import Slider from "@mui/material/Slider";
-
-export function name() {
-  return <div>yuval</div>;
-}
+import ChooseCity from "./chooseCity";
+import PeriodSlider from "./periodSlider";
+import {
+  ChartContainerBox,
+  ChooseCityAndPeriodBox,
+} from "./weatherForecast.style";
+import DailyForecast from "./dailyForecast";
+import WeatherTable from "./weatherTable";
+import WeatherChart from "./weatherChart";
 
 const ImsForecast = () => {
+  const [dataJson, setDataJson] = useState(null);
   const [dataset, setDataset] = useState([]);
-  const [data, setData] = useState(null);
+  const [slicedDataset, setSlicedDataset] = useState([]);
   const [city, setCity] = useState(3);
-  const [period, setPeriod] = React.useState([0, 24]);
+  const [chosenTimePeriod, setChosenTimePeriod] = useState([6, 32]);
+  const [minValue, setMinValue] = useState(null);
+  const [maxValue, setMaxValue] = useState(null);
+  const [columns, setColumns] = useState([]);
+  const [rows, setRows] = useState([]);
+  const [dailyCountryForecast, setDailyCountryForecast] = useState("");
 
   useEffect(() => {
-    getImsForecast(city).then((data) => setData(data));
+    // Get IMS forecast data when city is changed
+    getImsForecast(city).then((data) => setDataJson(data));
   }, [city]);
 
-  // useEffect(() => {
-  //   if (!data) return;
-  //   const newDataset = [];
-  //   Object.entries(data.data.forecast_data).forEach(([date, forecastData]) => {
-  //     const formattedDate = new Date(date).toISOString().split("T")[0];
-  //     const hourlyForecast = forecastData.hourly;
-  //     Object.entries(hourlyForecast).forEach(([hour, forecast]) => {
-  //       const dateTime = new Date(`${formattedDate}T${hour}`);
-  //       newDataset.push({
-  //         pastTemp: parseFloat(forecast.precise_temperature),
-  //         futureTemp: parseFloat(forecast.precise_temperature),
-  //         utcTime: dateTime.getTime(),
-  //       });
-  //     });
-  //   });
-  //   setDataset(newDataset);
-  // }, [data]);
+  useEffect(() => {
+    // Process IMS forecast data when dataJson changes
+    if (!dataJson) return;
+
+    const { dataset, minValue, maxValue, country } =
+      processForecastData(dataJson);
+    setDataset(dataset);
+    setMinValue(minValue);
+    setMaxValue(maxValue);
+    setDailyCountryForecast(country);
+  }, [dataJson]);
 
   useEffect(() => {
-    if (!data) return;
+    // Slice dataset based on chosen time period
+    if (dataset.length === 0) return;
+    const tempSlicedDataset = dataset.slice(
+      chosenTimePeriod[0],
+      chosenTimePeriod[1]
+    );
+    setSlicedDataset(tempSlicedDataset);
+  }, [dataset, chosenTimePeriod]);
 
-    const newDataset = [];
-    const now = new Date();
+  // Generate formatted X Axis using useMemo
+  const formattedXAxis = useMemo(() => generateFormattedXAxis(), []);
 
-    Object.entries(data.data.forecast_data).forEach(([date, forecastData]) => {
-      const formattedDate = new Date(date).toISOString().split("T")[0];
-      const hourlyForecast = forecastData.hourly;
+  // Generate formatted Y Axis using useMemo
+  const formattedYAxis = useMemo(
+    () => generateFormattedYAxis(minValue, maxValue),
+    [minValue, maxValue]
+  );
 
-      Object.entries(hourlyForecast).forEach(([hour, forecast]) => {
-        const dateTime = new Date(`${formattedDate}T${hour}`);
-        const temp = parseFloat(forecast.precise_temperature);
+  // Generate forecast chart series using useMemo
+  const forecastChartSeries = useMemo(() => generateForecastChartSeries(), []);
 
-        // Check if this timestamp is before or after "now"
-        const isPast = dateTime < now;
-
-        newDataset.push({
-          pastTemp: isPast ? temp : null,
-          futureTemp: isPast ? null : temp,
-          OurTemp: isPast ? null : temp + (Math.random() * 4 - 2),
-          utcTime: dateTime.getTime(),
-        });
-      });
-    });
-
-    setDataset(newDataset);
-  }, [data]);
-
-  const minPeriod = 6;
-
-  const handleChange2 = (event, newValue, activeThumb) => {
-    if (!Array.isArray(newValue)) {
+  // Build columns & rows for the transposed table
+  useEffect(() => {
+    if (slicedDataset.length === 0) {
+      setColumns([]);
+      setRows([]);
       return;
     }
 
-    if (newValue[1] - newValue[0] < minPeriod) {
-      if (activeThumb === 0) {
-        const clamped = Math.min(newValue[0], 100 - minPeriod);
-        setPeriod([clamped, clamped + minPeriod]);
-      } else {
-        const clamped = Math.max(newValue[1], minPeriod);
-        setPeriod([clamped - minPeriod, clamped]);
-      }
-    } else {
-      setPeriod(newValue);
-    }
-  };
+    const newColumns = [
+      { id: "parameter", label: "Parameter", minWidth: 170 },
+      ...slicedDataset.map((item, index) => ({
+        id: `time-${index}`,
+        label: item.formattedTime,
+        minWidth: 60,
+      })),
+    ];
 
-  function indexToHour(value) {
-    const startDate = new Date();
-    startDate.setHours(0, 0, 0, 0);
-    const date = new Date(startDate.getTime() + value * 60 * 60 * 1000);
-    return `${date.getDate().toString().padStart(2, "0")}/${(date.getMonth() + 1).toString().padStart(2, "0")} ${date.getHours().toString().padStart(2, "0")}:00`;
-  }
+    const paramRows = [
+      { parameter: "Temperature (°C)", paramKey: "ImsTemp" },
+      { parameter: "Rain Chance (%)", paramKey: "rain_chance" },
+      { parameter: "Wave Height (m)", paramKey: "wave_height" },
+      { parameter: "Relative Humidity (%)", paramKey: "relative_humidity" },
+      { parameter: "Wind Speed (km/h)", paramKey: "wind_speed" },
+    ];
 
-  // Separate data into two arrays: "pastData" and "futureData"
-  const filteredData = dataset.slice(period[0], period[1]);
-  const nowTime = Date.now();
-  const pastData = filteredData.filter((item) => item.utcTime < nowTime);
-  const futureData = filteredData.filter((item) => item.utcTime >= nowTime);
+    const newRows = paramRows.map((pRow) => {
+      const rowObj = { parameter: pRow.parameter };
+      slicedDataset.forEach((item, idx) => {
+        rowObj[`time-${idx}`] = item[pRow.paramKey] ?? "-";
+      });
+      return rowObj;
+    });
+
+    setColumns(newColumns);
+    setRows(newRows);
+  }, [slicedDataset]);
 
   return (
     <>
-      <h3>Hourly Forecast</h3>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
-          gap: 8,
-        }}
-      >
-        <Autocomplete
-          disablePortal
-          options={imsStations}
-          sx={{ width: 300 }}
-          defaultValue={imsStations[2]}
-          onChange={(event, newValue) => setCity(newValue.id)}
-          renderInput={(params) => <TextField {...params} label="City" />}
+      <DailyForecast dailyCountryForecast={dailyCountryForecast} />
+      <ChooseCityAndPeriodBox>
+        <ChooseCity setCity={setCity} />
+        <PeriodSlider
+          period={chosenTimePeriod}
+          setPeriod={setChosenTimePeriod}
+          minPeriod={6}
         />
-        <Slider
-          valueLabelDisplay="on"
-          valueLabelFormat={(value) => indexToHour(value)}
-          max={93}
-          sx={{ width: 500 }}
-          getAriaLabel={() => "Time Period"}
-          value={period}
-          onChange={handleChange2}
-          disableSwap
+      </ChooseCityAndPeriodBox>
+      <ChartContainerBox>
+        <WeatherChart
+          dataset={slicedDataset}
+          formattedXAxis={formattedXAxis}
+          formattedYAxis={formattedYAxis}
+          forecastChartSeries={forecastChartSeries}
         />
-      </Box>
-      <Box>
-        <LineChart
-          loading={dataset.length === 0}
-          dataset={dataset.slice(period[0], period[1])}
-          xAxis={[
-            {
-              scaleType: "utc",
-              dataKey: "utcTime",
-              label: "Time",
-              valueFormatter: (utcTime) => {
-                const date = new Date(utcTime);
-                const formattedDate = `${date.getDate().toString().padStart(1, "0")}/${date.getMonth().toString().padStart(1, "0") + 1}`;
-                const formattedTime = `${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
-                return `${formattedDate} ${formattedTime}`;
-              },
-            },
-          ]}
-          yAxis={[{ label: "Temperature (°C)" }]}
-          series={[
-            {
-              id: "pastTemp",
-              dataKey: "pastTemp",
-              label: "Today Past (°C)",
-              color: "blue",
-            },
-            {
-              id: "futureTemp",
-              dataKey: "futureTemp",
-              label: "IMS's Forecast (°C)",
-              color: "#02620f",
-            },
-            {
-              id: "OurTemp",
-              dataKey: "OurTemp",
-              label: "WeatherNet's Forecast (°C)",
-              color: "#02b2af",
-            },
-          ]}
-          height={400}
-          margin={{ left: 60, right: 30, top: 30, bottom: 50 }}
-          grid={{ vertical: true, horizontal: true }}
-        />
-      </Box>
+      </ChartContainerBox>
+      <WeatherTable columns={columns} rows={rows} />
     </>
   );
 };

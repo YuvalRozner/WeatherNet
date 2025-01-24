@@ -9,7 +9,7 @@ exports.getImsForecast = onRequest({ region }, (req, res) => {
 
   const cityId = req.query.cityId;
 
-  fetch(`https://ims.gov.il/he/city_portal/${cityId}`)
+  fetch(`https://ims.gov.il/en/city_portal/${cityId}`)
     .then((response) => {
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
