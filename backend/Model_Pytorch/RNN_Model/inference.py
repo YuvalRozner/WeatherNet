@@ -331,10 +331,10 @@ def predict(model, input_window, device='cpu'):
     # Only replace the target column with the scaled prediction
     # Assuming 'T (degC)' is the last column
     dummy = np.zeros((output_scaled_np.shape[0], scaler.mean_.shape[0]))
-    dummy[:, -1] = output_scaled_np[:, 0]
+    dummy[:, 1] = output_scaled_np[:, 0]
 
     # Inverse transform
-    output_original_scale = scaler.inverse_transform(dummy)[:, -1]
+    output_original_scale = scaler.inverse_transform(dummy)[:, 1]
 
     return output_original_scale[0]  # Return as scalar
 

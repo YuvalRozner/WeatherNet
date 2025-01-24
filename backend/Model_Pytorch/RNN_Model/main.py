@@ -83,6 +83,7 @@ def normalize_data(train_data, val_data, scaler_path='./scaler.pkl'):
     return train_data_scaled, val_data_scaled, scaler
 
 if __name__ == "__main__":
+
     # 1) Load your single-station data
     df = pd.read_csv("..\\utils\\jena_climate_2009_2016.csv")
     df = preprocessing_df(df)
@@ -98,13 +99,17 @@ if __name__ == "__main__":
     # 4) Normalize the data
     train_data_scaled, val_data_scaled, scaler = normalize_data(train_data, val_data, scaler_path='./scaler.pkl')
 
+
+
+
     # 5) Create Datasets
-    input_width = 24
+    input_width = 4
     label_width = 1
     shift = 1
     column_indices = {name: i for i, name in enumerate(df.columns)}
     label_columns = [column_indices['T (degC)']]
     
+
     train_dataset = WindowGenerator(train_data_scaled, input_width, label_width, shift, label_columns)
     val_dataset   = WindowGenerator(val_data_scaled,   input_width, label_width, shift, label_columns)
     
@@ -121,7 +126,7 @@ if __name__ == "__main__":
         num_layers=2,
         label_width=label_width
     )
-    epochs_ = 2
+    epochs_ = 20
     # 7) Train
     train_model(
         train_dataset,

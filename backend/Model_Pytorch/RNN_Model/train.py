@@ -47,7 +47,7 @@ def train_model(
         best_val_loss = checkpoint['best_val_loss']
         print(f"Resumed from epoch {start_epoch}, best_val_loss={best_val_loss:.4f}")
     
-    for epoch in range(start_epoch, epochs):
+    for epoch in range(start_epoch, start_epoch + epochs):
         model.train()
         train_losses = []
         
@@ -85,7 +85,7 @@ def train_model(
         
         val_loss = np.mean(val_losses)
         
-        print(f"Epoch {epoch+1}/{epochs} | Train Loss: {train_loss:.4f} | Val Loss: {val_loss:.4f}")
+        print(f"Epoch {epoch+1}/{start_epoch + epochs} | Train Loss: {train_loss:.4f} | Val Loss: {val_loss:.4f}")
         
         # Checkpoint: always save the 'latest'
         torch.save({

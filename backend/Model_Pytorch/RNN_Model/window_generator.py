@@ -110,4 +110,4 @@ def test_window_generator():
 
     print("Test passed!")
 
-test_window_generator()
+#test_window_generator()
