@@ -6,11 +6,13 @@ export const ChooseCityAndPeriodBox = styled(Box)({
   display: "flex",
   flexDirection: "row",
   alignItems: "center",
+  justifyContent: "space-evenly",
   gap: 20,
 });
 
 export const ChartContainerBox = styled(Box)({
-  marginTop: "20px",
+  maxWidth: "90%",
+  // margin: "20px auto 0 auto",
 });
 
 export const DayilyForecastText = styled(Typography)({

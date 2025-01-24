@@ -6,6 +6,7 @@ import {
   generateFormattedYAxis,
   generateForecastChartSeries,
 } from "../../../utils/DataManipulations";
+import { ChartContainerBox } from "./weatherForecast.style";
 
 const WeatherChart = ({ dataset, minValue, maxValue }) => {
   // Generate formatted X Axis using useMemo
@@ -21,7 +22,7 @@ const WeatherChart = ({ dataset, minValue, maxValue }) => {
   const forecastChartSeries = useMemo(() => generateForecastChartSeries(), []);
 
   return (
-    <Box>
+    <ChartContainerBox>
       <LineChart
         loading={dataset.length === 0}
         dataset={dataset}
@@ -32,7 +33,7 @@ const WeatherChart = ({ dataset, minValue, maxValue }) => {
         margin={{ left: 60, right: 30, top: 30, bottom: 50 }}
         grid={{ vertical: true, horizontal: true }}
       />
-    </Box>
+    </ChartContainerBox>
   );
 };
 

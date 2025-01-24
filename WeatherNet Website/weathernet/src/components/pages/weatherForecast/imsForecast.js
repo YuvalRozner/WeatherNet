@@ -73,13 +73,11 @@ const ImsForecast = () => {
           minPeriod={6}
         />
       </ChooseCityAndPeriodBox>
-      <ChartContainerBox>
-        <WeatherChart
-          dataset={slicedDataset}
-          minValue={minValue}
-          maxValue={maxValue}
-        />
-      </ChartContainerBox>
+      <WeatherChart
+        dataset={slicedDataset}
+        minValue={minValue}
+        maxValue={maxValue}
+      />
       <WeatherTable dataset={slicedDataset} />
     </>
   );
