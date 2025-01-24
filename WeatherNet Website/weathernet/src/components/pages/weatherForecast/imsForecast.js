@@ -29,13 +29,11 @@ const ImsForecast = () => {
   const [dataJson, setDataJson] = useState(null);
   const [dataset, setDataset] = useState([]);
   const [slicedDataset, setSlicedDataset] = useState([]);
-  const [city, setCity] = useState(3);
+  const [city, setCity] = useState(3); // default city is 3 (Haifa)
   const [chosenTimePeriod, setChosenTimePeriod] = useState([6, 32]);
+  const [dailyCountryForecast, setDailyCountryForecast] = useState("");
   const [minValue, setMinValue] = useState(null);
   const [maxValue, setMaxValue] = useState(null);
-  const [columns, setColumns] = useState([]);
-  const [rows, setRows] = useState([]);
-  const [dailyCountryForecast, setDailyCountryForecast] = useState("");
 
   useEffect(() => {
     // Get IMS forecast data when city is changed
@@ -64,55 +62,6 @@ const ImsForecast = () => {
     setSlicedDataset(tempSlicedDataset);
   }, [dataset, chosenTimePeriod]);
 
-  // Generate formatted X Axis using useMemo
-  const formattedXAxis = useMemo(() => generateFormattedXAxis(), []);
-
-  // Generate formatted Y Axis using useMemo
-  const formattedYAxis = useMemo(
-    () => generateFormattedYAxis(minValue, maxValue),
-    [minValue, maxValue]
-  );
-
-  // Generate forecast chart series using useMemo
-  const forecastChartSeries = useMemo(() => generateForecastChartSeries(), []);
-
-  // Build columns & rows for the transposed table
-  useEffect(() => {
-    if (slicedDataset.length === 0) {
-      setColumns([]);
-      setRows([]);
-      return;
-    }
-
-    const newColumns = [
-      { id: "parameter", label: "Parameter", minWidth: 170 },
-      ...slicedDataset.map((item, index) => ({
-        id: `time-${index}`,
-        label: item.formattedTime,
-        minWidth: 60,
-      })),
-    ];
-
-    const paramRows = [
-      { parameter: "Temperature (°C)", paramKey: "ImsTemp" },
-      { parameter: "Rain Chance (%)", paramKey: "rain_chance" },
-      { parameter: "Wave Height (m)", paramKey: "wave_height" },
-      { parameter: "Relative Humidity (%)", paramKey: "relative_humidity" },
-      { parameter: "Wind Speed (km/h)", paramKey: "wind_speed" },
-    ];
-
-    const newRows = paramRows.map((pRow) => {
-      const rowObj = { parameter: pRow.parameter };
-      slicedDataset.forEach((item, idx) => {
-        rowObj[`time-${idx}`] = item[pRow.paramKey] ?? "-";
-      });
-      return rowObj;
-    });
-
-    setColumns(newColumns);
-    setRows(newRows);
-  }, [slicedDataset]);
-
   return (
     <>
       <DailyForecast dailyCountryForecast={dailyCountryForecast} />
@@ -127,12 +76,11 @@ const ImsForecast = () => {
       <ChartContainerBox>
         <WeatherChart
           dataset={slicedDataset}
-          formattedXAxis={formattedXAxis}
-          formattedYAxis={formattedYAxis}
-          forecastChartSeries={forecastChartSeries}
+          minValue={minValue}
+          maxValue={maxValue}
         />
       </ChartContainerBox>
-      <WeatherTable columns={columns} rows={rows} />
+      <WeatherTable dataset={slicedDataset} />
     </>
   );
 };

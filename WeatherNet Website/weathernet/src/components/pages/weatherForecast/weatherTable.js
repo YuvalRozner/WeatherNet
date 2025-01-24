@@ -7,8 +7,49 @@ import {
   TableRow,
 } from "@mui/material";
 import TableContainer from "@mui/material/TableContainer";
+import { useEffect, useState } from "react";
 
-const WeatherTable = ({ columns, rows }) => {
+const WeatherTable = ({ dataset }) => {
+  const [columns, setColumns] = useState([]);
+  const [rows, setRows] = useState([]);
+
+  // Build columns & rows for the transposed table
+  useEffect(() => {
+    if (dataset.length === 0) {
+      setColumns([]);
+      setRows([]);
+      return;
+    }
+
+    const newColumns = [
+      { id: "parameter", label: "Parameter", minWidth: 170 },
+      ...dataset.map((item, index) => ({
+        id: `time-${index}`,
+        label: item.formattedTime,
+        minWidth: 60,
+      })),
+    ];
+
+    const paramRows = [
+      { parameter: "Temperature (°C)", paramKey: "ImsTemp" },
+      { parameter: "Rain Chance (%)", paramKey: "rain_chance" },
+      { parameter: "Wave Height (m)", paramKey: "wave_height" },
+      { parameter: "Relative Humidity (%)", paramKey: "relative_humidity" },
+      { parameter: "Wind Speed (km/h)", paramKey: "wind_speed" },
+    ];
+
+    const newRows = paramRows.map((pRow) => {
+      const rowObj = { parameter: pRow.parameter };
+      dataset.forEach((item, idx) => {
+        rowObj[`time-${idx}`] = item[pRow.paramKey] ?? "-";
+      });
+      return rowObj;
+    });
+
+    setColumns(newColumns);
+    setRows(newRows);
+  }, [dataset]);
+
   return (
     <TableContainer sx={{ maxHeight: 400 }}>
       <Table stickyHeader aria-label="sticky table">
