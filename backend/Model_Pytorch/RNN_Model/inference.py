@@ -12,6 +12,7 @@ from parameters import PARAMS, WINDOW_PARAMS, LSTM_MODEL_PARAMS
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 
+from backend.Model_Pytorch.common.window_generator import WindowGenerator
 
 # inference.py
 
@@ -52,7 +53,7 @@ def load_data_and_preprocess(data_path, target_column):
     return df, target_index
 
 
-def load_window(data_np, window_size, label_width, scaler, target_column_index=1, idx=0):
+def load_window(data_np, window_size, shift, label_width, scaler, target_column_index=1, idx=0):
     # Calculate the number of possible windows
     total_windows = len(data_np) - window_size - 1  # -1 for target
     if total_windows < 1:
@@ -60,7 +61,7 @@ def load_window(data_np, window_size, label_width, scaler, target_column_index=1
 
     # Extract the window and actual target
     window = data_np[idx:idx + window_size, :]  # shape (window_size, in_channels)
-    actual_target = data_np[idx + window_size:idx + window_size + label_width, target_column_index]  # shape (1,)
+    actual_target = data_np[idx + window_size + shift:idx + window_size + label_width + shift, target_column_index]  # shape (1,)
     # Normalize the window
     window_scaled = scaler.transform(window)
     # Convert to torch.Tensor and reshape to (1, window_size, in_channels)
@@ -116,6 +117,7 @@ if __name__ == "__main__":
     checkpoint_path = os.path.join(os.path.dirname(__file__),'output','checkpoints', 'best_checkpoint.pth')
     window_size = WINDOW_PARAMS['input_width']  # Must match input_width used during training
     target_column = WINDOW_PARAMS['label_columns'][0]  # Ensure this matches your dataset
+    shift = WINDOW_PARAMS['shift']
     prediction_mode = 'train'  # Options: 'single', 'train'
     ## single parameters
     index = 500  # index for single
@@ -146,7 +148,7 @@ if __name__ == "__main__":
     actual_temps = []
 
     if prediction_mode == 'single':
-        scaled_window, actual_temp = load_window(data_np=df.values, window_size=window_size,
+        scaled_window, actual_temp = load_window(data_np=df.values, window_size=window_size, shift=shift,
                                                  label_width=model_params['label_width'],
                                                  scaler=scaler, target_column_index=target_index, idx=index)
         y_pred = predict(model, scaled_window, target_index, device=device)
@@ -159,7 +161,8 @@ if __name__ == "__main__":
         end = len(val_data_scaled) - window_size if stop_after == -1 else min(len(val_data_scaled) - window_size,
                                                                               stop_after)
         for i in tqdm(range(0, end,model_params['label_width']), desc="Predicting"):
-            scaled_window, actual_temp = load_window(data_np=val_data_scaled,window_size=window_size,label_width=model_params['label_width'],
+            scaled_window, actual_temp = load_window(data_np=val_data_scaled,window_size=window_size, shift=shift,
+                                                     label_width=model_params['label_width'],
                                                      scaler=scaler, target_column_index=target_index, idx=i)
             y_pred = predict(model, scaled_window, target_index, device=device)
             predictions.append(y_pred)
