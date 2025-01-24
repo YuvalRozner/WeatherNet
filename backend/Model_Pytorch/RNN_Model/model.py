@@ -33,8 +33,8 @@ class LSTMModel(nn.Module):
             batch_first=True
         )
         
-        # Final linear layer to produce a single output (or label_width outputs)
-        self.fc_out = nn.Linear(hidden_dim, 1)
+        # Final linear layer to produce a label_width outputs
+        self.fc_out = nn.Linear(hidden_dim, label_width)
         
     def forward(self, x):
         """
