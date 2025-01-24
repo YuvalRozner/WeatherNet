@@ -99,6 +99,74 @@ def preprocessing_df(df):
     return df
 
 
+def load_i_window(data_path, window_size, scaler, target_column='T (degC)', idx=42):
+    """
+    Load data, preprocess, normalize, and extract a random window and its actual target for inference.
+
+    Args:
+        data_path (str): Path to the CSV data file.
+        window_size (int): Number of time steps in the input window.
+        scaler (StandardScaler): Fitted scaler for data normalization.
+        target_column (str): Name of the target column.
+        seed (int): Seed for random number generator.
+
+    Returns:
+        torch.Tensor: Random window of shape (1, window_size, in_channels).
+        float: Actual temperature corresponding to the window.
+    """
+    import random
+
+    # Set the random seed for reproducibility
+
+    # Load data
+    if not os.path.exists(data_path):
+        raise FileNotFoundError(f"Data file not found at {data_path}")
+
+    df = pd.read_csv(data_path)
+    print(f"Data loaded from {data_path}")
+
+    # Preprocess data
+    df = preprocessing_df(df)
+    print("Data preprocessing completed.")
+
+    # Convert to numpy array
+    data_np = df.values  # shape (T, in_channels)
+    print(f"Data shape after preprocessing: {data_np.shape}")
+
+    # Find the index of the target column
+    try:
+        target_index = df.columns.get_loc(target_column)
+    except KeyError:
+        raise KeyError(f"Target column '{target_column}' not found in the data.")
+
+    # Calculate the number of possible windows
+    total_windows = len(data_np) - window_size - 1  # -1 for target
+    if total_windows < 1:
+        raise ValueError(f"Not enough data points ({len(data_np)}) for window size {window_size} and target.")
+
+    # Select a random window index
+    
+    print(f"Selected window index: {idx}")
+
+    # Extract the window and actual target
+    window = data_np[idx:idx + window_size, :]  # shape (window_size, in_channels)
+    actual_target = data_np[idx + window_size, target_index]  # shape (1,)
+
+    print(f"window shape: {window.shape}")
+    print(f"Actual target temperature: {actual_target}")
+
+    # Normalize the window
+    window_scaled = scaler.transform(window)
+    print("Random window normalized.")
+
+    # Convert to torch.Tensor and reshape to (1, window_size, in_channels)
+    window_tensor = torch.tensor(window_scaled, dtype=torch.float32).unsqueeze(0)
+    print(f"Random window reshaped for model input: {window_tensor.shape}")
+
+    return window_tensor, actual_target
+
+
+
 def load_random_window(data_path, window_size, scaler, target_column='T (degC)', seed=42):
     """
     Load data, preprocess, normalize, and extract a random window and its actual target for inference.
@@ -454,9 +522,36 @@ if __name__ == "__main__":
     scaler = load_scaler(scaler_path=scaler_path)
 
     # Choose prediction mode: 'single', 'random', or 'batch'
-    prediction_mode = 'random'  # Options: 'single', 'random', 'batch'
+    prediction_mode = 'week'  # Options: 'single', 'random', 'batch'
+    j = 50
+    if prediction_mode == 'week':
+        actual_temps = []
+        predictions = []
+        for i in range(0, 7):
+            # Load a random window and its actual temperature
+            window, actual_temp = load_i_window(data_path, window_size, scaler, target_column, idx=j)
 
-    if prediction_mode == 'single':
+            # Make prediction on the random window
+            y_pred = predict(model, window, device=device)
+
+            # Print both predicted and actual temperatures
+            print(f"Random Window Prediction:")
+            print(f"Predicted temperature (°C): {y_pred:.2f}")
+            print(f"Actual temperature (°C): {actual_temp:.2f}")
+            actual_temps.append(actual_temp)
+            predictions.append(y_pred)
+            j += 1
+        #create a graph
+        import matplotlib.pyplot as plt
+        plt.scatter(range(len(actual_temps)), actual_temps, label='Actual', color='blue')
+        plt.scatter(range(len(predictions)), predictions, label='Predicted', color='red')
+        plt.xlabel('Days')
+        plt.ylabel('Temperature (°C)')
+        plt.title('Temperature Prediction for the next week')
+        plt.legend()
+        plt.show()
+
+    elif prediction_mode == 'single':
         # Load the last window and actual temperature for single prediction
         last_window_scaled, actual_temp = load_last_window(data_path, window_size, scaler, target_column)
 

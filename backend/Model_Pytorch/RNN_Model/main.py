@@ -99,9 +99,6 @@ if __name__ == "__main__":
     # 4) Normalize the data
     train_data_scaled, val_data_scaled, scaler = normalize_data(train_data, val_data, scaler_path='./scaler.pkl')
 
-
-
-
     # 5) Create Datasets
     input_width = 4
     label_width = 1
@@ -109,7 +106,6 @@ if __name__ == "__main__":
     column_indices = {name: i for i, name in enumerate(df.columns)}
     label_columns = [column_indices['T (degC)']]
     
-
     train_dataset = WindowGenerator(train_data_scaled, input_width, label_width, shift, label_columns)
     val_dataset   = WindowGenerator(val_data_scaled,   input_width, label_width, shift, label_columns)
     
