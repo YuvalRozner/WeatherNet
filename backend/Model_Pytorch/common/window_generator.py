@@ -81,12 +81,14 @@ class WindowGenerator(Dataset):
             f'Shift: {self.shift}',
             f'Label columns indices: {self.label_columns}'
         ])
+    
 def test_window_generator():
     # Sample data: 100 time steps, 3 features
     data = np.arange(300).reshape(100, 3)
+    print(data)
     input_width = 24
-    label_width = 1
-    shift = 1
+    label_width = 1 # not suppost to change this in this test
+    shift = 2
     label_columns = [2]  # Assuming we're predicting the third feature
 
     dataset = WindowGenerator(
@@ -106,7 +108,7 @@ def test_window_generator():
     print("Label value:", y.item())  # Expected: data[24, 2]
 
     # Verify alignment
-    assert y.item() == data[24, 2], "Label alignment incorrect!"
+    assert y.item() == data[input_width+shift-1, label_columns[0]], "Label alignment incorrect!"
 
     print("Test passed!")
 
