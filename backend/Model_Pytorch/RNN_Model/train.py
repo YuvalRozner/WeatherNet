@@ -6,6 +6,7 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
 import numpy as np
+from tqdm import tqdm
 
 def train_model(
     train_dataset,
@@ -21,8 +22,6 @@ def train_model(
     # DataLoaders
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
     val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
-    
-    # Check if GPU is available and set device accordingly
 
     # Move model to device
     model = model.to(device)
@@ -51,7 +50,7 @@ def train_model(
         model.train()
         train_losses = []
         
-        for x_batch, y_batch in train_loader:
+        for x_batch, y_batch in tqdm(train_loader, desc=f"Epoch {epoch+1}/{start_epoch + epochs}"):
             x_batch = x_batch.to(device)  # (batch, seq_len, in_channels)
             y_batch = y_batch.to(device)  # (batch, label_width, num_label_features) or (batch, 1, 1)
             
