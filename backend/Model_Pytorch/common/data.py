@@ -14,6 +14,7 @@ def preprocessing_tensor_df(df):
     """
     Apply the same preprocessing steps as during training.
     """
+    print("preproccessing data...")
     # Slice the DataFrame and create a copy to avoid SettingWithCopyWarning
     df = df[5::6].copy()
     date_time = pd.to_datetime(df.pop('Date Time'), format='%d.%m.%Y %H:%M:%S')

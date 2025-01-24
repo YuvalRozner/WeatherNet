@@ -3,29 +3,16 @@
 import torch
 import numpy as np
 import pandas as pd
-from torch.utils.data import DataLoader
 
 from model import LSTMModel
-from window_generator import WindowGenerator
-from sklearn.preprocessing import StandardScaler
+from backend.Model_Pytorch.common.data import preprocessing_tensor_df
 import pickle
 import os
-import csv
+from  parameters import PARAMS, WINDOW_PARAMS, LSTM_MODEL_PARAMS
+from tqdm import tqdm
+import matplotlib.pyplot as plt
 
 # inference.py
-
-import torch
-import numpy as np
-import pandas as pd
-from torch.utils.data import DataLoader
-
-from model import LSTMModel
-from window_generator import WindowGenerator
-from sklearn.preprocessing import StandardScaler
-import pickle
-import os
-import csv
-
 
 def load_scaler(scaler_path='./scaler.pkl'):
     """
@@ -56,325 +43,43 @@ def load_model_for_inference(checkpoint_path, model_params, device='cpu'):
     print(f"Model loaded from {checkpoint_path}")
     return model
 
-
-def preprocessing_df(df):
-    """
-    Apply the same preprocessing steps as during training.
-    """
-    # Slice the DataFrame and create a copy to avoid SettingWithCopyWarning
-    df = df[5::6].copy()
-    date_time = pd.to_datetime(df.pop('Date Time'), format='%d.%m.%Y %H:%M:%S')
-
-    # Handle 'wv (m/s)'
-    wv = df['wv (m/s)']
-    bad_wv = wv == -9999.0
-    df.loc[bad_wv, 'wv (m/s)'] = 0.0  # Use .loc to modify the original DataFrame
-    wv = df.pop('wv (m/s)')
-
-    # Handle 'max. wv (m/s)'
-    max_wv = df['max. wv (m/s)']
-    bad_max_wv = max_wv == -9999.0
-    df.loc[bad_max_wv, 'max. wv (m/s)'] = 0.0  # Use .loc to modify the original DataFrame
-    max_wv = df.pop('max. wv (m/s)')
-
-    # Convert to radians.
-    wd_rad = df.pop('wd (deg)') * np.pi / 180
-
-    # Calculate wind x and y components using .loc
-    df.loc[:, 'Wx'] = wv * np.cos(wd_rad)
-    df.loc[:, 'Wy'] = wv * np.sin(wd_rad)
-    df.loc[:, 'max Wx'] = max_wv * np.cos(wd_rad)
-    df.loc[:, 'max Wy'] = max_wv * np.sin(wd_rad)
-
-    # Time-based features
-    timestamp_s = date_time.map(pd.Timestamp.timestamp)
-    day = 24 * 60 * 60
-    year = 365.2425 * day
-
-    df.loc[:, 'Day sin'] = np.sin(timestamp_s * (2 * np.pi / day))
-    df.loc[:, 'Day cos'] = np.cos(timestamp_s * (2 * np.pi / day))
-    df.loc[:, 'Year sin'] = np.sin(timestamp_s * (2 * np.pi / year))
-    df.loc[:, 'Year cos'] = np.cos(timestamp_s * (2 * np.pi / year))
-
-    return df
-
-
-def load_i_window(data_path, window_size, scaler, target_column='T (degC)', idx=42):
-    """
-    Load data, preprocess, normalize, and extract a random window and its actual target for inference.
-
-    Args:
-        data_path (str): Path to the CSV data file.
-        window_size (int): Number of time steps in the input window.
-        scaler (StandardScaler): Fitted scaler for data normalization.
-        target_column (str): Name of the target column.
-        seed (int): Seed for random number generator.
-
-    Returns:
-        torch.Tensor: Random window of shape (1, window_size, in_channels).
-        float: Actual temperature corresponding to the window.
-    """
-    import random
-
-    # Set the random seed for reproducibility
-
-    # Load data
-    if not os.path.exists(data_path):
-        raise FileNotFoundError(f"Data file not found at {data_path}")
-
+def load_data_and_preprocess(data_path, target_column):
     df = pd.read_csv(data_path)
-    print(f"Data loaded from {data_path}")
+    df = preprocessing_tensor_df(df)
+    target_index = df.columns.get_loc(target_column)
+    return df, target_index
 
-    # Preprocess data
-    df = preprocessing_df(df)
-    print("Data preprocessing completed.")
-
-    # Convert to numpy array
-    data_np = df.values  # shape (T, in_channels)
-    print(f"Data shape after preprocessing: {data_np.shape}")
-
-    # Find the index of the target column
-    try:
-        target_index = df.columns.get_loc(target_column)
-    except KeyError:
-        raise KeyError(f"Target column '{target_column}' not found in the data.")
-
+def load_window(data_np, scaler, target_column_index=1 , idx=0, print = False):
     # Calculate the number of possible windows
     total_windows = len(data_np) - window_size - 1  # -1 for target
     if total_windows < 1:
         raise ValueError(f"Not enough data points ({len(data_np)}) for window size {window_size} and target.")
 
-    # Select a random window index
-    
-    print(f"Selected window index: {idx}")
+    if print:
+        print(f"Selected window index: {idx}")
 
     # Extract the window and actual target
     window = data_np[idx:idx + window_size, :]  # shape (window_size, in_channels)
-    actual_target = data_np[idx + window_size, target_index]  # shape (1,)
+    actual_target = data_np[idx + window_size, target_column_index]  # shape (1,)
 
-    print(f"window shape: {window.shape}")
-    print(f"Actual target temperature: {actual_target}")
-
-    # Normalize the window
-    window_scaled = scaler.transform(window)
-    print("Random window normalized.")
-
-    # Convert to torch.Tensor and reshape to (1, window_size, in_channels)
-    window_tensor = torch.tensor(window_scaled, dtype=torch.float32).unsqueeze(0)
-    print(f"Random window reshaped for model input: {window_tensor.shape}")
-
-    return window_tensor, actual_target
-
-
-
-def load_random_window(data_path, window_size, scaler, target_column='T (degC)', seed=42):
-    """
-    Load data, preprocess, normalize, and extract a random window and its actual target for inference.
-
-    Args:
-        data_path (str): Path to the CSV data file.
-        window_size (int): Number of time steps in the input window.
-        scaler (StandardScaler): Fitted scaler for data normalization.
-        target_column (str): Name of the target column.
-        seed (int): Seed for random number generator.
-
-    Returns:
-        torch.Tensor: Random window of shape (1, window_size, in_channels).
-        float: Actual temperature corresponding to the window.
-    """
-    import random
-
-    # Set the random seed for reproducibility
-    random.seed(seed)
-    np.random.seed(seed)
-    torch.manual_seed(seed)
-
-    # Load data
-    if not os.path.exists(data_path):
-        raise FileNotFoundError(f"Data file not found at {data_path}")
-
-    df = pd.read_csv(data_path)
-    print(f"Data loaded from {data_path}")
-
-    # Preprocess data
-    df = preprocessing_df(df)
-    print("Data preprocessing completed.")
-
-    # Convert to numpy array
-    data_np = df.values  # shape (T, in_channels)
-    print(f"Data shape after preprocessing: {data_np.shape}")
-
-    # Find the index of the target column
-    try:
-        target_index = df.columns.get_loc(target_column)
-    except KeyError:
-        raise KeyError(f"Target column '{target_column}' not found in the data.")
-
-    # Calculate the number of possible windows
-    total_windows = len(data_np) - window_size - 1  # -1 for target
-    if total_windows < 1:
-        raise ValueError(f"Not enough data points ({len(data_np)}) for window size {window_size} and target.")
-
-    # Select a random window index
-    random_idx = random.randint(0, total_windows - 1)
-    print(f"Selected random window index: {random_idx}")
-
-    # Extract the window and actual target
-    window = data_np[random_idx:random_idx + window_size, :]  # shape (window_size, in_channels)
-    actual_target = data_np[random_idx + window_size, target_index]  # shape (1,)
-
-    print(f"Random window shape: {window.shape}")
-    print(f"Actual target temperature: {actual_target}")
+    if print:
+        print(f"window shape: {window.shape}")
+        print(f"Actual target temperature: {actual_target}")
 
     # Normalize the window
     window_scaled = scaler.transform(window)
-    print("Random window normalized.")
+    if print:
+        print("Random window normalized.")
 
     # Convert to torch.Tensor and reshape to (1, window_size, in_channels)
     window_tensor = torch.tensor(window_scaled, dtype=torch.float32).unsqueeze(0)
-    print(f"Random window reshaped for model input: {window_tensor.shape}")
+    if print:
+        print(f"Random window reshaped for model input: {window_tensor.shape}")
 
     return window_tensor, actual_target
 
-
-def load_last_window(data_path, window_size, scaler, target_column='T (degC)'):
-    """
-    Load data, preprocess, normalize, and extract the last window and its actual target for inference.
-
-    Args:
-        data_path (str): Path to the CSV data file.
-        window_size (int): Number of time steps in the input window.
-        scaler (StandardScaler): Fitted scaler for data normalization.
-        target_column (str): Name of the target column.
-
-    Returns:
-        torch.Tensor: Last window of shape (1, window_size, in_channels).
-        float: Actual temperature corresponding to the window.
-    """
-    # Load data
-    if not os.path.exists(data_path):
-        raise FileNotFoundError(f"Data file not found at {data_path}")
-
-    df = pd.read_csv(data_path)
-    print(f"Data loaded from {data_path}")
-
-    # Preprocess data
-    df = preprocessing_df(df)
-    print("Data preprocessing completed.")
-
-    # Convert to numpy array
-    data_np = df.values  # shape (T, in_channels)
-    print(f"Data shape after preprocessing: {data_np.shape}")
-
-    # Find the index of the target column
-    try:
-        target_index = df.columns.get_loc(target_column)
-    except KeyError:
-        raise KeyError(f"Target column '{target_column}' not found in the data.")
-
-    # Check if there are enough data points for window and target
-    if len(data_np) < window_size + 1:
-        raise ValueError(f"Not enough data points ({len(data_np)}) for window size {window_size} and target.")
-
-    # Extract the last window and the actual target
-    last_window = data_np[-(window_size + 1):-1, :]  # shape (window_size, in_channels)
-    actual_target = data_np[-1, target_index]  # shape (1,)
-
-    print(f"Last window shape: {last_window.shape}")
-    print(f"Actual target temperature: {actual_target}")
-
-    # Normalize the last window
-    last_window_scaled = scaler.transform(last_window)
-    print("Last window normalized.")
-
-    # Convert to torch.Tensor and reshape to (1, window_size, in_channels)
-    last_window_tensor = torch.tensor(last_window_scaled, dtype=torch.float32).unsqueeze(0)
-    print(f"Last window reshaped for model input: {last_window_tensor.shape}")
-
-    return last_window_tensor, actual_target
-
-
-def load_windows(data_path, window_size, scaler, target_column='T (degC)'):
-    """
-    Load data, preprocess, normalize, and extract all windows and their actual targets for inference.
-
-    Args:
-        data_path (str): Path to the CSV data file.
-        window_size (int): Number of time steps in the input window.
-        scaler (StandardScaler): Fitted scaler for data normalization.
-        target_column (str): Name of the target column.
-
-    Returns:
-        list of torch.Tensor: List of windows, each of shape (1, window_size, in_channels).
-        list of float: List of actual temperatures corresponding to each window.
-    """
-    # Load data
-    if not os.path.exists(data_path):
-        raise FileNotFoundError(f"Data file not found at {data_path}")
-
-    df = pd.read_csv(data_path)
-    print(f"Data loaded from {data_path}")
-
-    # Preprocess data
-    df = preprocessing_df(df)
-    print("Data preprocessing completed.")
-
-    # Convert to numpy array
-    data_np = df.values  # shape (T, in_channels)
-    print(f"Data shape after preprocessing: {data_np.shape}")
-
-    # Find the index of the target column
-    try:
-        target_index = df.columns.get_loc(target_column)
-    except KeyError:
-        raise KeyError(f"Target column '{target_column}' not found in the data.")
-
-    # Check if there are enough data points for at least one window and target
-    if len(data_np) < window_size + 1:
-        raise ValueError(f"Not enough data points ({len(data_np)}) for window size {window_size} and target.")
-
-    windows = []
-    actuals = []
-
-    for i in range(len(data_np) - window_size):
-        window = data_np[i:i + window_size, :]
-        target = data_np[i + window_size, target_index]
-
-        # Normalize the window
-        window_scaled = scaler.transform(window)
-        window_tensor = torch.tensor(window_scaled, dtype=torch.float32).unsqueeze(
-            0)  # Shape: (1, window_size, in_channels)
-
-        windows.append(window_tensor)
-        actuals.append(target)
-
-    print(f"Total windows loaded: {len(windows)}")
-
-    return windows, actuals
-
-
 @torch.no_grad()
-def predict_batch(model, windows, device='cpu'):
-    """
-    Perform batch predictions.
-
-    Args:
-        model (torch.nn.Module): Trained LSTM model.
-        windows (list of torch.Tensor): List of input windows, each of shape (1, seq_len, in_channels).
-        device (str): Device to perform inference on.
-
-    Returns:
-        list of float: Predicted temperatures in original scale (°C).
-    """
-    predictions = []
-    for window in windows:
-        pred = predict(model, window, device)
-        predictions.append(pred)
-    return predictions
-
-
-@torch.no_grad()
-def predict(model, input_window, device='cpu'):
+def predict(model, input_window,target_column_index, device='cpu'):
     """
     Perform prediction on a single input window.
 
@@ -394,226 +99,85 @@ def predict(model, input_window, device='cpu'):
     # Convert to numpy
     output_scaled_np = output_scaled.squeeze(-1).cpu().numpy().reshape(-1, 1)  # Shape: (batch_size, 1)
 
-    # Inverse transform to get original scale
-    # Create a dummy array with the same number of features as the scaler expects
-    # Only replace the target column with the scaled prediction
-    # Assuming 'T (degC)' is the last column
     dummy = np.zeros((output_scaled_np.shape[0], scaler.mean_.shape[0]))
-    dummy[:, 1] = output_scaled_np[:, 0]
+    dummy[:, target_column_index] = output_scaled_np[:, 0]
 
     # Inverse transform
-    output_original_scale = scaler.inverse_transform(dummy)[:, 1]
+    output_original_scale = scaler.inverse_transform(dummy)[:, target_column_index]
 
     return output_original_scale[0]  # Return as scalar
 
-
-def load_random_window(data_path, window_size, scaler, target_column='T (degC)', seed=42):
-    """
-    Load data, preprocess, normalize, and extract a random window and its actual target for inference.
-
-    Args:
-        data_path (str): Path to the CSV data file.
-        window_size (int): Number of time steps in the input window.
-        scaler (StandardScaler): Fitted scaler for data normalization.
-        target_column (str): Name of the target column.
-        seed (int): Seed for random number generator.
-
-    Returns:
-        torch.Tensor: Random window of shape (1, window_size, in_channels).
-        float: Actual temperature corresponding to the window.
-    """
-    import random
-
-    # Set the random seed for reproducibility
-    random.seed(seed)
-    np.random.seed(seed)
-    torch.manual_seed(seed)
-
-    # Load data
-    if not os.path.exists(data_path):
-        raise FileNotFoundError(f"Data file not found at {data_path}")
-
-    df = pd.read_csv(data_path)
-    print(f"Data loaded from {data_path}")
-
-    # Preprocess data
-    df = preprocessing_df(df)
-    print("Data preprocessing completed.")
-
-    # Convert to numpy array
+def get_val_data_scaled(df, scalar):
     data_np = df.values  # shape (T, in_channels)
-    print(f"Data shape after preprocessing: {data_np.shape}")
-
-    # Find the index of the target column
-    try:
-        target_index = df.columns.get_loc(target_column)
-    except KeyError:
-        raise KeyError(f"Target column '{target_column}' not found in the data.")
-
-    # Calculate the number of possible windows
-    total_windows = len(data_np) - window_size - 1  # -1 for target
-    if total_windows < 1:
-        raise ValueError(f"Not enough data points ({len(data_np)}) for window size {window_size} and target.")
-
-    # Select a random window index
-    random_idx = random.randint(0, total_windows - 1)
-    print(f"Selected random window index: {random_idx}")
-
-    # Extract the window and actual target
-    window = data_np[random_idx:random_idx + window_size, :]  # shape (window_size, in_channels)
-    actual_target = data_np[random_idx + window_size, target_index]  # shape (1,)
-
-    print(f"Random window shape: {window.shape}")
-    print(f"Actual target temperature: {actual_target}")
-
-    # Normalize the window
-    window_scaled = scaler.transform(window)
-    print("Random window normalized.")
-
-    # Convert to torch.Tensor and reshape to (1, window_size, in_channels)
-    window_tensor = torch.tensor(window_scaled, dtype=torch.float32).unsqueeze(0)
-    print(f"Random window reshaped for model input: {window_tensor.shape}")
-
-    return window_tensor, actual_target
-
-
-def save_predictions(predictions, actuals, output_path='predictions.csv'):
-    """
-    Save predictions and actual temperatures to a CSV file.
-
-    Args:
-        predictions (list of float): Predicted temperatures.
-        actuals (list of float): Actual temperatures.
-        output_path (str): Path to save the CSV file.
-    """
-    with open(output_path, mode='w', newline='') as file:
-        writer = csv.writer(file)
-        writer.writerow(['Prediction (°C)', 'Actual (°C)'])
-        for pred, actual in zip(predictions, actuals):
-            writer.writerow([f"{pred:.2f}", f"{actual:.2f}"])
-    print(f"Predictions saved to {output_path}")
-
+    train_size = int(0.8 * len(data_np))
+    val_data = data_np[train_size:]
+    val_data_scaled = scalar.transform(val_data)
+    return val_data_scaled
 
 if __name__ == "__main__":
     # Define parameters directly in main
-    data_path = "../utils/jena_climate_2009_2016.csv"  # Adjust the path as needed
+    data_path = PARAMS['filePah']  # Adjust the path as needed
     scaler_path = './scaler.pkl'
     checkpoint_path = "./checkpoints/best_checkpoint.pth"
-    window_size = 24  # Must match input_width used during training
-    target_column = 'T (degC)'  # Ensure this matches your dataset
-    output_csv = 'predictions.csv'  # Path to save predictions
-    seed = 80  # Seed for random window selection
+    window_size = WINDOW_PARAMS['input_width']  # Must match input_width used during training
+    target_column = WINDOW_PARAMS['label_columns'][0]  # Ensure this matches your dataset
+    prediction_mode = 'train'  # Options: 'single', 'train'
+    ## single parameters
+    index = 500 # index for single
 
+    ## train parameters
+    stop_after = 30 # if you dont want to stop set to -1
+    show_examples = 30 # how many examples to plot
+    plot = True
+    if show_examples > stop_after:
+        raise RuntimeError("show_examples needs to be lower then stop_after")
+    
     # Define model parameters
     model_params = {
         "in_channels": 19,  # Must match your data's feature count
-        "hidden_dim": 64,
-        "num_layers": 2,
+        "hidden_dim": LSTM_MODEL_PARAMS['hidden_dim'],
+        "num_layers": LSTM_MODEL_PARAMS['num_layers'],
         "label_width": 1,
     }
+    df, target_index = load_data_and_preprocess(data_path, target_column)
 
-    # Determine device
-    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'    # Determine device
 
-    # Load model
-    model = load_model_for_inference(checkpoint_path, model_params, device=device)
+    model = load_model_for_inference(checkpoint_path, model_params, device=device)     # Load model
 
-    # Load scaler
-    scaler = load_scaler(scaler_path=scaler_path)
+    scaler = load_scaler(scaler_path=scaler_path)   # Load scaler
 
-    # Choose prediction mode: 'single', 'random', or 'batch'
-    prediction_mode = 'week'  # Options: 'single', 'random', 'batch'
-    j = 50
-    if prediction_mode == 'week':
-        actual_temps = []
-        predictions = []
-        for i in range(0, 7):
-            # Load a random window and its actual temperature
-            window, actual_temp = load_i_window(data_path, window_size, scaler, target_column, idx=j)
+    predictions = []
+    actual_temps = []
 
-            # Make prediction on the random window
-            y_pred = predict(model, window, device=device)
-
-            # Print both predicted and actual temperatures
-            print(f"Random Window Prediction:")
-            print(f"Predicted temperature (°C): {y_pred:.2f}")
-            print(f"Actual temperature (°C): {actual_temp:.2f}")
-            actual_temps.append(actual_temp)
+    if prediction_mode == 'single':
+        scaled_window, actual_temp = load_window(data_np=df.values, scaler=scaler, target_column_index=target_index , idx=index, print = False)
+        y_pred = predict(model,scaled_window, target_index, device=device)
+        print(f"Predicted temperature (°C): {y_pred:.2f}")
+        print(f"Actual temperature (°C): {actual_temp:.2f}")
+    elif prediction_mode == 'train':
+        # for each of val_data_scaled check prediction against actual
+        val_data_scaled = get_val_data_scaled(df, scaler)
+        
+        end = len(val_data_scaled) - window_size if stop_after == -1 else min(len(val_data_scaled) - window_size,stop_after)
+        for i in tqdm(range(0, end), desc="Predicting"):
+            scaled_window, actual_temp = load_window(val_data_scaled, scaler, target_index, idx=i)
+            y_pred = predict(model, scaled_window, target_index, device=device)
             predictions.append(y_pred)
-            j += 1
-        #create a graph
-        import matplotlib.pyplot as plt
-        plt.scatter(range(len(actual_temps)), actual_temps, label='Actual', color='blue')
-        plt.scatter(range(len(predictions)), predictions, label='Predicted', color='red')
-        plt.xlabel('Days')
-        plt.ylabel('Temperature (°C)')
-        plt.title('Temperature Prediction for the next week')
-        plt.legend()
-        plt.show()
+            actual_temps.append(actual_temp)
 
-    elif prediction_mode == 'single':
-        # Load the last window and actual temperature for single prediction
-        last_window_scaled, actual_temp = load_last_window(data_path, window_size, scaler, target_column)
 
-        # Make single prediction
-        y_pred = predict(model, last_window_scaled, device=device)
-
-        # Print both predicted and actual temperatures
-        print(f"Predicted temperature (°C): {y_pred:.2f}")
-        print(f"Actual temperature (°C): {actual_temp:.2f}")
-
-    elif prediction_mode == 'random':
-        # Load a random window and its actual temperature
-        random_window_scaled, actual_temp = load_random_window(data_path, window_size, scaler, target_column, seed=seed)
-
-        # Make prediction on the random window
-        y_pred = predict(model, random_window_scaled, device=device)
-
-        # Print both predicted and actual temperatures
-        print(f"Random Window Prediction:")
-        print(f"Predicted temperature (°C): {y_pred:.2f}")
-        print(f"Actual temperature (°C): {actual_temp:.2f}")
-
-        random_window_scaled, actual_temp = load_random_window(data_path, window_size, scaler, target_column, seed=seed+1)
-
-        # Make prediction on the random window
-        y_pred = predict(model, random_window_scaled, device=device)
-
-        # Print both predicted and actual temperatures
-        print(f"Random Window Prediction:")
-        print(f"Predicted temperature (°C): {y_pred:.2f}")
-        print(f"Actual temperature (°C): {actual_temp:.2f}")
-
-        random_window_scaled, actual_temp = load_random_window(data_path, window_size, scaler, target_column,
-                                                               seed=seed + 2)
-
-        # Make prediction on the random window
-        y_pred = predict(model, random_window_scaled, device=device)
-
-        # Print both predicted and actual temperatures
-        print(f"Random Window Prediction:")
-        print(f"Predicted temperature (°C): {y_pred:.2f}")
-        print(f"Actual temperature (°C): {actual_temp:.2f}")
-
-    elif prediction_mode == 'batch':
-        # Load all windows and actual temperatures
-        windows_scaled, actual_temps = load_windows(data_path, window_size, scaler, target_column)
-
-        # Make batch predictions
-        predictions = predict_batch(model, windows_scaled, device=device)
-
-        # Save predictions to CSV
-        save_predictions(predictions, actual_temps, output_path=output_csv)
-
-        # Calculate and display performance metrics
-        from sklearn.metrics import mean_absolute_error, mean_squared_error
-
-        mae = mean_absolute_error(actual_temps, predictions)
-        rmse = np.sqrt(mean_squared_error(actual_temps, predictions))
-
-        print(f"\nOverall Performance:")
-        print(f"Mean Absolute Error (MAE): {mae:.2f}°C")
-        print(f"Root Mean Squared Error (RMSE): {rmse:.2f}°C")
+        if plot:
+            plt.figure(figsize=(10, 6))
+            plt.plot(actual_temps[:30], label='Actual', color='blue')
+            plt.plot(predictions[:30], label='Predicted', color='red')
+            plt.xlabel('Hours')
+            plt.ylabel('Temperature (°C)')
+            plt.title('Temperature Prediction for the next week')
+            plt.legend()
+            plt.show()
 
     else:
-        print(f"Invalid prediction mode: {prediction_mode}. Choose from 'single', 'random', or 'batch'.")
+        print(f"Invalid prediction mode: {prediction_mode}.")
+
+
