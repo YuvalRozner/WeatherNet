@@ -12,7 +12,7 @@ from parameters import PARAMS, WINDOW_PARAMS, LSTM_MODEL_PARAMS
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 from backend.Model_Pytorch.common.data import preprocessing_our_df, normalize_data, load_pkl_file
-
+from backend.Model_Pytorch.common.analyze import analyze
 from backend.Model_Pytorch.common.window_generator import WindowGenerator
 
 
@@ -46,15 +46,6 @@ def load_model_for_inference(checkpoint_path, model_params, device='cpu'):
     model.eval()
     print(f"Model loaded from {checkpoint_path}")
     return model
-
-
-def load_data_and_preprocess(data_path, target_column):
-    df = load_pkl_file(PARAMS['fileName'])
-    df = preprocessing_our_df(df)
-    # df = pd.read_csv(data_path)
-    # df = preprocessing_tensor_df(df)
-    target_index = df.columns.get_loc(target_column)
-    return df, target_index
 
 
 def load_window(data_np, window_size, shift, label_width, scaler, target_column_index=1, idx=0):
@@ -111,6 +102,17 @@ def get_val_data(df):
     val_data = data_np[train_size:]
     return val_data
 
+def load_data_and_preprocess(data_path, target_column, fileName=True):
+    if fileName:
+        df = load_pkl_file(PARAMS['fileName'])
+        df = preprocessing_our_df(df)
+        print("using preprocessing_our_df !!!")
+    else:
+        df = pd.read_csv(os.path.join(os.path.dirname(__file__), PARAMS['filePah']))
+        df = preprocessing_tensor_df(df)
+        print("using preprocessing_tensor_df !!!")
+    target_index = df.columns.get_loc(target_column)
+    return df, target_index
 
 if __name__ == "__main__":
     # Define parameters directly in main
@@ -122,15 +124,15 @@ if __name__ == "__main__":
     window_size = WINDOW_PARAMS['input_width']  # Must match input_width used during training
     target_column = WINDOW_PARAMS['label_columns'][0]  # Ensure this matches your dataset
     shift = WINDOW_PARAMS['shift']
-    prediction_mode = 'train'  # Options: 'single', 'train'
+    prediction_mode = 'analyze'  # Options: 'single', 'train', 'analyze'
     ## single parameters
     index = 500  # index for single
 
     ## train parameters
-    stop_after = 30  # if you dont want to stop set to -1
+    stop_after = -1  # if you dont want to stop set to -1
     show_examples = 30  # how many examples to plot
     plot = True
-    if show_examples > stop_after:
+    if stop_after != -1 and show_examples > stop_after:
         raise RuntimeError("show_examples needs to be lower then stop_after")
 
     # Define model parameters
@@ -162,8 +164,7 @@ if __name__ == "__main__":
         # for each of val_data_scaled check prediction against actual
         val_data = get_val_data(df)
 
-        end = len(val_data) - window_size if stop_after == -1 else min(len(val_data) - window_size,
-                                                                       stop_after)
+        end = len(val_data) - window_size if stop_after == -1 else min(len(val_data) - window_size, stop_after)
         for i in tqdm(range(0, end, model_params['label_width']), desc="Predicting"):
             scaled_window, actual_temp = load_window(data_np=val_data, window_size=window_size, shift=shift,
                                                      label_width=model_params['label_width'],
@@ -181,6 +182,23 @@ if __name__ == "__main__":
             plt.title('Temperature Prediction for the next week')
             plt.legend()
             plt.show()
+    elif prediction_mode == 'analyze':
+        val_data = get_val_data(df)
+        end = len(val_data) - window_size if stop_after == -1 else min(len(val_data) - window_size, stop_after)
+        for i in tqdm(range(0, end, model_params['label_width']), desc="Predicting"):
+            scaled_window, actual_temp = load_window(data_np=val_data, window_size=window_size, shift=shift,
+                                                    label_width=model_params['label_width'],
+                                                    scaler=scaler, target_column_index=target_index, idx=i)
+            y_pred = predict(model, scaled_window, target_index, device=device)
+            # check if the prediction is np array or number- if not array then convert to array
+            if not isinstance(y_pred, np.ndarray):
+                y_pred = np.array([y_pred])
+            if not isinstance(actual_temp, np.ndarray):
+                actual_temp = np.array([actual_temp])
+            predictions.append(y_pred)
+            actual_temps.append(actual_temp)
+
+        analyze(predictions, actual_temps)
 
     else:
         print(f"Invalid prediction mode: {prediction_mode}.")
