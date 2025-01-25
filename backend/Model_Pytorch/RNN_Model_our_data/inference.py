@@ -132,10 +132,7 @@ if __name__ == "__main__":
 
     ## train parameters
     stop_after = -1  # if you dont want to stop set to -1
-    show_examples = 30  # how many examples to plot
-    plot = True
-    if stop_after != -1 and show_examples > stop_after:
-        raise RuntimeError("show_examples needs to be lower then stop_after")
+
 
     # Define model parameters
     model_params = {
@@ -197,10 +194,12 @@ if __name__ == "__main__":
                 y_pred = np.array([y_pred])
             if not isinstance(actual_temp, np.ndarray):
                 actual_temp = np.array([actual_temp])
+            if len(y_pred) != len(actual_temp):
+                continue
             predictions.append(y_pred)
             actual_temps.append(actual_temp)
 
-        analyze(predictions, actual_temps)
+        analyze(predictions, actual_temps,WINDOW_PARAMS['label_width'])
 
     else:
         print(f"Invalid prediction mode: {prediction_mode}.")
