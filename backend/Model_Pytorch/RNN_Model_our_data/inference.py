@@ -124,6 +124,8 @@ if __name__ == "__main__":
     window_size = WINDOW_PARAMS['input_width']  # Must match input_width used during training
     target_column = WINDOW_PARAMS['label_columns'][0]  # Ensure this matches your dataset
     shift = WINDOW_PARAMS['shift']
+    
+    
     prediction_mode = 'analyze'  # Options: 'single', 'train', 'analyze'
     ## single parameters
     index = 500  # index for single
@@ -137,7 +139,7 @@ if __name__ == "__main__":
 
     # Define model parameters
     model_params = {
-        "in_channels": 15,  # Must match your data's feature count
+        "in_channels": PARAMS['in_channels'],  # Must match your data's feature count
         "hidden_dim": LSTM_MODEL_PARAMS['hidden_dim'],
         "num_layers": LSTM_MODEL_PARAMS['num_layers'],
         "label_width": WINDOW_PARAMS['label_width'],

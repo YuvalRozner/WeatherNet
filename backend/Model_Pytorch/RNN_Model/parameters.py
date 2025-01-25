@@ -7,7 +7,8 @@ PARAMS = {
     'fileName' : 'data.csv',
     'filePah' : "..\\common\\jena_climate_2009_2016.csv",
     'epochs' : 20,
-    'device' : device
+    'device' : device,
+    'in_channels' : 19 # how many features we have
 }
 
 WINDOW_PARAMS = {
