@@ -11,8 +11,9 @@ export const ChooseCityAndPeriodBox = styled(Box)({
 });
 
 export const ChartContainerBox = styled(Box)({
-  maxWidth: "90%",
-  // margin: "20px auto 0 auto",
+  marginLeft: "auto",
+  marginRight: "auto",
+  width: "90%",
 });
 
 export const DayilyForecastText = styled(Typography)({

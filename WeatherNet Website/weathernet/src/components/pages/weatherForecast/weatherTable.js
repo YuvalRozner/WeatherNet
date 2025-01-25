@@ -22,11 +22,11 @@ const WeatherTable = ({ dataset }) => {
     }
 
     const newColumns = [
-      { id: "parameter", label: "Parameter", minWidth: 170 },
+      { id: "parameter", label: "Parameter", minWidth: 180 },
       ...dataset.map((item, index) => ({
         id: `time-${index}`,
         label: item.formattedTime,
-        minWidth: 60,
+        minWidth: 50,
       })),
     ];
 
@@ -51,8 +51,8 @@ const WeatherTable = ({ dataset }) => {
   }, [dataset]);
 
   return (
-    <TableContainer sx={{ maxHeight: 400 }}>
-      <Table stickyHeader aria-label="sticky table">
+    <TableContainer sx={{ maxHeight: 370, width: "90%" }}>
+      <Table stickyHeader aria-label="sticky table" size="small">
         <TableHead>
           <TableRow>
             {columns.map((column) => (
@@ -65,7 +65,10 @@ const WeatherTable = ({ dataset }) => {
                     ? {
                         position: "sticky",
                         left: 0,
-                        backgroundColor: "inherit",
+                        backgroundColor: "#282c34",
+                        zIndex: 4,
+                        boxShadow: "2px 0px 3px -1px rgba(0,0,0,0.1)",
+                        fontWeight: "bold",
                       }
                     : {}
                 }
@@ -77,7 +80,13 @@ const WeatherTable = ({ dataset }) => {
         </TableHead>
         <TableBody>
           {rows.map((row, rIndex) => (
-            <TableRow hover role="checkbox" tabIndex={-1} key={rIndex}>
+            <TableRow
+              hover
+              role="checkbox"
+              tabIndex={-1}
+              key={rIndex}
+              sx={{ height: 44 }}
+            >
               {columns.map((column) => (
                 <TableCell
                   key={column.id}
@@ -87,7 +96,10 @@ const WeatherTable = ({ dataset }) => {
                       ? {
                           position: "sticky",
                           left: 0,
-                          backgroundColor: "inherit",
+                          backgroundColor: "#282c34",
+                          zIndex: 2,
+                          boxShadow: "2px 0px 3px -1px rgba(0,0,0,0.1)",
+                          fontWeight: "bold",
                         }
                       : {}
                   }
