@@ -8,7 +8,7 @@ from sklearn.metrics import (
     mean_absolute_percentage_error,
     r2_score
 )
-
+import itertools
 
 # https://chatgpt.com/share/6794d6f7-4e44-8010-91ed-30cf30a80b3a
 def flatten_data(predictions, actuals):
@@ -133,33 +133,6 @@ def plot_error_distribution(data):
     plt.ylabel('Frequency')
     plt.show()
 
-
-def analyze(actuals, predictions, num_hours=1):
-    data = flatten_data(predictions, actuals)
-
-    # 2. Compute Error Metrics
-    metrics = compute_error_metrics(data['Actual'], data['Predicted'])
-    print("Error Metrics:")
-    for key, value in metrics.items():
-        if key == 'MAPE':
-            print(f"{key}: {value:.2f}%")
-        else:
-            print(f"{key}: {value:.2f}")
-
-    # 3. Per-Hour Analysis
-    per_hour_metrics = per_hour_analysis(predictions, actuals, num_hours)
-    print("\nPer-Hour Performance Metrics:")
-    print(per_hour_metrics)
-
-    # 4. Visualizations
-    # a. Time Series Plot
-    plot_time_series(data, num_points=500)
-
-    # c. Error Distribution
-    data['Error'] = data['Predicted'] - data['Actual']
-    plot_error_distribution(data)
-
-
 def plot_actual_vs_predicted_per_window(predictions, actuals, num_hours=24, max_windows=10):
     """
     Plots actual vs. predicted temperatures for each window with distinct colors.
@@ -181,12 +154,13 @@ def plot_actual_vs_predicted_per_window(predictions, actuals, num_hours=24, max_
         actuals = actuals[:max_windows]
 
     # Define a color palette
-    color_cycle = iter(['red', 'green', 'blue', 'yellow'])  # Example color cycle
+    color_cycle = itertools.cycle(['red', 'green', 'blue', 'yellow'])  # Example color cycle
 
     plt.figure(figsize=(15, 8))
 
     for idx, (pred_window, actual_window) in enumerate(zip(predictions, actuals)):
         color = next(color_cycle)
+
         hours = range(idx, num_hours + idx)
 
         plt.plot(hours, actual_window, marker='o', linestyle='-', color=color, label=f'Actual Window {idx + 1}')
@@ -199,6 +173,33 @@ def plot_actual_vs_predicted_per_window(predictions, actuals, num_hours=24, max_
     plt.grid(True)
     plt.tight_layout()
     plt.show()
+
+
+def analyze(actuals, predictions, num_hours=1):
+    data = flatten_data(predictions, actuals)
+
+    # 2. Compute Error Metrics
+    metrics = compute_error_metrics(data['Actual'], data['Predicted'])
+    print("Error Metrics:")
+    for key, value in metrics.items():
+        if key == 'MAPE':
+            print(f"{key}: {value:.2f}%")
+        else:
+            print(f"{key}: {value:.2f}")
+
+    # 3. Per-Hour Analysis
+    per_hour_metrics = per_hour_analysis(predictions, actuals, num_hours)
+    print("\nPer-Hour Performance Metrics:")
+    print(per_hour_metrics)
+
+    # 4. Visualizations
+    # a. Time Series Plot
+    plot_time_series(data, num_points=500)
+    plot_actual_vs_predicted_per_window(predictions, actuals, num_hours=num_hours)
+
+    # c. Error Distribution
+    data['Error'] = data['Predicted'] - data['Actual']
+    plot_error_distribution(data)
 
 
 def main():
