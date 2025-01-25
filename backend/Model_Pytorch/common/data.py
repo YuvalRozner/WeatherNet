@@ -52,6 +52,16 @@ def preprocessing_tensor_df(df):
 
     return df
 
+def preprocessing_our_df(df):
+    """
+    Apply the same preprocessing steps as during training.
+    """
+    print("preproccessing data...")
+    df = df[5::6].copy()
+    # drop nan
+    df = df.dropna()
+    return df
+
 def normalize_data(train_data, val_data, scaler_path='./scaler.pkl'):
     """
     Fit a StandardScaler on the training data and transform both train and val data.
@@ -84,7 +94,7 @@ def normalize_data(train_data, val_data, scaler_path='./scaler.pkl'):
 
 def load_pkl_file(station_name):
     current_path = os.path.dirname(__file__)
-    file_path = f"{current_path}\\..\\..\\data\\{station_name}.pkl"
+    file_path = f"{current_path}\\..\\..\\..\\data\\{station_name}.pkl"
     try:
         with open(file_path, 'rb') as file:
             data = pickle.load(file)
