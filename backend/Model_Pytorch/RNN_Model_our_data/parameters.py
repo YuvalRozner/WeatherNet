@@ -14,7 +14,7 @@ WINDOW_PARAMS = {
     'input_width' : 24,
     'label_width' : 1,
     'shift' : 1,
-    'label_columns' : ['T (degC)'],
+    'label_columns' : ['TD (degC)'],
 }
 
 LSTM_MODEL_PARAMS = {

@@ -14,6 +14,7 @@ import matplotlib.pyplot as plt
 
 from backend.Model_Pytorch.common.window_generator import WindowGenerator
 
+
 # inference.py
 
 def load_scaler(scaler_path='./scaler.pkl'):
@@ -61,7 +62,8 @@ def load_window(data_np, window_size, shift, label_width, scaler, target_column_
 
     # Extract the window and actual target
     window = data_np[idx:idx + window_size, :]  # shape (window_size, in_channels)
-    actual_target = data_np[idx + window_size + shift:idx + window_size + label_width + shift, target_column_index]  # shape (1,)
+    actual_target = data_np[idx + window_size + shift:idx + window_size + label_width + shift,
+                    target_column_index]  # shape (1,)
     # Normalize the window
     window_scaled = scaler.transform(window)
     # Convert to torch.Tensor and reshape to (1, window_size, in_channels)
@@ -100,12 +102,11 @@ def predict(model, input_window, target_column_index, device='cpu'):
     return output_original_scale  # Return as scalar
 
 
-def get_val_data_scaled(df, scalar):
+def get_val_data(df):
     data_np = df.values  # shape (T, in_channels)
     train_size = int(0.8 * len(data_np))
     val_data = data_np[train_size:]
-    val_data_scaled = scalar.transform(val_data)
-    return val_data_scaled
+    return val_data
 
 
 if __name__ == "__main__":
@@ -113,8 +114,8 @@ if __name__ == "__main__":
     path_to_file = os.path.join(os.path.dirname(__file__), PARAMS['filePah'])
 
     data_path = path_to_file  # Adjust the path as needed
-    scaler_path = os.path.join(os.path.dirname(__file__),'output','scaler.pkl')
-    checkpoint_path = os.path.join(os.path.dirname(__file__),'output','checkpoints', 'best_checkpoint.pth')
+    scaler_path = os.path.join(os.path.dirname(__file__), 'output', 'scaler.pkl')
+    checkpoint_path = os.path.join(os.path.dirname(__file__), 'output', 'checkpoints', 'best_checkpoint.pth')
     window_size = WINDOW_PARAMS['input_width']  # Must match input_width used during training
     target_column = WINDOW_PARAMS['label_columns'][0]  # Ensure this matches your dataset
     shift = WINDOW_PARAMS['shift']
@@ -156,12 +157,12 @@ if __name__ == "__main__":
         print(f"Actual temperature (°C): {actual_temp}")
     elif prediction_mode == 'train':
         # for each of val_data_scaled check prediction against actual
-        val_data_scaled = get_val_data_scaled(df, scaler)
+        val_data = get_val_data(df)
 
-        end = len(val_data_scaled) - window_size if stop_after == -1 else min(len(val_data_scaled) - window_size,
-                                                                              stop_after)
-        for i in tqdm(range(0, end,model_params['label_width']), desc="Predicting"):
-            scaled_window, actual_temp = load_window(data_np=val_data_scaled,window_size=window_size, shift=shift,
+        end = len(val_data) - window_size if stop_after == -1 else min(len(val_data) - window_size,
+                                                                       stop_after)
+        for i in tqdm(range(0, end, model_params['label_width']), desc="Predicting"):
+            scaled_window, actual_temp = load_window(data_np=val_data, window_size=window_size, shift=shift,
                                                      label_width=model_params['label_width'],
                                                      scaler=scaler, target_column_index=target_index, idx=i)
             y_pred = predict(model, scaled_window, target_index, device=device)
