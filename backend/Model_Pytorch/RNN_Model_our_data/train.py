@@ -51,6 +51,8 @@ def train_model(
         train_losses = []
         
         for x_batch, y_batch in tqdm(train_loader, desc=f"Epoch {epoch+1}/{start_epoch + epochs}"):
+        #for x_batch, y_batch in train_loader:
+
             x_batch = x_batch.to(device)  # (batch, seq_len, in_channels)
             y_batch = y_batch.to(device)  # (batch, label_width, num_label_features) or (batch, 1, 1)
             

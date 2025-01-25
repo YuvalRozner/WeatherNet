@@ -56,8 +56,8 @@ def load_window(data_np, window_size, shift, label_width, scaler, target_column_
 
     # Extract the window and actual target
     window = data_np[idx:idx + window_size, :]  # shape (window_size, in_channels)
-    actual_target = data_np[idx + window_size + shift - 1:idx + window_size + label_width + shift - 1,
-                    target_column_index]  # shape (1,)
+    start = idx + window_size + shift - 1
+    actual_target = data_np[start:start + label_width, target_column_index]  # shape (1,)
     # Normalize the window
     window_scaled = scaler.transform(window)
     # Convert to torch.Tensor and reshape to (1, window_size, in_channels)
@@ -162,8 +162,9 @@ if __name__ == "__main__":
     elif prediction_mode == 'train':
         # for each of val_data_scaled check prediction against actual
         val_data = get_val_data(df)
-
-        end = len(val_data) - window_size if stop_after == -1 else min(len(val_data) - window_size, stop_after)
+        total_window_size = window_size + shift - 1 + WINDOW_PARAMS['label_width']
+        end = len(val_data) - total_window_size if stop_after == -1 else min(len(val_data) - total_window_size, stop_after)
+        print(f"end: {end},total_window_size: {total_window_size},len(val_data): {len(val_data)} ")
         for i in tqdm(range(0, end, model_params['label_width']), desc="Predicting"):
             scaled_window, actual_temp = load_window(data_np=val_data, window_size=window_size, shift=shift,
                                                      label_width=model_params['label_width'],
@@ -183,8 +184,9 @@ if __name__ == "__main__":
             plt.show()
     elif prediction_mode == 'analyze':
         val_data = get_val_data(df)
-        end = len(val_data) - window_size if stop_after == -1 else min(len(val_data) - window_size, stop_after)
-        for i in tqdm(range(0, end, model_params['label_width']), desc="Predicting"):
+        total_window_size = window_size + shift - 1 + WINDOW_PARAMS['label_width']
+        end = len(val_data) - total_window_size if stop_after == -1 else min(len(val_data) - total_window_size,stop_after)
+        for i in tqdm(range(0, end), desc="Predicting"):
             scaled_window, actual_temp = load_window(data_np=val_data, window_size=window_size, shift=shift,
                                                     label_width=model_params['label_width'],
                                                     scaler=scaler, target_column_index=target_index, idx=i)

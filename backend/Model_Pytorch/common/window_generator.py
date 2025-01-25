@@ -32,7 +32,7 @@ class WindowGenerator(Dataset):
         self.shift = shift
 
         # total window = input plus how far to shift
-        self.total_window_size = input_width + shift
+        self.total_window_size = input_width + shift - 1 + label_width
 
         # label columns
         self.label_columns = label_columns
@@ -57,8 +57,12 @@ class WindowGenerator(Dataset):
         x_end = x_start + self.input_width  # not inclusive
 
         # label window range
-        y_start = x_start + self.total_window_size - self.label_width
-        y_end = x_start + self.total_window_size
+        y_start = x_start + self.input_width + self.shift - 1
+        y_end = y_start + self.label_width
+
+
+        #y_end = x_start + self.input_width + self.shift - 1  + self.label_width
+
 
         # slice input
         x = self.data[x_start:x_end]  # shape (input_width, num_features)
