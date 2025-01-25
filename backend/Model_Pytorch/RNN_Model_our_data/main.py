@@ -12,7 +12,7 @@ import os
 
 
 if __name__ == "__main__":
-    
+
     # 1) Load data
     df = load_pkl_file(PARAMS['fileName'])
     df = preprocessing_our_df(df)
@@ -63,6 +63,6 @@ if __name__ == "__main__":
         batch_size=32,
         lr=1e-3,
         checkpoint_dir=os.path.join(os.path.dirname(__file__),'output','checkpoints'),
-        resume=False,
+        resume=PARAMS['resume'],
         device=device
     )

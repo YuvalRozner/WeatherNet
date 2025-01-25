@@ -7,13 +7,14 @@ PARAMS = {
     'fileName' : 'Avne Etan',
     'filePah' : "..\\common\\jena_climate_2009_2016.csv",
     'epochs' : 20,
+    'resume' : False, # resume train or start new
     'device' : device,
     'in_channels' : 15 # how many features we have
 }
 
 WINDOW_PARAMS = {
-    'input_width' : 24,
-    'label_width' : 1,
+    'input_width' : 72, #window input size
+    'label_width' : 24, # how many hours to predict to the future
     'shift' : 1,
     'label_columns' : ['TD (degC)'],
 }
