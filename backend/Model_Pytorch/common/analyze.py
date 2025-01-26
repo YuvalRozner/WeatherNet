@@ -199,6 +199,8 @@ def analyze(actuals, predictions, num_hours=1):
 
     # c. Error Distribution
     data['Error'] = data['Predicted'] - data['Actual']
+    #save the error data
+    data.to_csv("error_data.csv")
     plot_error_distribution(data)
 
 
