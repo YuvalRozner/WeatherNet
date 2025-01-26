@@ -63,9 +63,9 @@ export default function VerticalLinearStepper() {
         </Stepper>
         {activeStep === content.length && (
           <Paper square elevation={0} style={{ p: 3 }}>
-            <Typography> {/* TODO: change? */} Thats all for now!</Typography>
+            <Typography> That was WeatherNet!</Typography>
             <LabelNavigateButton onClick={handleReset}>
-              Reset
+              Explore WeatherNet again
             </LabelNavigateButton>
           </Paper>
         )}

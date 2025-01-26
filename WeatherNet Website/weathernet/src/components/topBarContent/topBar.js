@@ -4,19 +4,26 @@ import {
   SiteNameContainer,
   ShareButtonsContainer,
   InvisibleDiv,
+  IconAndTitleContainer,
 } from "./topBar.style.js";
 import ShareContainer from "./shareContainer.js";
 import { ThemeSwitcher } from "@toolpad/core";
 import GitHubButton from "./githubContainer.js";
+import { useNavigate } from "react-router-dom";
 
 export function AppTitle() {
+  const navigate = useNavigate();
+  const handleIconClick = () => {
+    navigate(`/Home`); // Navigate to the segment
+  };
+
   return (
-    <>
+    <IconAndTitleContainer onClick={handleIconClick}>
       <Logo src="/logo/compressed_empty_logo.png" alt="WeatherNet Logo" />
       <SiteNameContainer>
         <SiteName>WeatherNet</SiteName>
       </SiteNameContainer>
-    </>
+    </IconAndTitleContainer>
   );
 }
 

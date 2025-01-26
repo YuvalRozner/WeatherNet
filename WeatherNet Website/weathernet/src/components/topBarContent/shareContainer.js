@@ -4,6 +4,7 @@ import SpeedDial from "@mui/material/SpeedDial";
 import SpeedDialAction from "@mui/material/SpeedDialAction";
 import ShareIcon from "@mui/icons-material/Share";
 import { sharingOptions } from "../../utils/SahringList";
+import Tooltip from "@mui/material/Tooltip";
 
 export default function ControlledOpenSpeedDial({ shareUrl, title }) {
   const [open, setOpen] = useState(false);
@@ -12,53 +13,55 @@ export default function ControlledOpenSpeedDial({ shareUrl, title }) {
 
   return (
     <Box sx={{ position: "absolute", top: "11px", right: "30px" }}>
-      <SpeedDial
-        ariaLabel="share options"
-        onClose={handleClose}
-        onOpen={handleOpen}
-        open={open}
-        direction="down"
-        icon={<ShareIcon style={{ width: "24px", height: "24px" }} />}
-        FabProps={{ size: "small" }}
-      >
-        {sharingOptions.map(
-          ({ name, IconComponent, url, action, windowName }) => (
-            <SpeedDialAction
-              key={name}
-              icon={
-                <IconComponent
-                  style={{
-                    borderRadius: "45px",
-                    width: "100%",
-                    height: "100%",
-                    transition: "transform 0.3s ease",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = "scale(1.1)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = "scale(1)";
-                  }}
-                />
-              }
-              tooltipTitle={name}
-              onClick={() => {
-                if (action) {
-                  action(shareUrl);
-                } else {
-                  const shareWindowOptions = "width=800,height=400";
-                  window.open(
-                    url(shareUrl, title),
-                    windowName,
-                    shareWindowOptions
-                  );
+      <Tooltip title="Share This Page" arrow placement="left-start">
+        <SpeedDial
+          ariaLabel="share options"
+          onClose={handleClose}
+          onOpen={handleOpen}
+          open={open}
+          direction="down"
+          icon={<ShareIcon style={{ width: "24px", height: "24px" }} />}
+          FabProps={{ size: "small" }}
+        >
+          {sharingOptions.map(
+            ({ name, IconComponent, url, action, windowName }) => (
+              <SpeedDialAction
+                key={name}
+                icon={
+                  <IconComponent
+                    style={{
+                      borderRadius: "45px",
+                      width: "100%",
+                      height: "100%",
+                      transition: "transform 0.3s ease",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = "scale(1.1)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = "scale(1)";
+                    }}
+                  />
                 }
-                handleClose(); // Close the SpeedDial when an action is clicked
-              }}
-            />
-          )
-        )}
-      </SpeedDial>
+                tooltipTitle={name}
+                onClick={() => {
+                  if (action) {
+                    action(shareUrl);
+                  } else {
+                    const shareWindowOptions = "width=800,height=400";
+                    window.open(
+                      url(shareUrl, title),
+                      windowName,
+                      shareWindowOptions
+                    );
+                  }
+                  handleClose(); // Close the SpeedDial when an action is clicked
+                }}
+              />
+            )
+          )}
+        </SpeedDial>
+      </Tooltip>
     </Box>
   );
 }

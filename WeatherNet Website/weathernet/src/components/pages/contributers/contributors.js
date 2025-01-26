@@ -26,6 +26,7 @@ import {
 } from "@mui/icons-material";
 import { ContributorsList } from "../../../utils/contributorsList.js";
 import { DraggablePaperComponent } from "../../../utils/draggable.js";
+import Tooltip from "@mui/material/Tooltip";
 
 export default function Contributors() {
   const [open, setOpen] = React.useState(false);
@@ -45,19 +46,25 @@ export default function Contributors() {
     <ProfilesCardsContainer>
       {ContributorsList.map((person, index) => (
         <StyledCard key={index}>
-          <CardActionArea onClick={() => handleClickOpen(person)}>
-            <CardMedia
-              component="img"
-              height="190"
-              image={person.image}
-              alt={person.name}
-            />
-            <CardContent>
-              <NameContainer>{person.name}</NameContainer>
-              <AboutContainer>{person.about}</AboutContainer>
-              <RoleContainer>{person.role}</RoleContainer>
-            </CardContent>
-          </CardActionArea>
+          <Tooltip
+            title="Click to view contact details"
+            arrow
+            placement="bottom-end"
+          >
+            <CardActionArea onClick={() => handleClickOpen(person)}>
+              <CardMedia
+                component="img"
+                height="190"
+                image={person.image}
+                alt={person.name}
+              />
+              <CardContent>
+                <NameContainer>{person.name}</NameContainer>
+                <AboutContainer>{person.about}</AboutContainer>
+                <RoleContainer>{person.role}</RoleContainer>
+              </CardContent>
+            </CardActionArea>
+          </Tooltip>
         </StyledCard>
       ))}
 
