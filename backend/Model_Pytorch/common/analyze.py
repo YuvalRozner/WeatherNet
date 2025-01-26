@@ -176,6 +176,7 @@ def plot_actual_vs_predicted_per_window(predictions, actuals, num_hours=24, max_
 
 
 def analyze(actuals, predictions, num_hours=1):
+    save_data = False
     data = flatten_data(predictions, actuals)
 
     # 2. Compute Error Metrics
@@ -199,10 +200,12 @@ def analyze(actuals, predictions, num_hours=1):
 
     # c. Error Distribution
     data['Error'] = data['Predicted'] - data['Actual']
-    #save the error data
-    data.to_csv("error_data.csv")
-    #save the error data as json
-    data.to_json("error_data.json")
+
+    if save_data:
+        #save the error data
+        data.to_csv("error_data.csv")
+        #save the error data as json
+        data.to_json("error_data.json")
     plot_error_distribution(data)
 
 
