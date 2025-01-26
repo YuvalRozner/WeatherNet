@@ -158,6 +158,7 @@ def sliceDf(df1, df2):
     result = find_first_match(df1, df2)
     if result is not None:
         i, j = result
+    print(f"find_first_match: i:{i},j:{j}")
     df1 = df1.iloc[i:]
     df2 = df2.iloc[j:]
     # reset index
@@ -167,6 +168,7 @@ def sliceDf(df1, df2):
     result = find_last_match(df1, df2)
     if result is not None:
         i, j = result
+    print(f"find_last_match : i:{i},j:{j}")
     df1 = df1.iloc[:i+1]
     df2 = df2.iloc[:j+1]
     df1.reset_index(drop=True, inplace=True)
@@ -235,6 +237,12 @@ if __name__ == "__main__":
     print("original size of data:")
     for df in dfs:
         print(df.shape)
+
+    print("from 2005 size of data:")
+    for i in range(len(dfs)):
+        dfs[i] = dfs[0][dfs[0]['Year']>2004]
+        print(dfs[i].shape)
+
 
     # use sliceDf() on all pairs of dataframes
     for i in tqdm(range(len(dfs)), desc="Slicing DataFrames"):
