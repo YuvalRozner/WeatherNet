@@ -8,6 +8,8 @@ PARAMS = {
     'filePah' : "..\\common\\jena_climate_2009_2016.csv",
     'fileNames' : ['Newe Yaar', 'Tavor Kadoorie', 'Yavneel'],
     'target_station' : 'Newe Yaar',
+    'target_station_id' : 0,
+
     'epochs' : 20,
     'resume' : False, # resume train or start new
     'device' : device,

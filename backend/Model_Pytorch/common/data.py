@@ -62,26 +62,10 @@ def preprocessing_our_df(df):
     df = df.dropna()
     return df
 
-def normalize_data(train_data, val_data, scaler_path='./scaler.pkl'):
-    """
-    Fit a StandardScaler on the training data and transform both train and val data.
-    Save the scaler to disk for future use.
-    
-    Args:
-        train_data (np.ndarray): Training data.
-        val_data (np.ndarray): Validation data.
-        scaler_path (str): Path to save the scaler.
-        
-    Returns:
-        train_data_scaled (np.ndarray): Scaled training data.
-        val_data_scaled (np.ndarray): Scaled validation data.
-        scaler (StandardScaler): Fitted scaler object.
-    """
+def return_and_save_scaler_normalize_data(train_data, val_data, scaler_path='./scaler.pkl'):
+   
     scaler = StandardScaler()
     scaler.fit(train_data)
-    
-    train_data_scaled = scaler.transform(train_data)
-    val_data_scaled = scaler.transform(val_data)
     
     # Save the scaler
     with open(scaler_path, 'wb') as f:
@@ -89,8 +73,39 @@ def normalize_data(train_data, val_data, scaler_path='./scaler.pkl'):
     
     print(f"Scaler saved to {scaler_path}")
     
-    return train_data_scaled, val_data_scaled, scaler
+    return scaler
 
+def normalize_data_collective(train_data, val_data, scaler_path='./scaler.pkl'):
+    """
+    Fit a single StandardScaler across all stations and features.
+    
+    Args:
+        train_data (np.ndarray): Training data of shape (T_train, num_stations, num_features).
+        val_data (np.ndarray): Validation data of shape (T_val, num_stations, num_features).
+        scaler_path (str): Path to save the scaler.
+        
+    Returns:
+        train_scaled (np.ndarray), val_scaled (np.ndarray), scaler (StandardScaler)
+    """
+    T_train, num_stations, num_features = train_data.shape
+    T_val = val_data.shape[0]
+    
+    # Reshape to (T_train*num_stations, num_features)
+    train_reshaped = train_data.reshape(-1, num_features)
+    val_reshaped = val_data.reshape(-1, num_features)
+    
+    scaler = StandardScaler()
+    scaler.fit(train_reshaped)
+    
+    train_scaled = scaler.transform(train_reshaped).reshape(train_data.shape)
+    val_scaled = scaler.transform(val_reshaped).reshape(val_data.shape)
+    
+    # Save the scaler
+    with open(scaler_path, 'wb') as f:
+        pickle.dump(scaler, f)
+    print(f"Scaler saved to {scaler_path}")
+    
+    return train_scaled, val_scaled, scaler
 
 def load_pkl_file(station_name):
     current_path = os.path.dirname(__file__)
