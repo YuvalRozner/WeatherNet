@@ -2,7 +2,7 @@ import torch
 from torch.utils.data import Dataset
 from torch.utils.data import DataLoader
 
-class WindowGenerator(Dataset):
+class WindowGeneratorMultipleStations(Dataset):
     """
     Creates sliding windows from a multi-station dataset.
     data: shape (T, num_stations, num_features)
@@ -87,7 +87,7 @@ class WindowGenerator(Dataset):
             f'Target station index: {self.target_station_idx}'
         ])
     
-    
+
 if __name__ == "__main__":
     import numpy as np
     import torch
@@ -109,7 +109,7 @@ if __name__ == "__main__":
     label_size = 1
     shift = 1
 
-    window_gen = WindowGenerator(
+    window_gen = WindowGeneratorMultipleStations(
         data=data,
         input_width=window_size,
         label_width=label_size,

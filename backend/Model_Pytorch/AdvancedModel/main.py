@@ -3,11 +3,11 @@
 import torch
 import pandas as pd
 
-from backend.Model_Pytorch.common.window_generator import WindowGenerator
-from backend.Model_Pytorch.common.data import preprocessing_our_df, normalize_data, load_pkl_file
-from model import TargetedWeatherPredictionModel, normalize_coordinates
-from train import train_model
-from parameters import PARAMS, WINDOW_PARAMS, LSTM_MODEL_PARAMS
+from backend.Model_Pytorch.common.window_generator_multiple_stations import WindowGeneratorMultipleStations
+from backend.Model_Pytorch.common.data import preprocessing_our_df, normalize_data, load_pkl_file , normalize_data_collective
+from backend.Model_Pytorch.AdvancedModel.model import TargetedWeatherPredictionModel, normalize_coordinates
+from backend.Model_Pytorch.AdvancedModel.train import train_model
+from backend.Model_Pytorch.AdvancedModel.parameters import PARAMS, WINDOW_PARAMS, LSTM_MODEL_PARAMS
 import os
 
 import pandas as pd
@@ -224,7 +224,31 @@ def slice_six(df):
     df = df[5::6].copy()
 
     return df
+
+# Define the normalization function
+def normalize_coordinates(x_coords, y_coords):
+    """
+    Normalize the X and Y coordinates to the range [0, 1].
+    """
+    x_min, x_max = x_coords.min(), x_coords.max()
+    y_min, y_max = y_coords.min(), y_coords.max()
+
+    x_normalized = (x_coords - x_min) / (x_max - x_min)
+    y_normalized = (y_coords - y_min) / (y_max - y_min)
+
+    # Convert to torch tensors
+    x_normalized = torch.tensor(x_normalized, dtype=torch.float32).unsqueeze(1)  # [num_stations, 1]
+    y_normalized = torch.tensor(y_normalized, dtype=torch.float32).unsqueeze(1)  # [num_stations, 1]
+
+    return x_normalized, y_normalized
+
 if __name__ == "__main__":
+
+    east = np.array([217010, 238440, 248110])  # new israel coordination system
+    north = np.array([734820, 734540, 733730])  # new israel coordination system
+
+    east_normalized, north_normalized = normalize_coordinates(east, north)
+
     # Apply the function to the list of DataFrames
  
     filenames = PARAMS['fileNames']
@@ -264,21 +288,23 @@ if __name__ == "__main__":
     print("size of data after drop_nan_rows_multiple:")
     for df in df_cleaned_list:
         print(df.shape)
-  
-    exit()
-    # 2) Convert to numpy array
-    data_np = df.values  # shape (T, in_channels)
-    
-    # 3) Create train/val split
-    train_size = int(0.8 * len(data_np))
-    train_data = data_np[:train_size]
-    val_data = data_np[train_size:]
-    
-    # 4) Normalize the data
-    train_data_scaled, val_data_scaled, scaler = normalize_data(train_data, val_data, scaler_path=os.path.join(os.path.dirname(__file__),'output','scaler.pkl'))
 
-    print("split data and normilized")
+    list_of_values = [df.values for df in dfs]  # Each element is (T, num_features)
 
+    train_size = int(0.8 * len(list_of_values[0]))
+    list_of_train_data = []
+    list_of_val_data = []
+    for values in list_of_values:
+        train_data = values[:train_size]
+        val_data = values[train_size:]
+        list_of_train_data.append(train_data)
+        list_of_val_data.append(val_data)
+    
+    combined_train_data = np.stack(list_of_train_data, axis=1)  # axis=1 corresponds to stations
+    combined_val_data = np.stack(list_of_val_data, axis=1)  # axis=1 corresponds to stations
+
+    train_data_scaled, val_data_scaled, scaler = normalize_data_collective(combined_train_data, combined_val_data, scaler_path=os.path.join(os.path.dirname(__file__),'output','scaler.pkl'))
+    
     # 5) Create Datasets
     input_width = WINDOW_PARAMS['input_width']
     label_width = WINDOW_PARAMS['label_width']
@@ -286,23 +312,45 @@ if __name__ == "__main__":
 
     column_indices = {name: i for i, name in enumerate(df.columns)}
     label_columns = [column_indices[WINDOW_PARAMS['label_columns'][0]]]
+
+    train_dataset = WindowGeneratorMultipleStations(
+        data=train_data_scaled, 
+        input_width=input_width, 
+        label_width=label_width, 
+        shift=shift, 
+        label_columns=label_columns,
+        target_station_idx=PARAMS['target_station_id']
+        )
     
-    train_dataset = WindowGenerator(train_data_scaled, input_width, label_width, shift, label_columns)
-    val_dataset   = WindowGenerator(val_data_scaled,   input_width, label_width, shift, label_columns)
-    
+    val_dataset = WindowGeneratorMultipleStations(
+        data=val_data_scaled, 
+        input_width=input_width, 
+        label_width=label_width, 
+        shift=shift, 
+        label_columns=label_columns,
+        target_station_idx=PARAMS['target_station_id']
+        )
+        
     # 6) Instantiate model (LSTM)
-    in_channels = df.shape[1]  # number of features
+    in_channels = PARAMS['in_channels']  # number of features
 
     device = PARAMS['device']
     print(f"Using device: {device}")
 
-    model = LSTMModel(
-        in_channels=in_channels,
-        hidden_dim=LSTM_MODEL_PARAMS['hidden_dim'],
-        num_layers=LSTM_MODEL_PARAMS['num_layers'],
-        label_width=label_width
+
+    model = TargetedWeatherPredictionModel(
+        num_stations=len(dfs),
+        time_steps=train_data_scaled.shape[1],
+        feature_dim=in_channels,
+        cnn_channels=16,
+        kernel_size=3,
+        d_model=128,
+        nhead=8,
+        num_layers=4,
+        target_station_idx=PARAMS['target_station_id']
     )
 
+   
     # 7) Train
     train_model(
         train_dataset,
