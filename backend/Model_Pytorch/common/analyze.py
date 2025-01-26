@@ -201,6 +201,8 @@ def analyze(actuals, predictions, num_hours=1):
     data['Error'] = data['Predicted'] - data['Actual']
     #save the error data
     data.to_csv("error_data.csv")
+    #save the error data as json
+    data.to_json("error_data.json")
     plot_error_distribution(data)
 
 
