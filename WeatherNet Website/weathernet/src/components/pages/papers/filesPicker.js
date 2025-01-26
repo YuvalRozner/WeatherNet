@@ -6,6 +6,7 @@ import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
 import CardActionArea from "@mui/material/CardActionArea";
 import { useNavigate } from "react-router-dom";
+import Tooltip from "@mui/material/Tooltip";
 
 const FilesPicker = ({ onSelectPaper, selectedCardId }) => {
   const [selectedCard, setSelectedCard] = useState(selectedCardId);
@@ -42,30 +43,32 @@ const FilesPicker = ({ onSelectPaper, selectedCardId }) => {
   return (
     <GridBox $columns={cards.length}>
       {cards.map((card, index) => (
-        <Card key={card.id}>
-          <CardActionArea
-            onClick={() => handleCardClick(index, card.segment)}
-            data-active={selectedCard === index ? "" : undefined}
-            sx={{
-              height: "100%",
-              "&[data-active]": {
-                backgroundColor: "action.selected",
-                "&:hover": {
-                  backgroundColor: "action.selectedHover",
+        <Tooltip title="Switch file" arrow placement="top-end">
+          <Card key={card.id}>
+            <CardActionArea
+              onClick={() => handleCardClick(index, card.segment)}
+              data-active={selectedCard === index ? "" : undefined}
+              sx={{
+                height: "100%",
+                "&[data-active]": {
+                  backgroundColor: "action.selected",
+                  "&:hover": {
+                    backgroundColor: "action.selectedHover",
+                  },
                 },
-              },
-            }}
-          >
-            <CardContent sx={{ height: "100%" }}>
-              <Typography variant="h5" component="div">
-                {card.title}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {card.description}
-              </Typography>
-            </CardContent>
-          </CardActionArea>
-        </Card>
+              }}
+            >
+              <CardContent sx={{ height: "100%" }}>
+                <Typography variant="h5" component="div">
+                  {card.title}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {card.description}
+                </Typography>
+              </CardContent>
+            </CardActionArea>
+          </Card>
+        </Tooltip>
       ))}
     </GridBox>
   );

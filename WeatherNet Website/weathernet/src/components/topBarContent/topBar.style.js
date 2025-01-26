@@ -14,7 +14,8 @@ export const SiteName = styled.h1`
   margin: 0;
 
   &:hover {
-    color: ${(props) => props.theme.hoverText};
+    transform: scale(1.03);
+    transition: transform 0.2s ease-in-out;
   }
 `;
 
@@ -22,6 +23,11 @@ export const Logo = styled.img`
   height: 60px;
   margin: 0px 22px 0px 6px;
   padding: 2px 0px;
+
+  &:hover {
+    transform: scale(1.03);
+    transition: transform 0.2s ease-in-out;
+  }
 `;
 
 export const InvisibleDiv = styled.div`
@@ -43,4 +49,10 @@ export const StyledIconButton = styled(IconButton)`
   width: 45px;
   height: 45px;
   padding: 7px;
+`;
+
+export const IconAndTitleContainer = styled.div`
+  display: flex;
+  align-items: center;
+  cursor: pointer;
 `;
