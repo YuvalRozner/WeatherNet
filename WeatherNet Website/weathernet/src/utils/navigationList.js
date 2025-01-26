@@ -103,6 +103,7 @@ export const NavigationList = [
         title: "Paper Phase A",
         icon: <Description />,
         fileName: "/papers/WeatherNet - Phase A Paper.pdf",
+        description: "First phase paper of WeatherNet.",
         pageComponent: (
           <PaperContainer
             key="PaperPhaseA"
@@ -117,6 +118,7 @@ export const NavigationList = [
         title: "Paper Phase B",
         icon: <Description />,
         fileName: "/papers/WeatherNet - Phase B Paper.pdf", // TODO: update the file Phase B Paper
+        description: "Second phase paper of WeatherNet.",
         pageComponent: (
           <PaperContainer
             key="PaperPhaseB"
@@ -131,6 +133,7 @@ export const NavigationList = [
         title: "User Manual",
         icon: <AssignmentIndOutlined />,
         fileName: "/papers/WeatherNet - User Manual.pdf",
+        description: "Guidelines for the user to use the website",
         pageComponent: (
           <PaperContainer
             key="UserManual"
@@ -145,6 +148,7 @@ export const NavigationList = [
         title: "Developer Manual",
         icon: <IntegrationInstructionsOutlined />,
         fileName: "/papers/WeatherNet - Developer Manual.pdf", // TODO: update the file Developer Manual
+        description: "Development guidelines for backend and frontend.",
         pageComponent: (
           <PaperContainer
             key="DeveloperManual"

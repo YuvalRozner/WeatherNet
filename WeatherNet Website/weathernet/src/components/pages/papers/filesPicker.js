@@ -28,7 +28,7 @@ const FilesPicker = ({ onSelectPaper, selectedCardId }) => {
         segment: child.segment,
         title: child.title,
         fileName: child.fileName,
-        description: `${child.title}.`, // TODO: Add description
+        description: child.description,
       })) || []
     );
   }, [papersAndManuals]);
