@@ -17,6 +17,7 @@ from backend.Model_Pytorch.common.data import (
 
 from backend.Model_Pytorch.AdvancedModel.model import TargetedWeatherPredictionModel
 from backend.Model_Pytorch.AdvancedModel.parameters import PARAMS, WINDOW_PARAMS, ADVANCED_MODEL_PARAMS, STATIONS_COORDINATES
+from backend.Model_Pytorch.common.analyze import analyze
 
 def load_scalers(scaler_dir='./output/scalers'):
     """
@@ -109,8 +110,7 @@ def predict(model, input_window, lat, lon, device='cpu'):
     output_scaled = model(input_tensor, lat, lon)
 
     # Convert to numpy
-    output_scaled_np = output_scaled.squeeze().cpu().numpy()  # Scalar
-
+    output_scaled_np = output_scaled.squeeze(-1).cpu().numpy().reshape(-1, 1)  # Scalar
     return output_scaled_np
 
 
@@ -283,7 +283,8 @@ if __name__ == "__main__":
             except ValueError as ve:
                 print(f"Skipping index {i}: {ve}")
                 continue
-        
+        analyze(predictions, actual_temps,WINDOW_PARAMS['label_width'])
+
         # Perform analysis (assuming analyze is a custom function)
         # You may need to adjust this based on your actual analyze function
         # For demonstration, let's plot the results
