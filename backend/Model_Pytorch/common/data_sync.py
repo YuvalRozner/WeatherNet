@@ -167,18 +167,25 @@ if __name__ == "__main__":
 
         # Slice based on the longest matching suffix
         if i_first != -1 and j_first != -1:
-            sliced_reference_first = reference_df.iloc[i_first:].reset_index(drop=True)
-            sliced_current_first = current_df.iloc[j_first:].reset_index(drop=True)
-
-        if i_first != -1 and j_first != -1:
-            reference_df = sliced_reference_first.copy()
+            reference_df = reference_df.iloc[i_first:].reset_index(drop=True)
+            #current_df = current_df.iloc[j_first:].reset_index(drop=True)
             dfs[0] = dfs[0].iloc[i_first:].reset_index(drop=True)
             dfs[idx] = dfs[idx].iloc[j_first:].reset_index(drop=True)
 
+    columns_to_print = ['Day sin', 'Day cos', 'Year sin', 'Year cos']  # Replace with your actual column names
+
     # find the shortest df and cut the rest from dfs
     min_len = min([len(df) for df in dfs])
+    for i in tqdm(range(min_len)):
+        if not dfs[0][columns_to_print].iloc[i] == dfs[1][columns_to_print].iloc[i] == dfs[2][columns_to_print].iloc[i]:
+            print(f"in hereeeeeee {i}")
+        #print(f"{dfs[0][columns_to_print].iloc[i]}")
+        #print(f"{dfs[1][columns_to_print].iloc[i]}")
+        #print(f"{dfs[2][columns_to_print].iloc[i]}")
+
+
     for idx, df in enumerate(dfs):
-        dfs[idx] = df.iloc[:min_len].reset_index(drop=True)
+        dfs[idx] = df.iloc[:min_len]
     
     # Save the cleaned DataFrames
     cleaned_folder_path = r'C:\Users\dorsha\Documents\GitHub\WeatherNet\backend\Model_Pytorch\input\cleaned'  # Update this path as needed
@@ -191,7 +198,6 @@ if __name__ == "__main__":
     print("Data cleaning completed successfully.")
 
     # print head of each df, shape and last cuople rows
-    columns_to_print = ['Day sin', 'Day cos', 'Year sin', 'Year cos']  # Replace with your actual column names
 
     for idx, df in enumerate(dfs):
         print(f"DataFrame {idx}")
