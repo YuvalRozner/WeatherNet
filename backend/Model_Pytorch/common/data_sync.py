@@ -213,7 +213,7 @@ def main():   # Load pickle files
 
 import pandas as pd
 
-def run(df1, df2):
+def run(df1, df2,atol):
     """
     Identifies the indexes of rows to delete from df1 and df2 to make them equal.
 
@@ -235,18 +235,24 @@ def run(df1, df2):
     df2_indices = df2.index.tolist()
     max1 = max(len(df1),len(df2))
     while i < len(df1) and j < len(df2):
-        print(f"\r{(((i+j)/2)/max1)*100}%",end="")
+        progress = (((i + j) / 2) / max1) * 100
+        print(f"\rProgress: {progress:.2f}% , len(delete_from_df1): {len(delete_from_df1)} ", end="")
+
         row_df1 = df1.iloc[i]
         row_df2 = df2.iloc[j]
 
-        if row_df1.equals(row_df2):
-            # Rows match; move both pointers forward
+        if np.allclose(row_df1.values, row_df2.values, atol=atol):
+            # Rows match within the tolerance; move both pointers forward
             i += 1
             j += 1
         else:
             # Attempt to find the next matching row in df2 for df1.iloc[i]
             # Create a boolean Series where each row in df2[j:] is compared to df1.iloc[i]
-            matches = df2.iloc[j:].apply(lambda row: row.equals(row_df1), axis=1)
+            def rows_match(row):
+                return np.allclose(row.values, row_df1.values, atol=atol)
+
+            # Apply the comparison function to rows in df2 starting from index j
+            matches = df2.iloc[j:].apply(rows_match, axis=1)
             
             if matches.any():
                 # Match found in df2
@@ -301,8 +307,8 @@ if __name__ == "__main__":
     #df1 = pd.DataFrame(data1)
     #df2 = pd.DataFrame(data2)
 
-    df1 = pd.read_pickle(r"C:\Users\dorsha\Documents\GitHub\WeatherNet\backend\Model_Pytorch\input\Newe Yaar.pkl")
-    df2 = pd.read_pickle(r"C:\Users\dorsha\Documents\GitHub\WeatherNet\backend\Model_Pytorch\input\Tavor Kadoorie.pkl")
+    df1 = pd.read_pickle(r"C:\Users\dorsh\Documents\GitHub\WeatherNet\backend\Model_Pytorch\input\Newe Yaar.pkl")
+    df2 = pd.read_pickle(r"C:\Users\dorsh\Documents\GitHub\WeatherNet\backend\Model_Pytorch\input\Tavor Kadoorie.pkl")
     selected_columns = ['Day sin', 'Day cos', 'Year sin', 'Year cos', 'Year']
     df1_col = df1.loc[:, selected_columns]
     df2_col = df2.loc[:, selected_columns]
