@@ -99,9 +99,8 @@ def find_last_matching_indices(
     return (-1, -1)
 
 
-if __name__ == "__main__":
-    # Load pickle files
-    folder_path = r'C:\Users\dorsha\Documents\GitHub\WeatherNet\backend\Model_Pytorch\input'  # Update this path as needed
+def main():   # Load pickle files
+    folder_path = r'C:\Users\dorsh\Documents\GitHub\WeatherNet\backend\Model_Pytorch\input'  # Update this path as needed
     # List to hold DataFrames
     dfs = []
 
@@ -118,14 +117,15 @@ if __name__ == "__main__":
             except Exception as e:
                 print(f"Error loading {filename}: {e}")
 
+
     if not dfs:
         print("No DataFrames loaded. Please check the folder path and contents.")
         exit()
     for i in range(len(dfs)):
-        dfs[i] = dfs[i][dfs[i]['Year'] >= 2005]
+        dfs[i] = dfs[i][dfs[i]['Year'] >= 2006].reset_index(drop=True)
     dfs_for_start_slice = []
 
-    year_to_check = 2005
+    year_to_check = 2006
 
     selected_columns = ['Day sin', 'Day cos', 'Year sin', 'Year cos']  # Replace with your actual column names
     for idx, df in enumerate(dfs):
@@ -177,7 +177,8 @@ if __name__ == "__main__":
     # find the shortest df and cut the rest from dfs
     min_len = min([len(df) for df in dfs])
     for i in tqdm(range(min_len)):
-        if not dfs[0][columns_to_print].iloc[i] == dfs[1][columns_to_print].iloc[i] == dfs[2][columns_to_print].iloc[i]:
+        if dfs[0][columns_to_print].iloc[i] != dfs[1][columns_to_print].iloc[i] or dfs[0][columns_to_print].iloc[i] != dfs[2][columns_to_print].iloc[i]:
+
             print(f"in hereeeeeee {i}")
         #print(f"{dfs[0][columns_to_print].iloc[i]}")
         #print(f"{dfs[1][columns_to_print].iloc[i]}")
@@ -206,3 +207,109 @@ if __name__ == "__main__":
         print(df[columns_to_print].tail(2))
         print()
     
+
+
+
+
+import pandas as pd
+
+def run(df1, df2):
+    """
+    Identifies the indexes of rows to delete from df1 and df2 to make them equal.
+
+    Parameters:
+    - df1: First Pandas DataFrame.
+    - df2: Second Pandas DataFrame.
+
+    Returns:
+    - delete_from_df1: List of indexes to delete from df1.
+    - delete_from_df2: List of indexes to delete from df2.
+    """
+    i = 0  # Pointer for df1
+    j = 0  # Pointer for df2
+    delete_from_df1 = []
+    delete_from_df2 = []
+
+    # Convert DataFrame indexes to lists for faster access
+    df1_indices = df1.index.tolist()
+    df2_indices = df2.index.tolist()
+
+    while i < len(df1) and j < len(df2):
+        row_df1 = df1.iloc[i]
+        row_df2 = df2.iloc[j]
+
+        if row_df1.equals(row_df2):
+            # Rows match; move both pointers forward
+            i += 1
+            j += 1
+        else:
+            # Attempt to find the next matching row in df2 for df1.iloc[i]
+            # Create a boolean Series where each row in df2[j:] is compared to df1.iloc[i]
+            matches = df2.iloc[j:].apply(lambda row: row.equals(row_df1), axis=1)
+            
+            if matches.any():
+                # Match found in df2
+                next_match_relative_idx = matches.idxmax()  # Get the index label
+                next_match_idx = df2_indices.index(next_match_relative_idx)  # Convert to positional index
+
+                # Rows in df2 from j to next_match_idx -1 are to be deleted
+                rows_to_delete = df2_indices[j:next_match_idx]
+                delete_from_df2.extend(rows_to_delete)
+
+                # Move j to the position after the matched row
+                j = next_match_idx + 1
+
+                # Move i forward as we've found a match for df1.iloc[i]
+                i += 1
+            else:
+                # No match found in df2; mark df1.iloc[i] for deletion
+                delete_from_df1.append(df1_indices[i])
+                i += 1
+
+    # After the loop, handle any remaining rows in df1
+    if i < len(df1):
+        remaining_df1 = df1_indices[i:]
+        delete_from_df1.extend(remaining_df1)
+
+    # Handle any remaining rows in df2
+    if j < len(df2):
+        remaining_df2 = df2_indices[j:]
+        delete_from_df2.extend(remaining_df2)
+
+    return delete_from_df1, delete_from_df2
+
+
+if __name__ == "__main__":
+    
+    df1 = pd.read_pickle(r"C:\Users\dorsh\Documents\GitHub\WeatherNet\backend\Model_Pytorch\input\Newe Yaar.pkl")
+    df2 = pd.read_pickle(r"C:\Users\dorsh\Documents\GitHub\WeatherNet\backend\Model_Pytorch\input\Tavor Kadoorie.pkl")
+    selected_columns = ['Day sin', 'Day cos', 'Year sin', 'Year cos']
+    df1_col = df1.loc[:, selected_columns]
+    df2_col = df2.loc[:, selected_columns]
+    delete_from_df1_col, delete_from_df2_col = run(df1_col, df2_col)
+    print(f"Rows to delete from df1: {delete_from_df1_col}")
+    print(f"Rows to delete from df2: {delete_from_df2_col}")
+    print(f"Total rows to delete from df1: {len(delete_from_df1_col)}")
+    print(f"Total rows to delete from df2: {len(delete_from_df2_col)}")
+    print()
+    # delete the rows from df1
+    df1_cleaned = df1.drop(delete_from_df1_col)
+    df2_cleaned = df2.drop(delete_from_df2_col)
+    print(f"Cleaned DataFrame 1 shape: {df1_cleaned.shape}")
+    print(f"Cleaned DataFrame 2 shape: {df2_cleaned.shape}")
+    print()
+    print(f"Cleaned DataFrame 1 head:")
+    print(df1_cleaned.head())
+    print()
+    print(f"Cleaned DataFrame 2 head:")
+    print(df2_cleaned.head())
+    print()
+    print(f"Cleaned DataFrame 1 tail:")
+    print(df1_cleaned.tail())
+    print()
+    print(f"Cleaned DataFrame 2 tail:")
+    print(df2_cleaned.tail())
+    print()
+
+    # df1_cleaned.to_pickle(r"path_to_save_cleaned_df1.pkl")
+    # df2_cleaned.to_pickle(r"path_to_save_cleaned_df2.pkl")
