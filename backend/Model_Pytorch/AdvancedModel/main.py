@@ -4,7 +4,7 @@ import torch
 import pandas as pd
 
 from backend.Model_Pytorch.common.window_generator_multiple_stations import WindowGeneratorMultipleStations
-from backend.Model_Pytorch.common.data import preprocessing_our_df, normalize_data, load_pkl_file , normalize_data_collective, normalize_data_independent
+from backend.Model_Pytorch.common.data import preprocessing_our_df, load_pkl_file , normalize_data_collective, normalize_data_independent
 from backend.Model_Pytorch.AdvancedModel.model import TargetedWeatherPredictionModel, normalize_coordinates
 from backend.Model_Pytorch.AdvancedModel.train import train_model
 from backend.Model_Pytorch.AdvancedModel.parameters import PARAMS, WINDOW_PARAMS, LSTM_MODEL_PARAMS
@@ -261,7 +261,9 @@ if __name__ == "__main__":
         print(df.shape)
 
     # 4. Slice DataFrames Based on Year (Ensure Independent Slicing)
+    """
     print("Filtering data from year 2005 onwards:")
+    
     for i in range(len(dfs)):
         if 'Year' not in dfs[i].columns:
             raise ValueError(f"'Year' column not found in DataFrame {i}.")
@@ -276,7 +278,7 @@ if __name__ == "__main__":
     print("Size of data after sliceDf:")
     for i, df in enumerate(dfs):
         print(f"Station {i}: {df.shape}")
-
+"""
     # 6. Slice Every 6th Row
     for i in tqdm(range(len(dfs)), desc="Slicing every 6th row"):
         dfs[i] = slice_six(dfs[i])  # Ensure `slice_six` correctly slices the DataFrame

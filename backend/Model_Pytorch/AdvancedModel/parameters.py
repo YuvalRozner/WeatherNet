@@ -6,7 +6,9 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'  # Determine device
 PARAMS = {
     'fileName' : 'Avne Etan',
     'filePah' : "..\\common\\jena_climate_2009_2016.csv",
-    'fileNames' : ['Newe Yaar', 'Tavor Kadoorie', 'Yavneel'],
+    'fileNames' : ['Newe Yaar', 'Newe Yaar'],
+#    'fileNames': ['Newe Yaar', 'Tavor Kadoorie', 'Yavneel'],
+
     'target_station' : 'Newe Yaar',
     'target_station_id' : 0,
 
