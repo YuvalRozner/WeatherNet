@@ -1,5 +1,3 @@
-# train.py
-
 import os
 import torch
 import torch.nn as nn
@@ -17,7 +15,8 @@ def train_model(
     lr=1e-3,
     checkpoint_dir='./checkpoints',
     resume=False,
-    device='cpu'
+    device='cpu',
+    coord=[0, 0]
 ):
     # DataLoaders
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
@@ -48,27 +47,31 @@ def train_model(
     
     for epoch in range(start_epoch, start_epoch + epochs):
         model.train()
-        train_losses = []
-        
-        for x_batch, y_batch in tqdm(train_loader, desc=f"Epoch {epoch+1}/{start_epoch + epochs}"):
-        #for x_batch, y_batch in train_loader:
-
-            x_batch = x_batch.to(device)  # (batch, seq_len, in_channels)
-            y_batch = y_batch.to(device)  # (batch, label_width, num_label_features) or (batch, 1, 1)
+        epoch_loss = 0.0
+        for batch_idx, (x_batch, y_batch) in enumerate(tqdm(train_loader, desc=f"Epoch {epoch+1}/{start_epoch + epochs}")):
+            x_batch = x_batch.to(device)  # [batch_size, input_width, num_stations, num_features]
+            y_batch = y_batch.to(device)  # [batch_size, num_label_features]
             
-            optimizer.zero_grad()
-            preds = model(x_batch)  # (batch, 1)
+            # Forward pass with coordinates
+            preds = model(x_batch, coord[0].to(device), coord[1].to(device))  # [batch_size, 1]
             
             # Flatten y_batch if necessary
-            y_batch_single = y_batch.squeeze(-1).squeeze(-1)  # (batch,)
-            preds = preds.squeeze(-1)                         # (batch,)
+            y_batch_single = y_batch.squeeze(-1)  # [batch_size]
+            preds = preds.squeeze(-1)            # [batch_size]
             
+            # Compute loss
             loss = criterion(preds, y_batch_single)
+            
+            # Backward pass and optimization
+            optimizer.zero_grad()
             loss.backward()
             optimizer.step()
-            train_losses.append(loss.item())
+            
+            # Accumulate loss
+            epoch_loss += loss.item()
         
-        train_loss = np.mean(train_losses)
+        # Compute average loss for the epoch
+        train_loss = epoch_loss / len(train_loader)
         
         # Validation
         model.eval()
@@ -78,12 +81,18 @@ def train_model(
                 x_val = x_val.to(device)
                 y_val = y_val.to(device)
                 
-                preds_val = model(x_val).squeeze(-1)   # (batch,)
-                y_val_single = y_val.squeeze(-1).squeeze(-1)  # (batch,)
+                # Forward pass with coordinates
+                preds_val = model(x_val, coord[0].to(device), coord[1].to(device))  # [batch_size, 1]
                 
+                # Flatten predictions and labels
+                preds_val = preds_val.squeeze(-1)          # [batch_size]
+                y_val_single = y_val.squeeze(-1)          # [batch_size]
+                
+                # Compute loss
                 loss_val = criterion(preds_val, y_val_single)
                 val_losses.append(loss_val.item())
         
+        # Compute average validation loss
         val_loss = np.mean(val_losses)
         
         print(f"Epoch {epoch+1}/{start_epoch + epochs} | Train Loss: {train_loss:.4f} | Val Loss: {val_loss:.4f}")
