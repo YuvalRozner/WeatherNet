@@ -4,7 +4,7 @@ import torch
 import pandas as pd
 
 from backend.Model_Pytorch.common.window_generator import WindowGenerator
-from backend.Model_Pytorch.common.data import preprocessing_our_df, normalize_data, load_pkl_file, timeEncode
+from backend.Model_Pytorch.common.data import preprocessing_our_df, normalize_data, load_pkl_file, timeEncode,drop_nan_rows_multiple
 from model import LSTMModel
 from train import train_model
 from parameters import PARAMS, WINDOW_PARAMS, LSTM_MODEL_PARAMS
@@ -16,6 +16,7 @@ if __name__ == "__main__":
     # 1) Load data
     df = load_pkl_file(PARAMS['fileName'])
     timeEncode([df])
+    df_cleaned_list = drop_nan_rows_multiple([df])
     # 2) Convert to numpy array
     data_np = df.values  # shape (T, in_channels)
     

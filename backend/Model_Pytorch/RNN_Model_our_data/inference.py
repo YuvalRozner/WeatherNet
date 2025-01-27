@@ -11,7 +11,7 @@ import os
 from parameters import PARAMS, WINDOW_PARAMS, LSTM_MODEL_PARAMS
 from tqdm import tqdm
 import matplotlib.pyplot as plt
-from backend.Model_Pytorch.common.data import preprocessing_our_df, normalize_data, load_pkl_file, timeEncode
+from backend.Model_Pytorch.common.data import preprocessing_our_df, normalize_data, load_pkl_file, timeEncode,drop_nan_rows_multiple
 from backend.Model_Pytorch.common.analyze import analyze
 from backend.Model_Pytorch.common.window_generator import WindowGenerator
 
@@ -106,6 +106,8 @@ def load_data_and_preprocess(data_path, target_column, fileName=True):
     if fileName:
         df = load_pkl_file(PARAMS['fileName'])
         timeEncode([df])
+        df_cleaned_list = drop_nan_rows_multiple([df])
+
     target_index = df.columns.get_loc(target_column)
     return df, target_index
 
