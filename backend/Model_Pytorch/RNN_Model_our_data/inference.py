@@ -11,7 +11,7 @@ import os
 from parameters import PARAMS, WINDOW_PARAMS, LSTM_MODEL_PARAMS
 from tqdm import tqdm
 import matplotlib.pyplot as plt
-from backend.Model_Pytorch.common.data import preprocessing_our_df, normalize_data, load_pkl_file
+from backend.Model_Pytorch.common.data import preprocessing_our_df, normalize_data, load_pkl_file, timeEncode
 from backend.Model_Pytorch.common.analyze import analyze
 from backend.Model_Pytorch.common.window_generator import WindowGenerator
 
@@ -105,20 +105,14 @@ def get_val_data(df):
 def load_data_and_preprocess(data_path, target_column, fileName=True):
     if fileName:
         df = load_pkl_file(PARAMS['fileName'])
-        df = preprocessing_our_df(df)
-        print("using preprocessing_our_df !!!")
-    else:
-        df = pd.read_csv(os.path.join(os.path.dirname(__file__), PARAMS['filePah']))
-        df = preprocessing_tensor_df(df)
-        print("using preprocessing_tensor_df !!!")
+        timeEncode([df])
     target_index = df.columns.get_loc(target_column)
     return df, target_index
 
 if __name__ == "__main__":
     # Define parameters directly in main
-    path_to_file = os.path.join(os.path.dirname(__file__), PARAMS['filePah'])
 
-    data_path = path_to_file  # Adjust the path as needed
+
     scaler_path = os.path.join(os.path.dirname(__file__), 'output', 'scaler.pkl')
     checkpoint_path = os.path.join(os.path.dirname(__file__), 'output', 'checkpoints', 'best_checkpoint.pth')
     window_size = WINDOW_PARAMS['input_width']  # Must match input_width used during training

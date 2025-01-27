@@ -4,8 +4,7 @@ import torch
 device = 'cuda' if torch.cuda.is_available() else 'cpu'  # Determine device
 
 PARAMS = {
-    'fileName' : 'Avne Etan',
-    'filePah' : "..\\common\\jena_climate_2009_2016.csv",
+    'fileName' : 'Newe Yaar_data_2005_2024',
     'epochs' : 20,
     'resume' : False, # resume train or start new
     'device' : device,
