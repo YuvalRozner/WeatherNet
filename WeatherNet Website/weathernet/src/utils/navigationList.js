@@ -12,7 +12,7 @@ import {
   FileCopyOutlined,
   ForwardToInboxRounded,
 } from "@mui/icons-material";
-import TemporaryComponentHome from "../components/pages/home/temporaryComponentHome.js";
+import Home from "../components/pages/home/home.js";
 import PaperContainer from "../components/pages/papers/paperContainer.js";
 import About from "../components/pages/about/about.js";
 import Contributors from "../components/pages/contributers/contributors.js";
@@ -27,7 +27,7 @@ export const NavigationList = [
     segment: "Home",
     title: "Home",
     icon: <HomeOutlined />,
-    pageComponent: <TemporaryComponentHome />,
+    pageComponent: <Home />,
   },
   {
     kind: "divider",
