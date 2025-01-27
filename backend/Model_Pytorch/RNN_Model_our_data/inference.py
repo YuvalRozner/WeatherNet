@@ -137,6 +137,8 @@ if __name__ == "__main__":
         "num_layers": LSTM_MODEL_PARAMS['num_layers'],
         "label_width": WINDOW_PARAMS['label_width'],
     }
+
+    data_path = ""
     df, target_index = load_data_and_preprocess(data_path, target_column)
 
     device = PARAMS['device']

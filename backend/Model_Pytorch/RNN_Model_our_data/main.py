@@ -61,7 +61,7 @@ if __name__ == "__main__":
         model,
         epochs=PARAMS['epochs'],
         batch_size=32,
-        lr=1e-3,
+        lr=1e-5,
         checkpoint_dir=os.path.join(os.path.dirname(__file__),'output','checkpoints'),
         resume=PARAMS['resume'],
         device=device
