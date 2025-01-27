@@ -7,17 +7,17 @@ import numpy as np
 from tqdm import tqdm
 
 def train_model(
-    train_dataset,
-    val_dataset,
-    model,
-    epochs=10,
-    batch_size=32,
-    lr=1e-3,
-    checkpoint_dir='./checkpoints',
-    resume=False,
-    device='cpu',
-    coord=[0, 0]
-):
+        train_dataset,
+        val_dataset,
+        model,
+        epochs=10,
+        batch_size=32,
+        lr=1e-5,
+        checkpoint_dir='./checkpoints',
+        resume=False,
+        device='cpu',
+        coord=[0, 0]
+    ):
     # DataLoaders
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
     val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)

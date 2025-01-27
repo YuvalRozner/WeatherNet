@@ -1,3 +1,5 @@
+# model.py
+
 import torch
 import torch.nn as nn
 import math
@@ -68,11 +70,12 @@ class TemporalPositionalEncoding(nn.Module):
 
 class TargetedWeatherPredictionModel(nn.Module):
     def __init__(self, num_stations, time_steps, feature_dim, cnn_channels, kernel_size,
-                 d_model, nhead, num_layers, target_station_idx):
+                 d_model, nhead, num_layers, target_station_idx, label_width=1):
         super(TargetedWeatherPredictionModel, self).__init__()
         self.num_stations = num_stations
         self.time_steps = time_steps
         self.target_station_idx = target_station_idx
+        self.label_width = label_width
 
         # Initialize separate CNNs for each station
         self.station_cnns = nn.ModuleList([
@@ -97,7 +100,7 @@ class TargetedWeatherPredictionModel(nn.Module):
         self.transformer_encoder = nn.TransformerEncoder(encoder_layer, num_layers=num_layers)
 
         # Final prediction layer
-        self.fc_out = nn.Linear(d_model, 1)
+        self.fc_out = nn.Linear(d_model, label_width)  # Output label_width predictions
 
     def forward(self, x, lat, lon):
         """
@@ -146,78 +149,15 @@ class TargetedWeatherPredictionModel(nn.Module):
         transformer_out = transformer_out.view(batch_size, num_stations, time_steps, -1)
 
         # Select target station's features: [batch_size, time_steps, d_model]
-        target_features = transformer_out[:, self.target_station_idx, :, :]
+        target_features = transformer_out[:, self.target_station_idx, :, :]  # [batch_size, time_steps, d_model]
 
-        # Aggregate over time steps (mean pooling)
-        target_features = target_features.mean(dim=1)  # [batch_size, d_model]
+        # Instead of mean pooling, you might retain temporal information or use other aggregation
+        # For multi-step prediction, you can use the entire sequence or specific parts
+        # Here, we'll simply take the last time step's features for simplicity
+        # Alternatively, more sophisticated methods can be employed
+        last_time_step_features = target_features[:, -1, :]  # [batch_size, d_model]
 
         # Final prediction
-        prediction = self.fc_out(target_features)  # [batch_size, 1]
+        prediction = self.fc_out(last_time_step_features)  # [batch_size, label_width]
 
         return prediction
-
-
-# Define the normalization function
-def normalize_coordinates(x_coords, y_coords):
-    """
-    Normalize the X and Y coordinates to the range [0, 1].
-
-    Args:
-        x_coords (numpy.ndarray): Array of X coordinates in meters.
-        y_coords (numpy.ndarray): Array of Y coordinates in meters.
-
-    Returns:
-        tuple: Normalized X and Y coordinates as torch tensors.
-    """
-    x_min, x_max = x_coords.min(), x_coords.max()
-    y_min, y_max = y_coords.min(), y_coords.max()
-
-    x_normalized = (x_coords - x_min) / (x_max - x_min)
-    y_normalized = (y_coords - y_min) / (y_max - y_min)
-
-    # Convert to torch tensors
-    x_normalized = torch.tensor(x_normalized, dtype=torch.float32).unsqueeze(1)  # [num_stations, 1]
-    y_normalized = torch.tensor(y_normalized, dtype=torch.float32).unsqueeze(1)  # [num_stations, 1]
-
-    return x_normalized, y_normalized
-
-if __name__ == "__main__":
-    # Example coordinates in meters (New Israel Coordination System)
-    # Replace these with your actual station coordinates
-    x_coords = np.array([1000, 2000, 3000, 4000, 5000])  # Example X coordinates in meters
-    y_coords = np.array([1500, 2500, 3500, 4500, 5500])  # Example Y coordinates in meters
-
-    # Normalize coordinates
-    lat_normalized, lon_normalized = normalize_coordinates(x_coords, y_coords)
-
-    # Hyperparameters
-    num_stations = 5  # 1 target + 4 nearby
-    time_steps = 24
-    feature_dim = 10
-    cnn_channels = 16
-    kernel_size = 3
-    d_model = 128
-    nhead = 8
-    num_layers = 4
-    target_station_idx = 0  # Index of the target station
-
-    # Instantiate the model
-    model = TargetedWeatherPredictionModel(
-        num_stations=num_stations,
-        time_steps=time_steps,
-        feature_dim=feature_dim,
-        cnn_channels=cnn_channels,
-        kernel_size=kernel_size,
-        d_model=d_model,
-        nhead=nhead,
-        num_layers=num_layers,
-        target_station_idx=target_station_idx
-    )
-
-    # Example input
-    batch_size = 32
-    x = torch.randn(batch_size, num_stations, time_steps, feature_dim)  # [batch, num_stations, time_steps, feature_dim]
-
-    # Forward pass
-    output = model(x, lat_normalized, lon_normalized)  # [batch, 1]
-    print(output.shape)  # Should print torch.Size([32, 1])

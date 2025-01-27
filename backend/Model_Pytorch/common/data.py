@@ -5,10 +5,107 @@ import json
 from sklearn.preprocessing import StandardScaler
 import pickle
 import numpy as np
+import torch
+from tqdm import tqdm
 """
 this file let you load the data of the stations from the pkl files 
 and the coordinates of the stations from the json file
 """
+
+def normalize_coordinates(x_coords, y_coords):
+    """
+    Normalize the X and Y coordinates to the range [0, 1].
+
+    Args:
+        x_coords (numpy.ndarray): Array of X coordinates in meters.
+        y_coords (numpy.ndarray): Array of Y coordinates in meters.
+
+    Returns:
+        tuple: Normalized X and Y coordinates as torch tensors.
+    """
+    x_min, x_max = x_coords.min(), x_coords.max()
+    y_min, y_max = y_coords.min(), y_coords.max()
+
+    x_normalized = (x_coords - x_min) / (x_max - x_min)
+    y_normalized = (y_coords - y_min) / (y_max - y_min)
+
+    # Convert to torch tensors
+    x_normalized = torch.tensor(x_normalized, dtype=torch.float32).unsqueeze(1)  # [num_stations, 1]
+    y_normalized = torch.tensor(y_normalized, dtype=torch.float32).unsqueeze(1)  # [num_stations, 1]
+
+    return x_normalized, y_normalized 
+
+def drop_nan_rows_multiple(df_list, reset_indices=True):
+    """
+    Removes rows from all DataFrames in the list where any DataFrame has NaN in any column.
+    
+    Parameters:
+    df_list (List[pd.DataFrame]): List of DataFrames to process.
+    reset_indices (bool): Whether to reset the index after dropping rows. Defaults to True.
+    
+    Returns:
+    List[pd.DataFrame]: List of cleaned DataFrames.
+    """
+    if not df_list:
+        raise ValueError("The list of DataFrames is empty.")
+    
+    # Ensure all DataFrames have the same number of rows
+    num_rows = df_list[0].shape[0]
+    for df in df_list:
+        if df.shape[0] != num_rows:
+            raise ValueError("All DataFrames must have the same number of rows.")
+    
+    # Step 1: Identify rows with any NaN in each DataFrame
+    nan_indices_list = [df.isnull().any(axis=1) for df in df_list]
+    
+    # Step 2: Combine the indices where NaNs are present in any DataFrame
+    combined_nan = pd.Series([False] * num_rows, index=df_list[0].index)
+    for nan_mask in nan_indices_list:
+        combined_nan = combined_nan | nan_mask
+    
+    # Get the indices to drop
+    indices_to_drop = combined_nan[combined_nan].index
+    
+    # Step 3: Drop the identified indices from all DataFrames
+    cleaned_df_list = []
+    for df in tqdm(df_list, desc="Dropping NaN rows"):
+        cleaned_df = df.drop(indices_to_drop)
+        if reset_indices:
+            cleaned_df = cleaned_df.reset_index(drop=True)
+        cleaned_df_list.append(cleaned_df)
+    
+    return cleaned_df_list
+
+# Define the normalization function
+def normalize_coordinates(x_coords, y_coords):
+    """
+    Normalize the X and Y coordinates to the range [0, 1].
+    """
+    x_min, x_max = x_coords.min(), x_coords.max()
+    y_min, y_max = y_coords.min(), y_coords.max()
+
+    x_normalized = (x_coords - x_min) / (x_max - x_min)
+    y_normalized = (y_coords - y_min) / (y_max - y_min)
+
+    # Convert to torch tensors
+    x_normalized = torch.tensor(x_normalized, dtype=torch.float32).unsqueeze(1)  # [num_stations, 1]
+    y_normalized = torch.tensor(y_normalized, dtype=torch.float32).unsqueeze(1)  # [num_stations, 1]
+
+    return x_normalized, y_normalized
+
+def timeEncode(dataframes):
+    day = 24*60*60
+    year = (365.2425)*day
+
+    for df in dataframes:
+        if 'Date Time' in df.columns:
+            timestamp_s = df['Date Time'].map(pd.Timestamp.timestamp)
+            df['Day sin'] = np.sin(timestamp_s * (2 * np.pi / day))
+            df['Day cos'] = np.cos(timestamp_s * (2 * np.pi / day))
+            df['Year sin'] = np.sin(timestamp_s * (2 * np.pi / year))
+            df['Year cos'] = np.cos(timestamp_s * (2 * np.pi / year))
+            df.drop(columns=['Date Time'], inplace=True)
+
 
 def preprocessing_tensor_df(df):
     """
