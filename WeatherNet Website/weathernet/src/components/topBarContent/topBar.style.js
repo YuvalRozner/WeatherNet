@@ -87,7 +87,7 @@ export const ShareContainerBox = styled(Box)`
 
   @media (max-width: ${MyTheme.breakpoints.values.sm}px) {
     top: 12px;
-    right: 4px;
+    right: 9px;
   }
 `;
 
