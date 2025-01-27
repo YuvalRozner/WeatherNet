@@ -4,7 +4,7 @@ import torch
 import pandas as pd
 
 from backend.Model_Pytorch.common.window_generator_multiple_stations import WindowGeneratorMultipleStations
-from backend.Model_Pytorch.common.data import preprocessing_our_df, normalize_data, load_pkl_file , normalize_data_collective
+from backend.Model_Pytorch.common.data import preprocessing_our_df, normalize_data, load_pkl_file , normalize_data_collective, normalize_data_independent
 from backend.Model_Pytorch.AdvancedModel.model import TargetedWeatherPredictionModel, normalize_coordinates
 from backend.Model_Pytorch.AdvancedModel.train import train_model
 from backend.Model_Pytorch.AdvancedModel.parameters import PARAMS, WINDOW_PARAMS, LSTM_MODEL_PARAMS
@@ -249,48 +249,53 @@ if __name__ == "__main__":
 
     east_normalized, north_normalized = normalize_coordinates(east, north)
 
-    # Apply the function to the list of DataFrames
- 
-    filenames = PARAMS['fileNames']
+    # 3. Load DataFrames from CSVs
+    filenames = PARAMS['fileNames']  # List of 5 filenames
     dfs = []
     for filename in filenames:
-        # 1) Load data
-        df = load_pkl_file(filename)
+        df = load_pkl_file(filename)  # Replace with actual data loading function
         dfs.append(df)
 
-    print("original size of data:")
+    print("Original size of data:")
     for df in dfs:
         print(df.shape)
 
-    print("from 2005 size of data:")
+    # 4. Slice DataFrames Based on Year (Ensure Independent Slicing)
+    print("Filtering data from year 2005 onwards:")
     for i in range(len(dfs)):
-        dfs[i] = dfs[0][dfs[0]['Year']>2004]
-        print(dfs[i].shape)
+        if 'Year' not in dfs[i].columns:
+            raise ValueError(f"'Year' column not found in DataFrame {i}.")
+        dfs[i] = dfs[i][dfs[i]['Year'] > 2004]
+        print(f"Station {i} data shape after filtering: {dfs[i].shape}")
 
-
-    # use sliceDf() on all pairs of dataframes
+    # 5. Apply `sliceDf` on All Pairs of DataFrames (Ensure Correct Functionality)
     for i in tqdm(range(len(dfs)), desc="Slicing DataFrames"):
         for j in range(i+1, len(dfs)):
-            dfs[i], dfs[j] = sliceDf(dfs[i], dfs[j])
+            dfs[i], dfs[j] = sliceDf(dfs[i], dfs[j])  # Ensure `sliceDf` correctly processes each pair
 
-    print("size of data after sliceDf:")
-    for df in dfs:
-        print(df.shape)
-    #slice each df in in jumps of 6 rows
+    print("Size of data after sliceDf:")
+    for i, df in enumerate(dfs):
+        print(f"Station {i}: {df.shape}")
+
+    # 6. Slice Every 6th Row
     for i in tqdm(range(len(dfs)), desc="Slicing every 6th row"):
-        dfs[i] = slice_six(dfs[i])
+        dfs[i] = slice_six(dfs[i])  # Ensure `slice_six` correctly slices the DataFrame
 
-    print("size of data after slice_six:")
-    for df in dfs:
-        print(df.shape)
-    df_cleaned_list = drop_nan_rows_multiple(dfs)
+    print("Size of data after slice_six:")
+    for i, df in enumerate(dfs):
+        print(f"Station {i}: {df.shape}")
 
-    print("size of data after drop_nan_rows_multiple:")
-    for df in df_cleaned_list:
-        print(df.shape)
+    # 7. Drop NaN Rows
+    df_cleaned_list = drop_nan_rows_multiple(dfs)  # Ensure this function returns a list of cleaned DataFrames
 
-    list_of_values = [df.values for df in dfs]  # Each element is (T, num_features)
+    print("Size of data after drop_nan_rows_multiple:")
+    for i, df in enumerate(df_cleaned_list):
+        print(f"Station {i}: {df.shape}")
 
+    # 8. Extract Feature Values (Use Cleaned Data)
+    list_of_values = [df.values for df in df_cleaned_list]  # Each element is (T, num_features)
+
+    # 9. Train/Validation Split per Station
     train_size = int(0.8 * len(list_of_values[0]))
     list_of_train_data = []
     list_of_val_data = []
@@ -299,59 +304,70 @@ if __name__ == "__main__":
         val_data = values[train_size:]
         list_of_train_data.append(train_data)
         list_of_val_data.append(val_data)
-    
-    combined_train_data = np.stack(list_of_train_data, axis=1)  # axis=1 corresponds to stations
-    combined_val_data = np.stack(list_of_val_data, axis=1)  # axis=1 corresponds to stations
 
-    train_data_scaled, val_data_scaled, scaler = normalize_data_collective(combined_train_data, combined_val_data, scaler_path=os.path.join(os.path.dirname(__file__),'output','scaler.pkl'))
-    
-    # 5) Create Datasets
+    # 10. Combine Data into 3D Arrays
+    combined_train_data = np.stack(list_of_train_data, axis=1)  # (T_train, num_stations, num_features)
+    combined_val_data = np.stack(list_of_val_data, axis=1)      # (T_val, num_stations, num_features)
+
+    # 11. Normalize Data Independently per Station
+    scaler_directory = os.path.join(os.path.dirname(__file__), 'output', 'scalers')
+    train_data_scaled, val_data_scaled, scalers = normalize_data_independent(
+        train_data=combined_train_data,
+        val_data=combined_val_data,
+        scaler_dir=scaler_directory
+    )
+
+    # 12. Create Datasets
     input_width = WINDOW_PARAMS['input_width']
     label_width = WINDOW_PARAMS['label_width']
     shift = WINDOW_PARAMS['shift']
 
-    column_indices = {name: i for i, name in enumerate(df.columns)}
+    # Ensure consistent column indexing
+    representative_df = df_cleaned_list[0]
+    column_indices = {name: i for i, name in enumerate(representative_df.columns)}
     label_columns = [column_indices[WINDOW_PARAMS['label_columns'][0]]]
 
+    # Define target station index
+    target_station_idx = PARAMS['target_station_id']  # Ensure this is 0-based and within range
+
+    # Instantiate Datasets
     train_dataset = WindowGeneratorMultipleStations(
         data=train_data_scaled, 
         input_width=input_width, 
         label_width=label_width, 
         shift=shift, 
         label_columns=label_columns,
-        target_station_idx=PARAMS['target_station_id']
-        )
-    
+        target_station_idx=target_station_idx
+    )
+
     val_dataset = WindowGeneratorMultipleStations(
         data=val_data_scaled, 
         input_width=input_width, 
         label_width=label_width, 
         shift=shift, 
         label_columns=label_columns,
-        target_station_idx=PARAMS['target_station_id']
-        )
-        
-    # 6) Instantiate model (LSTM)
-    in_channels = PARAMS['in_channels']  # number of features
+        target_station_idx=target_station_idx
+    )
+
+    # 13. Instantiate Model (Ensure Correct Parameters)
+    in_channels = len(label_columns)  # Number of features to predict
 
     device = PARAMS['device']
     print(f"Using device: {device}")
 
-
     model = TargetedWeatherPredictionModel(
-        num_stations=len(dfs),
-        time_steps=train_data_scaled.shape[1],
+        num_stations=len(df_cleaned_list),
+        time_steps=input_width,  # Corrected to input_width
         feature_dim=in_channels,
         cnn_channels=16,
         kernel_size=3,
         d_model=128,
         nhead=8,
         num_layers=4,
-        target_station_idx=PARAMS['target_station_id']
+        target_station_idx=target_station_idx
     )
 
-   
-    # 7) Train
+    # 14. Train the Model
     train_model(
         train_dataset,
         val_dataset,
@@ -361,5 +377,6 @@ if __name__ == "__main__":
         lr=1e-3,
         checkpoint_dir=os.path.join(os.path.dirname(__file__),'output','checkpoints'),
         resume=PARAMS['resume'],
-        device=device
+        device=device,
+        coord=[east_normalized, north_normalized]  # Ensure these are on the correct device
     )

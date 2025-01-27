@@ -75,6 +75,55 @@ def return_and_save_scaler_normalize_data(train_data, val_data, scaler_path='./s
     
     return scaler
 
+def normalize_data_independent(train_data, val_data, scaler_dir='./scalers'):
+    """
+    Fit a StandardScaler per station on the training data and transform both train and val data.
+    Save each scaler to disk for future use.
+    
+    Args:
+        train_data (np.ndarray): Training data of shape (T_train, num_stations, num_features).
+        val_data (np.ndarray): Validation data of shape (T_val, num_stations, num_features).
+        scaler_dir (str): Directory path to save the scalers.
+        
+    Returns:
+        train_data_scaled (np.ndarray): Scaled training data of shape (T_train, num_stations, num_features).
+        val_data_scaled (np.ndarray): Scaled validation data of shape (T_val, num_stations, num_features).
+        scalers (list of StandardScaler): List containing a scaler for each station.
+    """
+    if not os.path.exists(scaler_dir):
+        os.makedirs(scaler_dir)
+    
+    T_train, num_stations, num_features = train_data.shape
+    T_val = val_data.shape[0]
+    
+    # Initialize arrays to hold scaled data
+    train_data_scaled = np.zeros_like(train_data)
+    val_data_scaled = np.zeros_like(val_data)
+    
+    scalers = []
+    
+    for station_idx in range(num_stations):
+        scaler = StandardScaler()
+        
+        # Extract training data for the current station
+        train_station_data = train_data[:, station_idx, :]  # Shape: (T_train, num_features)
+        
+        # Fit the scaler on training data
+        scaler.fit(train_station_data)
+        scalers.append(scaler)
+        
+        # Transform training and validation data for the current station
+        train_data_scaled[:, station_idx, :] = scaler.transform(train_station_data)
+        val_data_scaled[:, station_idx, :] = scaler.transform(val_data[:, station_idx, :])
+        
+        # Save the scaler for the current station
+        scaler_path = os.path.join(scaler_dir, f'scaler_station_{station_idx}.pkl')
+        with open(scaler_path, 'wb') as f:
+            pickle.dump(scaler, f)
+        print(f"Scaler for Station {station_idx} saved to {scaler_path}")
+    
+    return train_data_scaled, val_data_scaled, scalers
+
 def normalize_data_collective(train_data, val_data, scaler_path='./scaler.pkl'):
     """
     Fit a single StandardScaler across all stations and features.
