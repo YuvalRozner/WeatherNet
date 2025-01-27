@@ -191,10 +191,12 @@ if __name__ == "__main__":
     print("Data cleaning completed successfully.")
 
     # print head of each df, shape and last cuople rows
+    columns_to_print = ['Day sin', 'Day cos', 'Year sin', 'Year cos']  # Replace with your actual column names
+
     for idx, df in enumerate(dfs):
         print(f"DataFrame {idx}")
-        print(df.head())
-        print(df.shape)
-        print(df.tail(2))
+        print(df[columns_to_print].head())
+        print(df[columns_to_print].shape)
+        print(df[columns_to_print].tail(2))
         print()
     
