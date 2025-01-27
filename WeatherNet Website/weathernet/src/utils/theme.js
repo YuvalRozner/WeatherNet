@@ -29,9 +29,32 @@ export const MyTheme = extendTheme({
           width: "1.1em",
           height: "1.1em",
           // Specific sizes for MenuOpenIcon and MenuIcon
-          '&[data-testid="MenuOpenIcon"], &[data-testid="MenuIcon"]': {
-            width: "1.4em",
-            height: "1.7em",
+          "@media (min-width: 600px)": {
+            '&[data-testid="MenuOpenIcon"], &[data-testid="MenuIcon"]': {
+              width: "1.4em",
+              height: "1.7em",
+            },
+          },
+        },
+      },
+    },
+    MuiSpeedDial: {
+      defaultProps: {
+        FabProps: { size: "small" },
+      },
+    },
+    MuiFab: {
+      styleOverrides: {
+        sizeSmall: {
+          width: "40px",
+          height: "40px",
+          minHeight: "40px",
+          padding: "4px",
+          "@media (max-width:600px)": {
+            width: "31px",
+            height: "31px",
+            minHeight: "31px",
+            padding: "3px",
           },
         },
       },

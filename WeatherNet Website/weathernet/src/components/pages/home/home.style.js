@@ -23,11 +23,9 @@ export const AppLogo = styled.img`
 `;
 
 export const AppHeader = styled.header`
-  background-color: ${({ theme }) => theme.background};
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: ${({ theme }) => theme.text};
 `;

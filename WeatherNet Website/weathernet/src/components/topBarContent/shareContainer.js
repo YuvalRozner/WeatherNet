@@ -1,10 +1,9 @@
 import React, { useState } from "react";
-import Box from "@mui/material/Box";
 import SpeedDial from "@mui/material/SpeedDial";
 import SpeedDialAction from "@mui/material/SpeedDialAction";
-import ShareIcon from "@mui/icons-material/Share";
 import { sharingOptions } from "../../utils/SahringList";
 import Tooltip from "@mui/material/Tooltip";
+import { ShareContainerBox, StyledShareIcon } from "./topBar.style";
 
 export default function ControlledOpenSpeedDial({ shareUrl, title }) {
   const [open, setOpen] = useState(false);
@@ -12,7 +11,7 @@ export default function ControlledOpenSpeedDial({ shareUrl, title }) {
   const handleClose = () => setOpen(false);
 
   return (
-    <Box sx={{ position: "absolute", top: "11px", right: "30px" }}>
+    <ShareContainerBox>
       <Tooltip title="Share This Page" arrow placement="left-start">
         <SpeedDial
           ariaLabel="share options"
@@ -20,8 +19,7 @@ export default function ControlledOpenSpeedDial({ shareUrl, title }) {
           onOpen={handleOpen}
           open={open}
           direction="down"
-          icon={<ShareIcon style={{ width: "24px", height: "24px" }} />}
-          FabProps={{ size: "small" }}
+          icon={<StyledShareIcon />}
         >
           {sharingOptions.map(
             ({ name, IconComponent, url, action, windowName }) => (
@@ -30,7 +28,7 @@ export default function ControlledOpenSpeedDial({ shareUrl, title }) {
                 icon={
                   <IconComponent
                     style={{
-                      borderRadius: "45px",
+                      borderRadius: "25px",
                       width: "100%",
                       height: "100%",
                       transition: "transform 0.3s ease",
@@ -62,6 +60,6 @@ export default function ControlledOpenSpeedDial({ shareUrl, title }) {
           )}
         </SpeedDial>
       </Tooltip>
-    </Box>
+    </ShareContainerBox>
   );
 }

@@ -32,8 +32,8 @@ export function ToolbarActions() {
   const title = "Check out WeatherNet!";
   return (
     <>
-      <ThemeSwitcher />
-      <GitHubButton />
+      <ThemeSwitcher sx={{ margin: "0px", padding: "0px" }} />
+      <GitHubButton style={{ margin: "0px", padding: "0px" }} />
       <InvisibleDiv />
       <ShareButtonsContainer>
         <ShareContainer shareUrl={shareUrl} title={title} />
