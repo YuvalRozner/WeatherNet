@@ -174,4 +174,27 @@ if __name__ == "__main__":
             reference_df = sliced_reference_first.copy()
             dfs[0] = dfs[0].iloc[i_first:].reset_index(drop=True)
             dfs[idx] = dfs[idx].iloc[j_first:].reset_index(drop=True)
+
+    # find the shortest df and cut the rest from dfs
+    min_len = min([len(df) for df in dfs])
+    for idx, df in enumerate(dfs):
+        dfs[idx] = df.iloc[:min_len].reset_index(drop=True)
+    
+    # Save the cleaned DataFrames
+    cleaned_folder_path = r'C:\Users\dorsha\Documents\GitHub\WeatherNet\backend\Model_Pytorch\input\cleaned'  # Update this path as needed
+    os.makedirs(cleaned_folder_path, exist_ok=True)
+    for idx, df in enumerate(dfs):
+        save_path = os.path.join(cleaned_folder_path, f'df_{idx}.pkl')
+        df.to_pickle(save_path)
+        print(f"Saved cleaned DataFrame {idx} to {save_path}.")
+    
+    print("Data cleaning completed successfully.")
+
+    # print head of each df, shape and last cuople rows
+    for idx, df in enumerate(dfs):
+        print(f"DataFrame {idx}")
+        print(df.head())
+        print(df.shape)
+        print(df.tail(2))
+        print()
     
