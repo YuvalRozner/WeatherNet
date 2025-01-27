@@ -72,10 +72,6 @@ class WindowGeneratorMultipleStations(Dataset):
             y = self.data[y_start:y_end, self.target_station_idx, self.label_columns]  # [label_width, num_label_features]
         else:
             y = self.data[y_start:y_end, self.target_station_idx, :]  # [label_width, num_features]
-
-        # Optionally, aggregate labels if predicting a single value per window
-        y = y.mean(dim=0)  # [num_label_features]
-
         # Return x and y
         return x, y
 
