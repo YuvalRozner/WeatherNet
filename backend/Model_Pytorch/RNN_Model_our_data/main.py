@@ -16,7 +16,7 @@ if __name__ == "__main__":
     # 1) Load data
     df = load_pkl_file(PARAMS['fileName'])
     timeEncode([df])
-    df_cleaned_list = drop_nan_rows_multiple([df])
+    df = df.dropna()
     # 2) Convert to numpy array
     data_np = df.values  # shape (T, in_channels)
     

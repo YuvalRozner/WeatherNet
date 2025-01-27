@@ -106,7 +106,7 @@ def load_data_and_preprocess(data_path, target_column, fileName=True):
     if fileName:
         df = load_pkl_file(PARAMS['fileName'])
         timeEncode([df])
-        df_cleaned_list = drop_nan_rows_multiple([df])
+        df = df.dropna()
 
     target_index = df.columns.get_loc(target_column)
     return df, target_index
