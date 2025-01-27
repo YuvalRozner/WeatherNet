@@ -233,8 +233,9 @@ def run(df1, df2):
     # Convert DataFrame indexes to lists for faster access
     df1_indices = df1.index.tolist()
     df2_indices = df2.index.tolist()
-
+    max1 = max(len(df1),len(df2))
     while i < len(df1) and j < len(df2):
+        print(f"\r{(((i+j)/2)/max1)*100}%",end="")
         row_df1 = df1.iloc[i]
         row_df2 = df2.iloc[j]
 
@@ -280,13 +281,32 @@ def run(df1, df2):
 
 
 if __name__ == "__main__":
-    
-    df1 = pd.read_pickle(r"C:\Users\dorsh\Documents\GitHub\WeatherNet\backend\Model_Pytorch\input\Newe Yaar.pkl")
-    df2 = pd.read_pickle(r"C:\Users\dorsh\Documents\GitHub\WeatherNet\backend\Model_Pytorch\input\Tavor Kadoorie.pkl")
-    selected_columns = ['Day sin', 'Day cos', 'Year sin', 'Year cos']
+    data1 = {
+        'Year': [2020, 2020, 2020 ],
+        'Day sin': [0.0, 1.0, 0.0],
+        'Day cos': [1.0, 0.0, -1.0 ],
+        'Year sin': [0.0, 0.0, 0.0],
+        'Year cos': [1.0, 1.0, 1.0 ],
+        'Value': [10, 20, 30 ]
+    }
+
+    data2 = {
+        'Year': [2020, 2020],
+        'Day sin': [0.0, -1.0],
+        'Day cos': [-1.0, 0.0],
+        'Year sin': [0.0, 0.0],
+        'Year cos': [1.0, 1.0],
+        'Value': [3000, 4000]
+    }
+    #df1 = pd.DataFrame(data1)
+    #df2 = pd.DataFrame(data2)
+
+    df1 = pd.read_pickle(r"C:\Users\dorsha\Documents\GitHub\WeatherNet\backend\Model_Pytorch\input\Newe Yaar.pkl")
+    df2 = pd.read_pickle(r"C:\Users\dorsha\Documents\GitHub\WeatherNet\backend\Model_Pytorch\input\Tavor Kadoorie.pkl")
+    selected_columns = ['Day sin', 'Day cos', 'Year sin', 'Year cos', 'Year']
     df1_col = df1.loc[:, selected_columns]
     df2_col = df2.loc[:, selected_columns]
-    delete_from_df1_col, delete_from_df2_col = run(df1_col, df2_col)
+    delete_from_df1_col, delete_from_df2_col = run(df1_col[df1_col['Year']==2005], df2_col[df2_col['Year']==2005])
     print(f"Rows to delete from df1: {delete_from_df1_col}")
     print(f"Rows to delete from df2: {delete_from_df2_col}")
     print(f"Total rows to delete from df1: {len(delete_from_df1_col)}")
