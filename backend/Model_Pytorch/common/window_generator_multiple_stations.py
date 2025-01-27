@@ -37,6 +37,7 @@ class WindowGeneratorMultipleStations(Dataset):
         # label columns
         self.label_columns = label_columns
         # If None, we'll just return all features as labels
+
         if label_columns is not None:
             self.num_label_features = len(label_columns)
         else:
@@ -66,6 +67,7 @@ class WindowGeneratorMultipleStations(Dataset):
         x = self.data[x_start:x_end]  # shape (input_width, num_stations, num_features)
 
         # slice label
+        x = x.permute(1, 0, 2)
         if self.label_columns is not None:
             y = self.data[y_start:y_end, self.target_station_idx, self.label_columns]  # [label_width, num_label_features]
         else:

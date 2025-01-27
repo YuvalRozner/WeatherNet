@@ -244,8 +244,8 @@ def normalize_coordinates(x_coords, y_coords):
 
 if __name__ == "__main__":
 
-    east = np.array([217010, 238440, 248110])  # new israel coordination system
-    north = np.array([734820, 734540, 733730])  # new israel coordination system
+    east = np.array([217010, 238440])  # new israel coordination system
+    north = np.array([734820, 734540])  # new israel coordination system
 
     east_normalized, north_normalized = normalize_coordinates(east, north)
 
@@ -352,15 +352,15 @@ if __name__ == "__main__":
     )
 
     # 13. Instantiate Model (Ensure Correct Parameters)
-    in_channels = len(label_columns)  # Number of features to predict
+    #in_channels = len(label_columns)  # Number of features to predict
 
     device = PARAMS['device']
     print(f"Using device: {device}")
-
+    num_stations = len(df_cleaned_list)
     model = TargetedWeatherPredictionModel(
-        num_stations=len(df_cleaned_list),
+        num_stations=num_stations,
         time_steps=input_width,  # Corrected to input_width
-        feature_dim=in_channels,
+        feature_dim= PARAMS['in_channels'],
         cnn_channels=16,
         kernel_size=3,
         d_model=128,
