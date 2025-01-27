@@ -24,11 +24,17 @@ export default function ControlledOpenSpeedDial({ shareUrl, title }) {
           {sharingOptions.map(
             ({ name, IconComponent, url, action, windowName }) => (
               <SpeedDialAction
+                sx={{
+                  margin: "5px",
+                  "@media (max-width: 600px)": {
+                    margin: "2px",
+                  },
+                }}
                 key={name}
                 icon={
                   <IconComponent
                     style={{
-                      borderRadius: "25px",
+                      borderRadius: "50px",
                       width: "100%",
                       height: "100%",
                       transition: "transform 0.3s ease",

@@ -46,9 +46,9 @@ export const MyTheme = extendTheme({
     MuiFab: {
       styleOverrides: {
         sizeSmall: {
-          width: "40px",
-          height: "40px",
-          minHeight: "40px",
+          width: "42px",
+          height: "42px",
+          minHeight: "42px",
           padding: "4px",
           "@media (max-width:600px)": {
             width: "31px",
