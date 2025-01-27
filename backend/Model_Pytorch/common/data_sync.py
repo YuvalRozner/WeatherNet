@@ -101,9 +101,11 @@ def find_last_matching_indices(
 
 if __name__ == "__main__":
     # Load pickle files
-    folder_path = r'C:\Users\dorsh\Documents\GitHub\WeatherNet\backend\Model_Pytorch\input'  # Update this path as needed
+    folder_path = r'C:\Users\dorsha\Documents\GitHub\WeatherNet\backend\Model_Pytorch\input'  # Update this path as needed
     # List to hold DataFrames
     dfs = []
+
+
 
     # Iterate through all files in the folder
     for filename in os.listdir(folder_path):
@@ -119,7 +121,8 @@ if __name__ == "__main__":
     if not dfs:
         print("No DataFrames loaded. Please check the folder path and contents.")
         exit()
-
+    for i in range(len(dfs)):
+        dfs[i] = dfs[i][dfs[i]['Year'] >= 2005]
     dfs_for_start_slice = []
 
     year_to_check = 2005
@@ -171,6 +174,4 @@ if __name__ == "__main__":
             reference_df = sliced_reference_first.copy()
             dfs[0] = dfs[0].iloc[i_first:].reset_index(drop=True)
             dfs[idx] = dfs[idx].iloc[j_first:].reset_index(drop=True)
-        print("yey")
-
-    print("yey")
+    
