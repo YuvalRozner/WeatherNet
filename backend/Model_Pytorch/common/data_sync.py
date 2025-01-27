@@ -286,6 +286,13 @@ def run(df1, df2,atol):
     return delete_from_df1, delete_from_df2
 
 
+def checkEqual(df1,df2,atol):
+    for i in range(len(df1)):
+        if np.allclose(df1.iloc[i].values, df2.iloc[i].values, atol=atol):
+            print(f"defreent {i}")
+            return False
+    return True
+
 if __name__ == "__main__":
     data1 = {
         'Year': [2020, 2020, 2020 ],
@@ -307,20 +314,28 @@ if __name__ == "__main__":
     #df1 = pd.DataFrame(data1)
     #df2 = pd.DataFrame(data2)
 
-    df1 = pd.read_pickle(r"C:\Users\dorsh\Documents\GitHub\WeatherNet\backend\Model_Pytorch\input\Newe Yaar.pkl")
-    df2 = pd.read_pickle(r"C:\Users\dorsh\Documents\GitHub\WeatherNet\backend\Model_Pytorch\input\Tavor Kadoorie.pkl")
+    df1 = pd.read_pickle(r"C:\Users\dorsha\Documents\GitHub\WeatherNet\backend\Model_Pytorch\input\Newe Yaar.pkl")
+    df2 = pd.read_pickle(r"C:\Users\dorsha\Documents\GitHub\WeatherNet\backend\Model_Pytorch\input\Tavor Kadoorie.pkl")
     selected_columns = ['Day sin', 'Day cos', 'Year sin', 'Year cos', 'Year']
     df1_col = df1.loc[:, selected_columns]
     df2_col = df2.loc[:, selected_columns]
-    delete_from_df1_col, delete_from_df2_col = run(df1_col[df1_col['Year']==2005], df2_col[df2_col['Year']==2005])
-    print(f"Rows to delete from df1: {delete_from_df1_col}")
-    print(f"Rows to delete from df2: {delete_from_df2_col}")
+    delete_from_df1_col, delete_from_df2_col = run(df1_col[df1_col['Year']==2005], df2_col[df2_col['Year']==2005],0.01)
+
     print(f"Total rows to delete from df1: {len(delete_from_df1_col)}")
-    print(f"Total rows to delete from df2: {len(delete_from_df2_col)}")
-    print()
+    print(f"Total rows to delete from df2: {len(delete_from_df2_col)}\n")
+
     # delete the rows from df1
     df1_cleaned = df1.drop(delete_from_df1_col)
     df2_cleaned = df2.drop(delete_from_df2_col)
+    d1 = df1_cleaned[df1_cleaned['Year'] == 2005]
+    d2 = df2_cleaned[df2_cleaned['Year'] == 2005]
+
+    print(d1.shape)
+    print(d2.shape)
+
+
+    print(checkEqual(d1.loc[:, selected_columns],d2.loc[:, selected_columns],0.0001))
+
     print(f"Cleaned DataFrame 1 shape: {df1_cleaned.shape}")
     print(f"Cleaned DataFrame 2 shape: {df2_cleaned.shape}")
     print()
