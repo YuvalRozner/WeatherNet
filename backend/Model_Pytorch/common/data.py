@@ -149,6 +149,35 @@ def preprocessing_tensor_df(df):
 
     return df
 
+def normalize_data(train_data, val_data, scaler_path='./scaler.pkl'):
+    """
+    Fit a StandardScaler on the training data and transform both train and val data.
+    Save the scaler to disk for future use.
+
+    Args:
+        train_data (np.ndarray): Training data.
+        val_data (np.ndarray): Validation data.
+        scaler_path (str): Path to save the scaler.
+
+    Returns:
+        train_data_scaled (np.ndarray): Scaled training data.
+        val_data_scaled (np.ndarray): Scaled validation data.
+        scaler (StandardScaler): Fitted scaler object.
+    """
+    scaler = StandardScaler()
+    scaler.fit(train_data)
+
+    train_data_scaled = scaler.transform(train_data)
+    val_data_scaled = scaler.transform(val_data)
+
+    # Save the scaler
+    with open(scaler_path, 'wb') as f:
+        pickle.dump(scaler, f)
+
+    print(f"Scaler saved to {scaler_path}")
+
+    return train_data_scaled, val_data_scaled, scaler
+
 def preprocessing_our_df(df):
     """
     Apply the same preprocessing steps as during training.
