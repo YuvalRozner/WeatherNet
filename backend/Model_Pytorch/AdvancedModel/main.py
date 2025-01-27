@@ -105,7 +105,7 @@ if __name__ == "__main__":
     device = PARAMS['device']
     print(f"Using device: {device}")
 
-    model = TargetedWeatherPredictionModel(ADVANCED_MODEL_PARAMS.copy())
+    model = TargetedWeatherPredictionModel(**ADVANCED_MODEL_PARAMS.copy())
 
     # 14. Train the Model
     train_model(

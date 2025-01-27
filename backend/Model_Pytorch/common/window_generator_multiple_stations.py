@@ -89,7 +89,7 @@ class WindowGeneratorMultipleStations(Dataset):
             f'Target station index: {self.target_station_idx}'
         ])
     
-
+"""
 if __name__ == "__main__":
     import numpy as np
     import torch
@@ -130,3 +130,4 @@ if __name__ == "__main__":
         print(f"x shape: {x.shape}")  # Expected: [batch_size, input_width, num_stations, num_features]
         print(f"y shape: {y.shape}")  # Expected: [batch_size, label_width]
         break  # Only show the first batch
+"""

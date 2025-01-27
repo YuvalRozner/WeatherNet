@@ -285,7 +285,7 @@ def loadData(station_names):
         station_coordinates = loadCoordinatesNewIsraelData(stations_details, station)
         stations_data[station] = stations_csv, station_coordinates
     return stations_data
-
+"""
 # example of use for this file
 if __name__ == "__main__":
     # Load the data
@@ -307,3 +307,4 @@ if __name__ == "__main__":
 
     print("yey")
 
+"""
