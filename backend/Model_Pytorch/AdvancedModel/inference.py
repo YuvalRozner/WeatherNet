@@ -257,6 +257,7 @@ if __name__ == "__main__":
         # Comprehensive analysis over validation data
         total_window_size = input_width + shift - 1 + label_width
         end = len(combined_val_data) - total_window_size
+        end = 30
         predictions = []
         actual_temps = []
         for i in tqdm(range(0, end), desc="Predicting"):
@@ -277,9 +278,11 @@ if __name__ == "__main__":
                 dummy = np.zeros((y_pred_scaled.shape[0], target_scaler.mean_.shape[0]))
                 dummy[:, label_columns] = y_pred_scaled
                 y_pred_original = target_scaler.inverse_transform(dummy)[:, label_columns]
-                
-                predictions.extend(y_pred_original)
-                actual_temps.extend(actual_temp)
+
+                if len(y_pred_original) != len(actual_temp):
+                    continue
+                predictions.append(y_pred_original)
+                actual_temps.append(actual_temp)
             except ValueError as ve:
                 print(f"Skipping index {i}: {ve}")
                 continue
