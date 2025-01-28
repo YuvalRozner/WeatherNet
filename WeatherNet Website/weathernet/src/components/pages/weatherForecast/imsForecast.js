@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { processImsForecastData } from "../../../utils/DataManipulations";
+import { processImsForecastData } from "../../../utils/dataManipulations.js";
 import { getImsForecast } from "../../../utils/network/weathernetServer";
 import ChooseCity from "../../dataDisplays/chooseCity.js";
 import PeriodSlider from "../../dataDisplays/periodSlider.js";

@@ -3,7 +3,7 @@ import {
   processForecastData,
   processWeatherNetForecastData,
   mergeByUtcTime,
-} from "../../../utils/DataManipulations";
+} from "../../../utils/dataManipulations.js";
 import { getImsForecast } from "../../../utils/network/weathernetServer";
 import ChooseCity from "../../dataDisplays/chooseCity.js";
 import PeriodSlider from "../../dataDisplays/periodSlider.js";

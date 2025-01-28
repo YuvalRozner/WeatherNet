@@ -4,7 +4,7 @@ import {
   generateFormattedXAxis,
   generateFormattedYAxis,
   generateForecastChartSeries,
-} from "../../utils/DataManipulations";
+} from "../../utils/dataManipulations";
 import { ChartContainerBox } from "./dataDisplays.style";
 
 const WeatherChart = ({ dataset, minValue, maxValue }) => {
