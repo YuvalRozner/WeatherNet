@@ -5,7 +5,7 @@ import StepLabel from "@mui/material/StepLabel";
 import StepContent from "@mui/material/StepContent";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
-import { content } from "../../../utils/aboutContent";
+import { content } from "../../../utils/staticData/aboutContent";
 import {
   AboutContainer,
   AboutContentBox,

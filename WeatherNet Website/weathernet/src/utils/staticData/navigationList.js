@@ -12,15 +12,15 @@ import {
   FileCopyOutlined,
   ForwardToInboxRounded,
 } from "@mui/icons-material";
-import Home from "../components/pages/home/home.js";
-import PaperContainer from "../components/pages/papers/paperContainer.js";
-import About from "../components/pages/about/about.js";
-import Contributors from "../components/pages/contributers/contributors.js";
-import ContactUs from "../components/pages/contactUs/contactUs.js";
-import Architecture from "../components/pages/architecture/architecture.js";
-import Statistics from "../components/pages/statistics/statistics.js";
-import ImsForcast from "../components/pages/weatherForecast/imsForecast.js";
-import WeathernetForecast from "../components/pages/weatherForecast/weathenetForecast.js";
+import Home from "../../components/pages/home/home.js";
+import PaperContainer from "../../components/pages/papers/paperContainer.js";
+import About from "../../components/pages/about/about.js";
+import Contributors from "../../components/pages/contributers/contributors.js";
+import ContactUs from "../../components/pages/contactUs/contactUs.js";
+import Architecture from "../../components/pages/architecture/architecture.js";
+import Statistics from "../../components/pages/statistics/statistics.js";
+import ImsForcast from "../../components/pages/weatherForecast/imsForecast.js";
+import WeathernetForecast from "../../components/pages/weatherForecast/weathenetForecast.js";
 
 export const NavigationList = [
   {

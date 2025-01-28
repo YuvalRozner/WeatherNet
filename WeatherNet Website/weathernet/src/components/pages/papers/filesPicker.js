@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { NavigationList } from "../../../utils/navigationList";
+import { NavigationList } from "../../../utils/staticData/navigationList";
 import { GridBox } from "./paper.style";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";

@@ -1,7 +1,7 @@
 import React from "react";
 import { Dialog, DialogTitle, DialogContent, IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { DraggablePaperComponent } from "../../utils/draggable.js";
+import { DraggablePaperComponent } from "../../utils/logicForComponents/draggable.js";
 
 export function HelpDialog({ open, onClose }) {
   return (

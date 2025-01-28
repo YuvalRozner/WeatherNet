@@ -24,8 +24,8 @@ import {
   GitHub as GitHubIcon,
   Phone as PhoneIcon,
 } from "@mui/icons-material";
-import { ContributorsList } from "../../../utils/contributorsList.js";
-import { DraggablePaperComponent } from "../../../utils/draggable.js";
+import { ContributorsList } from "../../../utils/staticData/contributorsList.js";
+import { DraggablePaperComponent } from "../../../utils/logicForComponents/draggable.js";
 import Tooltip from "@mui/material/Tooltip";
 
 export default function Contributors() {

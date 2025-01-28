@@ -4,14 +4,14 @@ import TextField from "@mui/material/TextField";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
-import { DraggablePaperComponent } from "../../../utils/draggable";
+import { DraggablePaperComponent } from "../../../utils/logicForComponents/draggable";
+import logger from "../../../utils/logicForComponents/logger";
 import {
   DraggableTopArea,
   DraggableDialogActions,
   DraggableDialogTitle,
 } from "./contactUs.style";
 import { WeatherNetLogoLayout } from "../../base/weathenetLogoLayout";
-import logger from "../../../utils/logger";
 import { useNotifications } from "@toolpad/core/useNotifications";
 
 export default function FormDialog() {

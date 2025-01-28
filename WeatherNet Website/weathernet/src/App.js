@@ -1,7 +1,10 @@
 import React, { useMemo } from "react";
 import { AppProvider, DashboardLayout, PageContainer } from "@toolpad/core";
 import { MyTheme } from "./utils/theme";
-import { NavigationList, SidebarFooter } from "./utils/navigationList";
+import {
+  NavigationList,
+  SidebarFooter,
+} from "./utils/staticData/navigationList";
 import { AppTitle, ToolbarActions } from "./components/topBarContent/topBar";
 import { Home } from "./components/pages/home/home";
 import {

@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Typography, Container, Box } from "@mui/material";
-import { content } from "../../../utils/aboutContent";
+import { content } from "../../../utils/staticData/aboutContent";
 
 // TODO: change the content
 export default function ArchitecturePage() {

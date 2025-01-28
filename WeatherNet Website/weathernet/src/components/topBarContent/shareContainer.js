@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import SpeedDial from "@mui/material/SpeedDial";
 import SpeedDialAction from "@mui/material/SpeedDialAction";
-import { sharingOptions } from "../../utils/SahringList";
+import { sharingOptions } from "../../utils/staticData/sharingList.js";
 import Tooltip from "@mui/material/Tooltip";
 import { ShareContainerBox, StyledShareIcon } from "./topBar.style";
 
