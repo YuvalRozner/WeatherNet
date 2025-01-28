@@ -4,11 +4,11 @@ import torch
 import numpy as np
 import pandas as pd
 
-from model import LSTMModel
+from backend.Model_Pytorch.RNN_Model_our_data.model import LSTMModel
 from backend.Model_Pytorch.common.data import preprocessing_tensor_df
 import pickle
 import os
-from parameters import PARAMS, WINDOW_PARAMS, LSTM_MODEL_PARAMS
+from backend.Model_Pytorch.RNN_Model_our_data.parameters import PARAMS, WINDOW_PARAMS, LSTM_MODEL_PARAMS
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 from backend.Model_Pytorch.common.data import preprocessing_our_df, normalize_data, load_pkl_file, timeEncode,drop_nan_rows_multiple
