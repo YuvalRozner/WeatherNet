@@ -21,7 +21,7 @@ from tqdm import tqdm
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import mean_absolute_error, mean_squared_error
-from torchsummary import summary
+from torchinfo import summary
 from torchviz import make_dot
 import netron
 
@@ -155,7 +155,7 @@ def load_window_multi_station(data_np, window_size, shift, label_width, scalers,
 
 
 @torch.no_grad()
-def predict(model, input_window, lat, lon, device='cpu', return_attn=False):
+def predict(model, input_window, lat, lon, device='cpu'):
     """
     Perform prediction using the multi-station model.
 
@@ -176,13 +176,9 @@ def predict(model, input_window, lat, lon, device='cpu', return_attn=False):
     lat = lat.to(device)
     lon = lon.to(device)
 
-    if return_attn:
-        # Model prediction with attention weights
-        output_scaled, attn_weights = model(input_tensor, lat, lon, return_attn=True)
-    else:
-        # Model prediction without attention weights
-        output_scaled = model(input_tensor, lat, lon)
-        attn_weights = None
+    # Model prediction without attention weights
+    output_scaled = model(input_tensor, lat, lon)
+    attn_weights = None
 
     # Convert to numpy
     output_scaled_np = output_scaled.squeeze(-1).cpu().numpy().reshape(-1, 1)  # Shape: (label_width, 1)
@@ -257,15 +253,14 @@ def export_model_to_onnx(model, device, filepath='model.onnx'):
     dummy_input = torch.randn(1, ADVANCED_MODEL_PARAMS['num_stations'],
                               WINDOW_PARAMS['input_width'],
                               ADVANCED_MODEL_PARAMS['feature_dim']).to(device)
-    dummy_lat = torch.from_numpy(east_normalized).float().unsqueeze(1).to(device)
-    dummy_lon = torch.from_numpy(north_normalized).float().unsqueeze(1).to(device)
+    #dummy_lat = torch.from_numpy(east_normalized).float().unsqueeze(1).to(device)
+    #dummy_lon = torch.from_numpy(north_normalized).float().unsqueeze(1).to(device)
 
     # Export the model
     torch.onnx.export(model,
-                      (dummy_input, dummy_lat, dummy_lon),
+                      (dummy_input, east_normalized, north_normalized),
                       filepath,
                       export_params=True,
-                      opset_version=11,
                       do_constant_folding=True,
                       input_names=['input_window', 'lat', 'lon'],
                       output_names=['output'],
@@ -290,11 +285,15 @@ def visualize_model_summary(model,east_normalized,north_normalized, device):
         device (str): Device to load the model on ('cpu' or 'cuda').
     """
     # Define the input size: (num_stations, time_steps, feature_dim)
-    input_size = (ADVANCED_MODEL_PARAMS['num_stations'],
+    input_size = [(32,
+        ADVANCED_MODEL_PARAMS['num_stations'],
                   WINDOW_PARAMS['input_width'],
-                  ADVANCED_MODEL_PARAMS['feature_dim'])
+                  ADVANCED_MODEL_PARAMS['feature_dim']),
+                  (ADVANCED_MODEL_PARAMS['num_stations'],1),
+                  (ADVANCED_MODEL_PARAMS['num_stations'],1)
+                  ]
     print("Model Summary:")
-    summary(model,east_normalized,north_normalized, input_size)
+    summary(model, input_size)
 
 
 def visualize_computational_graph(model, device,east_normalized,north_normalized, filepath='computational_graph'):
@@ -311,7 +310,7 @@ def visualize_computational_graph(model, device,east_normalized,north_normalized
                               WINDOW_PARAMS['input_width'],
                               ADVANCED_MODEL_PARAMS['feature_dim']).to(device)
     # Forward pass
-    output, _ = model(dummy_input, east_normalized, north_normalized, return_attn=True)
+    output = model(dummy_input, east_normalized.to(device), north_normalized.to(device))
 
     # Generate the computational graph
     dot = make_dot(output, params=dict(model.named_parameters()))
@@ -406,7 +405,7 @@ if __name__ == "__main__":
     visualize_computational_graph(model, device,east_normalized,north_normalized, filepath='computational_graph')
 
     # Export model to ONNX for visualization with Netron
-    export_model_to_onnx(model, device, filepath='model.onnx')
+    #export_model_to_onnx(model, device, filepath='model.onnx')
 
     # Define prediction mode
     prediction_mode = 'analyze'  # Options: 'single', 'batch', 'analyze'
@@ -416,6 +415,7 @@ if __name__ == "__main__":
         # Comprehensive analysis over validation data
         total_window_size = input_width + shift - 1 + label_width
         end = len(combined_val_data) - total_window_size
+        end = 30
         predictions = []
         actual_temps = []
         all_attention_weights = []  # To store attention weights for visualization
@@ -431,7 +431,7 @@ if __name__ == "__main__":
                     idx=i
                 )
                 y_pred_scaled, attn_weights = predict(model, input_window, east_normalized, north_normalized,
-                                                      device=device, return_attn=True)
+                                                      device=device)
 
                 # Inverse transform
                 target_scaler = scalers[ADVANCED_MODEL_PARAMS['target_station_idx']]
@@ -452,7 +452,7 @@ if __name__ == "__main__":
                 continue
 
         # Perform analysis (assuming analyze is a custom function)
-        analyze(predictions, actual_temps, WINDOW_PARAMS['label_width'])
+        #analyze(predictions, actual_temps, WINDOW_PARAMS['label_width'])
 
         # Plot predictions vs actual
         plt.figure(figsize=(15, 7))

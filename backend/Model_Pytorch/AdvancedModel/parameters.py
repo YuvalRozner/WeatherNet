@@ -15,11 +15,17 @@ STATIONS_COORDINATES_COLAB = {
     f'/content/Yavneel_data_2005_2024.pkl':           (248110, 733730),
 }
 
+STATIONS_LIST = {
+    "Newe Yaar": "186",
+    "Tavor Kadoorie": "13"
+}
+
 PARAMS = {
     'paths_in_colab': [f'/content/Newe Yaar_data_2005_2024.pkl', f'/content/Tavor Kadoorie_data_2005_2024.pkl'],
     #'fileNames':        ['Newe Yaar_data_2005_2024', 'Tavor Kadoorie_data_2005_2024', 'Yavneel_data_2005_2024'],
     'fileNames':        ['Newe Yaar_data_2005_2024', 'Tavor Kadoorie_data_2005_2024'],
     'target_station':   'Newe Yaar_data_2005_2024',
+    'target_station_desplay_name':   'Newe Yaar',
     'target_station_id': 0,
     'epochs' :           20,
     'resume' :           False, # resume train or start new

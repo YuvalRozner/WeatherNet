@@ -16,8 +16,83 @@ from backend.Model_Pytorch.common.data import (
 )
 
 from backend.Model_Pytorch.AdvancedModel.model import TargetedWeatherPredictionModel
-from backend.Model_Pytorch.AdvancedModel.parameters import PARAMS, WINDOW_PARAMS, ADVANCED_MODEL_PARAMS, STATIONS_COORDINATES
+from backend.Model_Pytorch.AdvancedModel.parameters import PARAMS, WINDOW_PARAMS, ADVANCED_MODEL_PARAMS, STATIONS_COORDINATES, STATIONS_LIST
 from backend.Model_Pytorch.common.analyze import analyze
+
+
+import numpy as np
+import json
+from datetime import datetime, timedelta
+
+def generate_forecast_json(city_name, date_str, starting_hour, temperatures, output_file):
+    """
+    Generates a JSON file containing forecast data.
+
+    Parameters:
+    - city_name (str): Name of the city.
+    - date_str (str): Starting date in "YYYY-MM-DD" format.
+    - starting_hour (int): Starting hour in 24-hour format (0-23).
+    - temperatures (np.ndarray): NumPy array of temperature readings.
+    - output_file (str): Path to the output JSON file.
+    """
+    
+    # Validate inputs
+    if not isinstance(city_name, str):
+        raise TypeError("city_name must be a string.")
+    
+    try:
+        current_date = datetime.strptime(date_str, "%Y-%m-%d")
+    except ValueError:
+        raise ValueError("date_str must be in 'YYYY-MM-DD' format.")
+    
+    if not (0 <= starting_hour <= 23):
+        raise ValueError("starting_hour must be between 0 and 23.")
+    
+    if not isinstance(temperatures, np.ndarray):
+        raise TypeError("temperatures must be a NumPy array.")
+    
+    # Initialize forecast_data dictionary
+    forecast_data = {}
+    
+    current_hour = starting_hour
+    
+    for temp in temperatures:
+        # Format the current date
+        date_key = current_date.strftime("%Y-%m-%d")
+        
+        # Initialize the date entry if it doesn't exist
+        if date_key not in forecast_data:
+            forecast_data[date_key] = {"hourly": {}}
+        
+        # Format the current time
+        time_str = "{:02d}:00".format(current_hour)
+        
+        # Assign the temperature, formatted to one decimal place
+        forecast_data[date_key]["hourly"][time_str] = {
+            "temperature": "{:.1f}".format(temp)
+        }
+        
+        # Increment the hour
+        current_hour += 1
+        
+        # If hour exceeds 23, reset to 0 and move to the next day
+        if current_hour > 23:
+            current_hour = 0
+            current_date += timedelta(days=1)
+    
+    # Construct the final JSON structure
+    data = {
+        "data": {
+            "title": city_name,
+            "forecast_data": forecast_data
+        }
+    }
+    
+    # Write the data to a JSON file
+    with open(output_file, 'w') as f:
+        json.dump(data, f, indent=2)
+    
+    print(f"Forecast data successfully written to {output_file}")
 
 def load_scalers(scaler_dir='./output/scalers'):
     """
@@ -242,6 +317,19 @@ if __name__ == "__main__":
         rmse = np.sqrt(mean_squared_error(actual_temps, predictions))
         print(f"Mean Absolute Error (MAE): {mae:.2f} °C")
         print(f"Root Mean Squared Error (RMSE): {rmse:.2f} °C")
-    
+    elif prediction_mode == 'live':
+        # getting the window to predict from function
+        # need to implement in the future get_window_live(input_width)
+        
+        input_window, last_hour, date_str = get_window_live(STATIONS_LIST, input_width)
+
+        y_pred_scaled = predict(model, input_window, east_normalized, north_normalized,  device=device)
+        target_scaler = scalers[ADVANCED_MODEL_PARAMS['target_station_idx']]
+        dummy = np.zeros((y_pred_scaled.shape[0], target_scaler.mean_.shape[0]))
+        dummy[:, target_col_index] = y_pred_scaled[:, 0]
+        y_pred_original = target_scaler.inverse_transform(dummy)[:, target_col_index]
+        generate_forecast_json(PARAMS['target_station_desplay_name'], date_str, last_hour+1, y_pred_original, "forecast.json")
+
+
     else:
         print(f"Invalid prediction mode: {prediction_mode}. Choose from 'single', 'batch', 'analyze'.")
