@@ -7,6 +7,7 @@ import { ChooseCityAndPeriodBox } from "./weatherForecast.style";
 import DailyForecast from "../../dataDisplays/dailyForecast.js";
 import WeatherTable from "../../dataDisplays/weatherTable.js";
 import WeatherChart from "../../dataDisplays/weatherChart.js";
+import { chartSeriesIms } from "../../../utils/dataManipulations.js";
 
 const ImsForecast = () => {
   const [dataJsonIms, setDataJsonIms] = useState(null);
@@ -65,6 +66,7 @@ const ImsForecast = () => {
         dataset={slicedDatasetIms}
         minValue={minValue}
         maxValue={maxValue}
+        chartSeries={chartSeriesIms}
       />
       <WeatherTable dataset={slicedDatasetIms} />
     </>

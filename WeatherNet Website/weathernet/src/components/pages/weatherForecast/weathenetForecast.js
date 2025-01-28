@@ -2,6 +2,7 @@ import WeatherChart from "../../dataDisplays/weatherChart.js";
 import { useState, useEffect } from "react";
 import { templateDataOur } from "../../../utils/forecast.js";
 import { processWeatherNetForecastData } from "../../../utils/dataManipulations.js";
+import { chartSeriesWeatherNet } from "../../../utils/dataManipulations.js";
 
 const WeathernetForecast = () => {
   const [dataJson, setDataJson] = useState(null);
@@ -42,6 +43,7 @@ const WeathernetForecast = () => {
       dataset={dataset} // todo: remove this
       minValue={minValue}
       maxValue={maxValue}
+      chartSeries={chartSeriesWeatherNet}
     />
   );
 };

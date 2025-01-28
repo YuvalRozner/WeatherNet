@@ -3,11 +3,10 @@ import { useMemo } from "react";
 import {
   generateFormattedXAxis,
   generateFormattedYAxis,
-  generateForecastChartSeries,
 } from "../../utils/dataManipulations";
 import { ChartContainerBox } from "./dataDisplays.style";
 
-const WeatherChart = ({ dataset, minValue, maxValue }) => {
+const WeatherChart = ({ dataset, minValue, maxValue, chartSeries }) => {
   // Generate formatted X Axis using useMemo
   const formattedXAxis = useMemo(() => generateFormattedXAxis(), []);
 
@@ -18,7 +17,7 @@ const WeatherChart = ({ dataset, minValue, maxValue }) => {
   );
 
   // Generate forecast chart series using useMemo
-  const forecastChartSeries = useMemo(() => generateForecastChartSeries(), []);
+  const forecastChartSeries = useMemo(() => chartSeries(), []);
 
   return (
     <ChartContainerBox>

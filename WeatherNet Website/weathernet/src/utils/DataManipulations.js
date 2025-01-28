@@ -46,9 +46,9 @@ export const processImsForecastData = (dataJson) => {
         newDataset.push({
           utcTime: dateTime.getTime(),
           formattedTime: formatTimeLabel(dateTime.getTime()),
-          ImsTemp: temp,
-          pastTemp: isPast ? temp : null,
-          futureTemp: isPast ? null : temp,
+          ImsTemp: isPast ? null : temp,
+          // pastTemp: isPast ? temp : null,
+          // futureTemp: isPast ? null : temp,
           rain_chance: forecast.rain_chance,
           wave_height: forecast.wave_height,
           relative_humidity: forecast.relative_humidity,
@@ -102,10 +102,7 @@ export const processWeatherNetForecastData = (dataJson) => {
         newDataset.push({
           utcTime: dateTime.getTime(),
           formattedTime: formatTimeLabel(dateTime.getTime()),
-          ImsTemp: temp,
-          // pastTemp: isPast ? temp : null,
-          // futureTemp: isPast ? null : temp,
-          OurTemp: temp + 1,
+          OurTemp: temp,
         });
       });
     }
@@ -118,42 +115,75 @@ export const processWeatherNetForecastData = (dataJson) => {
   };
 };
 
-export const mergeByUtcTime = (array1, array2) => {
-  // Create a map to hold the merged objects, keyed by utcTime
-  const mergedMap = new Map();
+export const processForecastDataMerge = (dataJsonIms, dataJsonWeatherNet) => {
+  // Process the two forecasts independently
+  const {
+    dataset: datasetIms,
+    minValue: minValIms,
+    maxValue: maxValIms,
+    country: countryData,
+  } = processImsForecastData(dataJsonIms);
 
-  // Iterate over the first array and add each object to the map
-  array1.forEach((item) => {
-    if (item.utcTime != null) {
-      // Ensure utcTime exists
-      mergedMap.set(item.utcTime, { ...item });
-    }
+  const {
+    dataset2: datasetWn,
+    minValue2: minValWn,
+    maxValue2: maxValWn,
+  } = processWeatherNetForecastData(dataJsonWeatherNet);
+
+  // We'll store merged entries in a map keyed by utcTime
+  const mergedMap = {};
+
+  // First, populate from IMS data
+  datasetIms.forEach((item) => {
+    mergedMap[item.utcTime] = { ...item };
   });
 
-  // Iterate over the second array and merge with existing objects in the map
-  array2.forEach((item) => {
-    if (item.utcTime != null) {
-      // Ensure utcTime exists
-      if (mergedMap.has(item.utcTime)) {
-        // Merge the two objects, with properties from array2 overwriting array1 if there's a conflict
-        mergedMap.set(item.utcTime, {
-          ...mergedMap.get(item.utcTime),
-          ...item,
-        });
-      } else {
-        // If utcTime doesn't exist in the map, add the object as-is
-        mergedMap.set(item.utcTime, { ...item });
+  // Then, merge WeatherNet data
+  datasetWn.forEach((item) => {
+    // If this utcTime doesn't exist yet, create a new entry
+    if (!mergedMap[item.utcTime]) {
+      mergedMap[item.utcTime] = {};
+    }
+
+    // Destructure to rename the "ImsTemp" field from the second dataset
+    // so it won't overwrite the IMS "ImsTemp"
+    const { ImsTemp, ...restProps } = item;
+    // We'll call it "weatherNetTemp" if needed, or just skip it
+    // mergedMap[item.utcTime].weatherNetTemp = ImsTemp;
+
+    // Copy all other properties (like OurTemp, formattedTime, etc.)
+    Object.assign(mergedMap[item.utcTime], restProps);
+  });
+
+  // Convert merged map back to an array and sort by utcTime
+  const mergedDataset = Object.values(mergedMap).sort(
+    (a, b) => a.utcTime - b.utcTime
+  );
+
+  // From the merged dataset, pick only the desired keys
+  const filteredDataset = mergedDataset.map((item) => {
+    const allowedKeys = ["utcTime", "formattedTime", "ImsTemp", "OurTemp"];
+    const newObj = {};
+
+    allowedKeys.forEach((key) => {
+      if (item[key] !== undefined) {
+        newObj[key] = item[key];
       }
-    }
+    });
+    return newObj;
   });
 
-  // Convert the map back to an array
-  const mergedArray = Array.from(mergedMap.values());
+  // Compute final min and max from both sets
+  const finalMin = Math.min(minValIms ?? 999, minValWn ?? 999);
+  const finalMax = Math.max(maxValIms ?? -999, maxValWn ?? -999);
 
-  // Optional: Sort the merged array by utcTime in ascending order
-  mergedArray.sort((a, b) => a.utcTime - b.utcTime);
-
-  return mergedArray;
+  // Return the merged results
+  return {
+    dataset: filteredDataset,
+    minValue: finalMin,
+    maxValue: finalMax,
+    country: countryData, // or merge if second data also has country
+  };
 };
 
 export const formatTimeLabel = (utcTime) => {
@@ -170,18 +200,48 @@ export const formatTimeLabel = (utcTime) => {
   return `${formattedDate} ${formattedTime}`;
 };
 
-export const generateForecastChartSeries = () => [
+export const chartSeriesMerged = () => [
   {
     id: "pastTemp",
-    dataKey: "pastTemp",
+    dataKey: "truePastTemp",
     label: "Today Past (°C)",
     color: "blue",
   },
   {
-    id: "futureTemp",
-    dataKey: "futureTemp",
+    id: "ImsTemp",
+    dataKey: "ImsTemp",
     label: "IMS's Forecast (°C)",
     color: "#02620f",
+  },
+  {
+    id: "OurTemp",
+    dataKey: "OurTemp",
+    label: "WeatherNet's Forecast (°C)",
+    color: "#02b2af",
+  },
+];
+
+export const chartSeriesIms = () => [
+  {
+    id: "pastTemp",
+    dataKey: "truePastTemp",
+    label: "Today Past (°C)",
+    color: "blue",
+  },
+  {
+    id: "ImsTemp",
+    dataKey: "ImsTemp",
+    label: "IMS's Forecast (°C)",
+    color: "#02620f",
+  },
+];
+
+export const chartSeriesWeatherNet = () => [
+  {
+    id: "pastTemp",
+    dataKey: "truePastTemp",
+    label: "Today Past (°C)",
+    color: "blue",
   },
   {
     id: "OurTemp",

@@ -1,22 +1,18 @@
 import React, { useEffect, useState } from "react";
-import {
-  processImsForecastData,
-  processWeatherNetForecastData,
-  mergeByUtcTime,
-} from "../../../utils/dataManipulations.js";
+import { processForecastDataMerge } from "../../../utils/dataManipulations.js";
 import { getImsForecast } from "../../../utils/network/weathernetServer.js";
 import ChooseCity from "../../dataDisplays/chooseCity.js";
 import PeriodSlider from "../../dataDisplays/periodSlider.js";
 import { ChooseCityAndPeriodBox } from "./weatherForecast.style.js";
 import WeatherChart from "../../dataDisplays/weatherChart.js";
 import { templateDataOur } from "../../../utils/forecast.js";
+import { chartSeriesMerged } from "../../../utils/dataManipulations.js";
 
 const ComparingChart = () => {
   const [dataJsonIms, setDataJsonIms] = useState(null);
   const [dataJsonOur, setDataJsonOur] = useState(null);
-  const [datasetIms, setDatasetIms] = useState([]);
-  const [datasetOur, setDatasetOur] = useState([]);
-  const [slicedDatasetIms, setSlicedDatasetIms] = useState([]);
+  const [dataset, setDataset] = useState([]);
+  const [slicedDataset, setSlicedDataset] = useState([]);
   const [city, setCity] = useState(3); // default city is 3 (Haifa)
   const [chosenTimePeriod, setChosenTimePeriod] = useState([6, 32]);
   const [minValue, setMinValue] = useState(null);
@@ -35,26 +31,25 @@ const ComparingChart = () => {
     // Process IMS forecast data when dataJson changes
     if (!dataJsonIms) return;
 
-    const { dataset, minValue, maxValue, country } =
-      processImsForecastData(dataJsonIms);
-    setDatasetIms(dataset);
-    const { dataset2, minValue2, maxValue2 } =
-      processWeatherNetForecastData(dataJsonOur);
-    setDatasetOur(dataset2);
-    setMinValue(Math.min(minValue, minValue2));
-    setMaxValue(Math.max(maxValue, maxValue2));
+    const { dataset, minValue, maxValue, country } = processForecastDataMerge(
+      dataJsonIms,
+      dataJsonOur
+    );
+    setDataset(dataset);
+    setMinValue(minValue);
+    setMaxValue(maxValue);
   }, [dataJsonIms, dataJsonOur]);
 
   useEffect(() => {
     // Slice dataset based on chosen time period
-    if (datasetIms.length === 0) return;
-    const tempSlicedDataset = mergeByUtcTime(datasetIms, datasetOur).slice(
+    if (dataset.length === 0) return;
+    const tempSlicedDataset = dataset.slice(
       chosenTimePeriod[0],
       chosenTimePeriod[1]
     );
-    setSlicedDatasetIms(tempSlicedDataset);
-    setBeginDateForSlider(datasetIms[0].utcTime);
-  }, [datasetIms, datasetOur, chosenTimePeriod]);
+    setSlicedDataset(tempSlicedDataset);
+    setBeginDateForSlider(dataset[0].utcTime);
+  }, [dataset, chosenTimePeriod]);
 
   return (
     <>
@@ -68,9 +63,10 @@ const ComparingChart = () => {
         />
       </ChooseCityAndPeriodBox>
       <WeatherChart
-        dataset={slicedDatasetIms}
+        dataset={slicedDataset}
         minValue={minValue}
         maxValue={maxValue}
+        chartSeries={chartSeriesMerged}
       />
     </>
   );
