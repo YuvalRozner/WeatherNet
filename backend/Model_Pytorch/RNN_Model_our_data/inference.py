@@ -121,7 +121,7 @@ if __name__ == "__main__":
     target_column = WINDOW_PARAMS['label_columns'][0]  # Ensure this matches your dataset
     shift = WINDOW_PARAMS['shift']
     
-    
+    plot = True
     prediction_mode = 'analyze'  # Options: 'single', 'train', 'analyze'
     ## single parameters
     index = 500  # index for single
