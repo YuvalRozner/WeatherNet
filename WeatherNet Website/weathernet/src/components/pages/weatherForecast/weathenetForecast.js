@@ -1,4 +1,4 @@
-import WeatherChart from "./weatherChart";
+import WeatherChart from "../../dataDisplays/weatherChart.js";
 import { useState, useEffect } from "react";
 import { templateDataOur } from "../../../utils/forecast.js";
 import { processForecastDataWeatherNet } from "../../../utils/DataManipulations";

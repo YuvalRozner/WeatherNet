@@ -9,15 +9,3 @@ export const ChooseCityAndPeriodBox = styled(Box)({
   justifyContent: "space-evenly",
   gap: 20,
 });
-
-export const ChartContainerBox = styled(Box)({
-  marginLeft: "auto",
-  marginRight: "auto",
-  width: "90%",
-});
-
-export const DayilyForecastText = styled(Typography)({
-  marginTop: "10px",
-  fontSize: "16px",
-  fontWeight: "bold",
-});

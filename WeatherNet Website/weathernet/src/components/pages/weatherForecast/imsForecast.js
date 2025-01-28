@@ -5,12 +5,12 @@ import {
   mergeByUtcTime,
 } from "../../../utils/DataManipulations";
 import { getImsForecast } from "../../../utils/network/weathernetServer";
-import ChooseCity from "./chooseCity";
-import PeriodSlider from "./periodSlider";
+import ChooseCity from "../../dataDisplays/chooseCity.js";
+import PeriodSlider from "../../dataDisplays/periodSlider.js";
 import { ChooseCityAndPeriodBox } from "./weatherForecast.style";
-import DailyForecast from "./dailyForecast";
-import WeatherTable from "./weatherTable";
-import WeatherChart from "./weatherChart";
+import DailyForecast from "../../dataDisplays/dailyForecast.js";
+import WeatherTable from "../../dataDisplays/weatherTable.js";
+import WeatherChart from "../../dataDisplays/weatherChart.js";
 import { templateDataOur } from "../../../utils/forecast.js";
 
 const ImsForecast = () => {

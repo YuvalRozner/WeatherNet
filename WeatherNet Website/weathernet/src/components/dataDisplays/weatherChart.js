@@ -1,12 +1,11 @@
-import { Box } from "@mui/material";
 import { LineChart } from "@mui/x-charts/LineChart";
 import { useMemo } from "react";
 import {
   generateFormattedXAxis,
   generateFormattedYAxis,
   generateForecastChartSeries,
-} from "../../../utils/DataManipulations";
-import { ChartContainerBox } from "./weatherForecast.style";
+} from "../../utils/DataManipulations";
+import { ChartContainerBox } from "./dataDisplays.style";
 
 const WeatherChart = ({ dataset, minValue, maxValue }) => {
   // Generate formatted X Axis using useMemo
