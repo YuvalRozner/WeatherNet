@@ -1,19 +1,17 @@
 import React, { useEffect, useState } from "react";
 import {
-  processForecastData,
+  processImsForecastData,
   processWeatherNetForecastData,
   mergeByUtcTime,
 } from "../../../utils/dataManipulations.js";
-import { getImsForecast } from "../../../utils/network/weathernetServer";
+import { getImsForecast } from "../../../utils/network/weathernetServer.js";
 import ChooseCity from "../../dataDisplays/chooseCity.js";
 import PeriodSlider from "../../dataDisplays/periodSlider.js";
-import { ChooseCityAndPeriodBox } from "./weatherForecast.style";
-import DailyForecast from "../../dataDisplays/dailyForecast.js";
-import WeatherTable from "../../dataDisplays/weatherTable.js";
+import { ChooseCityAndPeriodBox } from "./weatherForecast.style.js";
 import WeatherChart from "../../dataDisplays/weatherChart.js";
 import { templateDataOur } from "../../../utils/forecast.js";
 
-const ImsForecast = () => {
+const ComparingChart = () => {
   const [dataJsonIms, setDataJsonIms] = useState(null);
   const [dataJsonOur, setDataJsonOur] = useState(null);
   const [datasetIms, setDatasetIms] = useState([]);
@@ -21,7 +19,6 @@ const ImsForecast = () => {
   const [slicedDatasetIms, setSlicedDatasetIms] = useState([]);
   const [city, setCity] = useState(3); // default city is 3 (Haifa)
   const [chosenTimePeriod, setChosenTimePeriod] = useState([6, 32]);
-  const [dailyCountryForecast, setDailyCountryForecast] = useState("");
   const [minValue, setMinValue] = useState(null);
   const [maxValue, setMaxValue] = useState(null);
   const [beginDateForSlider, setBeginDateForSlider] = useState(
@@ -38,21 +35,14 @@ const ImsForecast = () => {
     // Process IMS forecast data when dataJson changes
     if (!dataJsonIms) return;
 
-    const { dataset1, minValue1, maxValue1, country } =
-      processForecastData(dataJsonIms);
-    setDatasetIms(dataset1);
-    setDailyCountryForecast(country);
+    const { dataset, minValue, maxValue, country } =
+      processImsForecastData(dataJsonIms);
+    setDatasetIms(dataset);
     const { dataset2, minValue2, maxValue2 } =
       processWeatherNetForecastData(dataJsonOur);
     setDatasetOur(dataset2);
-    setMinValue(Math.min(minValue1, minValue2));
-    setMaxValue(Math.max(maxValue1, maxValue2));
-
-    console.log(datasetIms);
-    console.log(datasetOur);
-    console.log(minValue1, minValue2);
-    console.log(maxValue1, maxValue2);
-    console.log(mergeByUtcTime(datasetIms, datasetOur));
+    setMinValue(Math.min(minValue, minValue2));
+    setMaxValue(Math.max(maxValue, maxValue2));
   }, [dataJsonIms, dataJsonOur]);
 
   useEffect(() => {
@@ -68,7 +58,6 @@ const ImsForecast = () => {
 
   return (
     <>
-      <DailyForecast dailyCountryForecast={dailyCountryForecast} />
       <ChooseCityAndPeriodBox>
         <ChooseCity setCity={setCity} />
         <PeriodSlider
@@ -83,9 +72,8 @@ const ImsForecast = () => {
         minValue={minValue}
         maxValue={maxValue}
       />
-      <WeatherTable dataset={slicedDatasetIms} />
     </>
   );
 };
 
-export default ImsForecast;
+export default ComparingChart;
