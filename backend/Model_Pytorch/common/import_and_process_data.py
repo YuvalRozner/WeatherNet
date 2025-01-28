@@ -1,11 +1,11 @@
-import pandas as pd
-import requests
+import pandas as pd# type: ignore
+import requests# type: ignore
 import json
 from datetime import datetime
 import os
-import numpy as np
-import matplotlib.pyplot as plt
-from tqdm import tqdm
+import numpy as np# type: ignore
+import matplotlib.pyplot as plt # type: ignore
+from tqdm import tqdm # type: ignore
 from constantsParams import *
 
 ##    function used for the first time to get the data from the IMS ##
