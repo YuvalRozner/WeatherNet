@@ -187,73 +187,10 @@ if __name__ == "__main__":
 
     # Define prediction mode
     prediction_mode = 'analyze'  # Options: 'single', 'batch', 'analyze'
+    target_col_index = label_columns[0]
+
     
-    if prediction_mode == 'single':
-        # Predict a single window
-        idx = 500  # Example index
-        input_window, actual_temp = load_window_multi_station(
-            data_np=combined_val_data,
-            window_size=input_width,
-            shift=shift,
-            label_width=label_width,
-            scalers=scalers,
-            target_column_index=label_columns,
-            idx=idx
-        )
-        y_pred_scaled = predict(model, input_window, east_normalized, north_normalized, device=device)
-        
-        # Inverse transform the prediction for the target station
-        target_scaler = scalers[ADVANCED_MODEL_PARAMS['target_station_idx']]
-        # Create a dummy array for inverse_transform
-        dummy = np.zeros((y_pred_scaled.shape[0], target_scaler.mean_.shape[0]))
-        dummy[:, label_columns] = y_pred_scaled  # Assign predicted values to the target column
-        y_pred_original = target_scaler.inverse_transform(dummy)[:, label_columns]
-        
-        print(f"Predicted temperatures (°C): {y_pred_original}")
-        print(f"Actual temperatures (°C): {actual_temp}")
-    
-    elif prediction_mode == 'batch':
-        # Predict in batch over validation data
-        total_window_size = input_width + shift - 1 + label_width
-        end = len(combined_val_data) - total_window_size
-        predictions = []
-        actual_temps = []
-        for i in tqdm(range(0, end, label_width), desc="Predicting"):
-            try:
-                input_window, actual_temp = load_window_multi_station(
-                    data_np=combined_val_data,
-                    window_size=input_width,
-                    shift=shift,
-                    label_width=label_width,
-                    scalers=scalers,
-                    target_column_index=label_columns,
-                    idx=i
-                )
-                y_pred_scaled = predict(model, input_window, east_normalized, north_normalized, device=device)
-                
-                # Inverse transform
-                target_scaler = scalers[ADVANCED_MODEL_PARAMS['target_station_idx']]
-                dummy = np.zeros((y_pred_scaled.shape[0], target_scaler.mean_.shape[0]))
-                dummy[:, label_columns] = y_pred_scaled
-                y_pred_original = target_scaler.inverse_transform(dummy)[:, label_columns]
-                
-                predictions.extend(y_pred_original)
-                actual_temps.extend(actual_temp)
-            except ValueError as ve:
-                print(f"Skipping index {i}: {ve}")
-                continue
-        
-        # Plot predictions vs actual
-        plt.figure(figsize=(10, 6))
-        plt.plot(actual_temps, label='Actual', color='blue')
-        plt.plot(predictions, label='Predicted', color='red')
-        plt.xlabel('Time Steps')
-        plt.ylabel('Temperature (°C)')
-        plt.title('Temperature Prediction')
-        plt.legend()
-        plt.show()
-    
-    elif prediction_mode == 'analyze':
+    if prediction_mode == 'analyze':
         # Comprehensive analysis over validation data
         total_window_size = input_width + shift - 1 + label_width
         end = len(combined_val_data) - total_window_size
@@ -268,16 +205,16 @@ if __name__ == "__main__":
                     shift=shift,
                     label_width=label_width,
                     scalers=scalers,
-                    target_column_index=label_columns,
+                    target_column_index=target_col_index,
                     idx=i
                 )
                 y_pred_scaled = predict(model, input_window, east_normalized, north_normalized,  device=device)
-                
+
                 # Inverse transform
                 target_scaler = scalers[ADVANCED_MODEL_PARAMS['target_station_idx']]
                 dummy = np.zeros((y_pred_scaled.shape[0], target_scaler.mean_.shape[0]))
-                dummy[:, label_columns] = y_pred_scaled
-                y_pred_original = target_scaler.inverse_transform(dummy)[:, label_columns]
+                dummy[:, target_col_index] = y_pred_scaled[:, 0]
+                y_pred_original = target_scaler.inverse_transform(dummy)[:, target_col_index]
 
                 if len(y_pred_original) != len(actual_temp):
                     continue
