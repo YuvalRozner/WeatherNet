@@ -194,7 +194,6 @@ if __name__ == "__main__":
         # Comprehensive analysis over validation data
         total_window_size = input_width + shift - 1 + label_width
         end = len(combined_val_data) - total_window_size
-        end = 30
         predictions = []
         actual_temps = []
         for i in tqdm(range(0, end), desc="Predicting"):
