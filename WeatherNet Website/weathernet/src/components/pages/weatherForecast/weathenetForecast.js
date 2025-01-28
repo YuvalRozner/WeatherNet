@@ -1,7 +1,7 @@
 import WeatherChart from "../../dataDisplays/weatherChart.js";
 import { useState, useEffect } from "react";
 import { templateDataOur } from "../../../utils/forecast.js";
-import { processForecastDataWeatherNet } from "../../../utils/DataManipulations";
+import { processWeatherNetForecastData } from "../../../utils/DataManipulations";
 
 const WeathernetForecast = () => {
   const [dataJson, setDataJson] = useState(null);
@@ -19,7 +19,7 @@ const WeathernetForecast = () => {
     if (!dataJson) return;
 
     const { dataset, minValue, maxValue } =
-      processForecastDataWeatherNet(dataJson);
+      processWeatherNetForecastData(dataJson);
     setDataset(dataset);
     setSlicedDataset(dataset); // todo: remove this
     setMinValue(minValue);

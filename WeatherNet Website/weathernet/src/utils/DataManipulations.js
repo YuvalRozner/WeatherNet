@@ -1,4 +1,4 @@
-export const processForecastData = (dataJson) => {
+export const processImsForecastData = (dataJson) => {
   // If dataJson or forecast_data is missing, safely return empty defaults
   if (!dataJson?.data?.forecast_data) {
     return {
@@ -59,14 +59,14 @@ export const processForecastData = (dataJson) => {
   );
 
   return {
-    dataset1: newDataset,
-    minValue1: Math.floor(minValueTemp - 0.6, 0),
-    maxValue1: Math.ceil(maxValueTemp + 0.4, 0),
+    dataset: newDataset,
+    minValue: Math.floor(minValueTemp - 0.6, 0),
+    maxValue: Math.ceil(maxValueTemp + 0.4, 0),
     country: countryData,
   };
 };
 
-export const processForecastDataWeatherNet = (dataJson) => {
+export const processWeatherNetForecastData = (dataJson) => {
   // If dataJson or forecast_data is missing, safely return empty defaults
   if (!dataJson?.data?.forecast_data) {
     return {
