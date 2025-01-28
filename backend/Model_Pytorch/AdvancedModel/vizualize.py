@@ -310,7 +310,7 @@ def visualize_computational_graph(model, device,east_normalized,north_normalized
                               WINDOW_PARAMS['input_width'],
                               ADVANCED_MODEL_PARAMS['feature_dim']).to(device)
     # Forward pass
-    output = model(dummy_input, east_normalized, north_normalized)
+    output = model(dummy_input, east_normalized.to(device), north_normalized.to(device))
 
     # Generate the computational graph
     dot = make_dot(output, params=dict(model.named_parameters()))
@@ -405,7 +405,7 @@ if __name__ == "__main__":
     visualize_computational_graph(model, device,east_normalized,north_normalized, filepath='computational_graph')
 
     # Export model to ONNX for visualization with Netron
-    export_model_to_onnx(model, device, filepath='model.onnx')
+    #export_model_to_onnx(model, device, filepath='model.onnx')
 
     # Define prediction mode
     prediction_mode = 'analyze'  # Options: 'single', 'batch', 'analyze'
@@ -415,6 +415,7 @@ if __name__ == "__main__":
         # Comprehensive analysis over validation data
         total_window_size = input_width + shift - 1 + label_width
         end = len(combined_val_data) - total_window_size
+        end = 30
         predictions = []
         actual_temps = []
         all_attention_weights = []  # To store attention weights for visualization
@@ -451,7 +452,7 @@ if __name__ == "__main__":
                 continue
 
         # Perform analysis (assuming analyze is a custom function)
-        analyze(predictions, actual_temps, WINDOW_PARAMS['label_width'])
+        #analyze(predictions, actual_temps, WINDOW_PARAMS['label_width'])
 
         # Plot predictions vs actual
         plt.figure(figsize=(15, 7))
