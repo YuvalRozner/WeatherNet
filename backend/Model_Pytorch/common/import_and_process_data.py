@@ -8,8 +8,6 @@ import matplotlib.pyplot as plt
 from tqdm import tqdm
 from constantsParams import *
 
-pd.set_option('future.no_silent_downcasting', True)
-
 ##    function used for the first time to get the data from the IMS ##
 ######################################################################################################################
 def fetch_weather_data(station_id, start_date, end_date):
