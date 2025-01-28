@@ -1,0 +1,39 @@
+{
+    "data": {
+      "title": "city_name",
+      "forecast_data": {
+        "YYYY-MM-DD": {
+          "hourly": {
+            "HH:MM": {
+              "temperature": "##.#"
+            },
+            "HH:MM": {
+              "temperature": "##.#"
+            },
+            "HH:MM": {
+              "temperature": "##.#"
+            },
+            "HH:MM": {
+              "temperature": "##.#"
+            }
+          }
+        },
+        "YYYY-MM-DD": {
+          "hourly": {
+            "HH:MM": {
+              "temperature": "##.#"
+            },
+            "HH:MM": {
+              "temperature": "##.#"
+            },
+            "HH:MM": {
+              "temperature": "##.#"
+            },
+            "HH:MM": {
+              "temperature": "##.#"
+            }
+          }
+        }
+      }
+    }
+  }
