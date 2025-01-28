@@ -2,9 +2,9 @@ export const processForecastData = (dataJson) => {
   // If dataJson or forecast_data is missing, safely return empty defaults
   if (!dataJson?.data?.forecast_data) {
     return {
-      dataset: [],
-      minValue: null,
-      maxValue: null,
+      dataset1: [],
+      minValue1: null,
+      maxValue1: null,
       country: [],
     };
   }
@@ -49,7 +49,6 @@ export const processForecastData = (dataJson) => {
           ImsTemp: temp,
           pastTemp: isPast ? temp : null,
           futureTemp: isPast ? null : temp,
-          OurTemp: isPast ? null : temp + (Math.random() * 2 - 1),
           rain_chance: forecast.rain_chance,
           wave_height: forecast.wave_height,
           relative_humidity: forecast.relative_humidity,
@@ -60,11 +59,101 @@ export const processForecastData = (dataJson) => {
   );
 
   return {
-    dataset: newDataset,
-    minValue: Math.floor(minValueTemp - 0.6, 0),
-    maxValue: Math.ceil(maxValueTemp + 0.4, 0),
+    dataset1: newDataset,
+    minValue1: Math.floor(minValueTemp - 0.6, 0),
+    maxValue1: Math.ceil(maxValueTemp + 0.4, 0),
     country: countryData,
   };
+};
+
+export const processForecastDataWeatherNet = (dataJson) => {
+  // If dataJson or forecast_data is missing, safely return empty defaults
+  if (!dataJson?.data?.forecast_data) {
+    return {
+      dataset2: [],
+      minValue2: null,
+      maxValue2: null,
+    };
+  }
+
+  const newDataset = [];
+  const now = new Date();
+  let minValueTemp = 100.0;
+  let maxValueTemp = -100.0;
+
+  Object.entries(dataJson.data.forecast_data).forEach(
+    ([date, forecastData]) => {
+      const formattedDate = new Date(date).toISOString().split("T")[0];
+      const hourlyForecast = forecastData.hourly;
+
+      Object.entries(hourlyForecast).forEach(([hour, forecast]) => {
+        const dateTime = new Date(`${formattedDate}T${hour}`);
+        const temp = parseFloat(forecast.temperature);
+        if (temp < minValueTemp) {
+          minValueTemp = temp;
+        }
+        if (temp > maxValueTemp) {
+          maxValueTemp = temp;
+        }
+
+        // Check if this timestamp is before or after "now"
+        const isPast = dateTime < now;
+
+        newDataset.push({
+          utcTime: dateTime.getTime(),
+          formattedTime: formatTimeLabel(dateTime.getTime()),
+          ImsTemp: temp,
+          // pastTemp: isPast ? temp : null,
+          // futureTemp: isPast ? null : temp,
+          OurTemp: temp + 1,
+        });
+      });
+    }
+  );
+
+  return {
+    dataset2: newDataset,
+    minValue2: Math.floor(minValueTemp - 0.6, 0),
+    maxValue2: Math.ceil(maxValueTemp + 0.4, 0),
+  };
+};
+
+export const mergeByUtcTime = (array1, array2) => {
+  // Create a map to hold the merged objects, keyed by utcTime
+  const mergedMap = new Map();
+
+  // Iterate over the first array and add each object to the map
+  array1.forEach((item) => {
+    if (item.utcTime != null) {
+      // Ensure utcTime exists
+      mergedMap.set(item.utcTime, { ...item });
+    }
+  });
+
+  // Iterate over the second array and merge with existing objects in the map
+  array2.forEach((item) => {
+    if (item.utcTime != null) {
+      // Ensure utcTime exists
+      if (mergedMap.has(item.utcTime)) {
+        // Merge the two objects, with properties from array2 overwriting array1 if there's a conflict
+        mergedMap.set(item.utcTime, {
+          ...mergedMap.get(item.utcTime),
+          ...item,
+        });
+      } else {
+        // If utcTime doesn't exist in the map, add the object as-is
+        mergedMap.set(item.utcTime, { ...item });
+      }
+    }
+  });
+
+  // Convert the map back to an array
+  const mergedArray = Array.from(mergedMap.values());
+
+  // Optional: Sort the merged array by utcTime in ascending order
+  mergedArray.sort((a, b) => a.utcTime - b.utcTime);
+
+  return mergedArray;
 };
 
 export const formatTimeLabel = (utcTime) => {
