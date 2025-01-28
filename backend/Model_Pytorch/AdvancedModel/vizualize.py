@@ -1,18 +1,5 @@
 # visualize.py
 
-"""
-# Installation Instructions:
-# Uncomment and run the following commands to install the required packages.
-
-# pip install torch torchvision torchaudio
-# pip install torchsummary
-# pip install torchviz
-# pip install netron
-# pip install matplotlib
-# pip install scikit-learn
-# pip install tqdm
-"""
-
 import torch
 import numpy as np
 import pickle
@@ -186,7 +173,82 @@ def predict(model, input_window, lat, lon, device='cpu'):
     return output_scaled_np, attn_weights
 
 
-def visualize_cnn_feature_maps(feature_maps, station_idx, layer='conv1', num_features=4):
+def visualize_feature_with_all_feature_maps(original_data, feature_maps, feature_name, station_idx,
+                                            layer='conv2', num_features=15):
+    """
+    Visualize the original feature data alongside all its CNN-generated feature maps.
+
+    Args:
+        original_data (np.ndarray): Original time series data for the feature. Shape: [time_steps]
+        feature_maps (dict): Dictionary containing feature maps.
+        feature_names (list): List of feature names corresponding to each feature map.
+        feature_name (str): The specific feature to visualize (e.g., 'Rain').
+        station_idx (int): Index of the station.
+        layer (str): CNN layer name ('conv1' or 'conv2').
+        num_features (int): Number of feature maps to display.
+    """
+    # Validate the feature_name
+    feature_names = [
+        'Rain', 'RH (%)', 'TD (degC)', 'TDmax (degC)', 'TDmin (degC)',
+        'STDwd (deg)', 'Year', 'Wind_x', 'Wind_y', 'Gust_x', 'Gust_y',
+        'Day sin', 'Day cos', 'Year sin', 'Year cos'
+    ]
+    if feature_name not in feature_names:
+        print(f"Feature '{feature_name}' not found in feature_names list.")
+        return
+
+    feature_idx = feature_names.index(feature_name)
+
+    layer_name = f'station_{station_idx}_{layer}'
+    if layer_name not in feature_maps:
+        print(f"No feature maps found for layer '{layer_name}'.")
+        return
+
+    # Get all feature maps for the feature
+    # Assuming multiple feature maps per feature
+    # Adjust based on your architecture
+    feature_map = feature_maps[layer_name][0, feature_idx, :]  # Shape: [time_steps]
+
+    # Determine the number of feature maps
+    total_feature_maps = feature_maps[layer_name].shape[1]
+
+    # Adjust num_features if necessary
+    num_features = min(num_features, total_feature_maps)
+
+    # Set up the plot grid
+    rows = 4  # Number of rows for feature maps
+    cols = 4  # Number of columns for feature maps
+    total_plots = rows * cols
+
+    plt.figure(figsize=(20, 20))
+
+    # Plot Original Feature
+    plt.subplot(rows + 1, cols, 1)
+    plt.plot(original_data, color='blue')
+    plt.title(f'Original Feature: {feature_name}')
+    plt.xlabel('Time Steps')
+    plt.ylabel(f'{feature_name} Value')
+    plt.grid(True)
+
+    # Plot Feature Maps
+    for i in range(num_features):
+        plt.subplot(rows + 1, cols, i + 2)
+        plt.plot(feature_maps[layer_name][0, i, :].numpy(), color='red')
+        plt.title(f'Feature Map {i + 1} from {layer_name}')
+        plt.xlabel('Time Steps')
+        plt.ylabel('Activation')
+        plt.grid(True)
+
+    # Hide any unused subplots
+    for j in range(num_features + 1, rows * cols + 1):
+        plt.subplot(rows + 1, cols, j + 1)
+        plt.axis('off')
+
+    plt.tight_layout()
+    plt.show()
+
+
+def visualize_cnn_feature_maps(feature_maps, station_idx, layer='conv2'):
     """
     Visualize CNN feature maps for a specific station and layer.
 
@@ -196,6 +258,13 @@ def visualize_cnn_feature_maps(feature_maps, station_idx, layer='conv1', num_fea
         layer (str): Layer name ('conv1' or 'conv2').
         num_features (int): Number of feature maps to display.
     """
+    num_features=15
+    feature_names = [
+        'Rain', 'RH (%)', 'TD (degC)', 'TDmax (degC)', 'TDmin (degC)',
+        'STDwd (deg)', 'Year', 'Wind_x', 'Wind_y', 'Gust_x', 'Gust_y',
+        'Day sin', 'Day cos', 'Year sin', 'Year cos'
+        ]
+  
     layer_name = f'station_{station_idx}_{layer}'
     if layer_name not in feature_maps:
         print(f"No feature maps found for {layer_name}")
@@ -208,11 +277,11 @@ def visualize_cnn_feature_maps(feature_maps, station_idx, layer='conv1', num_fea
     feature_map = feature_map[:num_features]
 
     # Plotting
-    plt.figure(figsize=(15, 5))
+    plt.figure(figsize=(15, 15))
     for i in range(num_features):
-        plt.subplot(1, num_features, i + 1)
+        plt.subplot(5, 3, i + 1)
         plt.plot(feature_map[i].numpy())
-        plt.title(f'{layer_name} Feature {i + 1}')
+        plt.title(feature_names[i])
         plt.xlabel('Time Steps')
         plt.ylabel('Activation')
     plt.tight_layout()
@@ -399,17 +468,42 @@ if __name__ == "__main__":
         station_cnn.conv2.register_forward_hook(get_cnn_hook(conv2_name))
 
     # Visualize model summary
-    visualize_model_summary(model,east_normalized.to(device),north_normalized.to(device), device)
+    #visualize_model_summary(model,east_normalized.to(device),north_normalized.to(device), device)
 
     # Visualize computational graph
-    visualize_computational_graph(model, device,east_normalized,north_normalized, filepath='computational_graph')
+    #visualize_computational_graph(model, device,east_normalized,north_normalized, filepath='computational_graph')
 
     # Export model to ONNX for visualization with Netron
     #export_model_to_onnx(model, device, filepath='model.onnx')
 
     # Define prediction mode
-    prediction_mode = 'analyze'  # Options: 'single', 'batch', 'analyze'
     target_col_index = label_columns[0]
+
+    input_window, actual_temp = load_window_multi_station(
+        data_np=combined_val_data,
+        window_size=input_width,
+        shift=shift,
+        label_width=label_width,
+        scalers=scalers,
+        target_column_index=target_col_index,
+        idx=0
+    )
+    y_pred_scaled, attn_weights = predict(model, input_window, east_normalized, north_normalized,
+                                          device=device)
+    # reduce input_window from (1, 2, 72, 15) to selectinf the first station and the first feature
+    input_window = input_window[:, 0, :, 2].unsqueeze(1)
+    # reduce input_window from (1, 1, 72) to np.array (72,)
+    input_window = input_window.squeeze(0).squeeze(0).numpy()
+    visualize_feature_with_all_feature_maps(
+        original_data=input_window,
+        feature_maps=cnn_feature_maps,
+        feature_name='TD (degC)',
+        station_idx=0,
+        layer='conv2',
+        num_features=16  # Adjust based on grid layout (e.g., 4x4=16)
+    )
+
+    prediction_mode = 'analyze'  # Options: 'single', 'batch', 'analyze'
 
     if prediction_mode == 'analyze':
         # Comprehensive analysis over validation data
@@ -470,8 +564,33 @@ if __name__ == "__main__":
         print(f"Mean Absolute Error (MAE): {mae:.2f} °C")
         print(f"Root Mean Squared Error (RMSE): {rmse:.2f} °C")
 
+        input_window, actual_temp = load_window_multi_station(
+            data_np=combined_val_data,
+            window_size=input_width,
+            shift=shift,
+            label_width=label_width,
+            scalers=scalers,
+            target_column_index=target_col_index,
+            idx=0
+        )
+        y_pred_scaled, attn_weights = predict(model, input_window, east_normalized, north_normalized,
+                                              device=device)
+        # reduce input_window from (1, 2, 72, 15) to selectinf the first station and the first feature
+        input_window = input_window[:, 0, :, 2].unsqueeze(1)
+        # reduce input_window from (1, 1, 72) to np.array (72,)
+        input_window = input_window.squeeze(0).squeeze(0).numpy()
+
+        visualize_feature_with_all_feature_maps(
+            original_data=input_window,
+            feature_maps=cnn_feature_maps,
+            feature_name='TD (degC)',
+            station_idx=0,
+            layer='conv2',
+            num_features=16  # Adjust based on grid layout (e.g., 4x4=16)
+        )
+
         # Visualize CNN Feature Maps (Example for Station 0, conv1)
-        visualize_cnn_feature_maps(cnn_feature_maps, station_idx=0, layer='conv1', num_features=4)
+        visualize_cnn_feature_maps(cnn_feature_maps, station_idx=0, layer='conv1')
 
         # Visualize Attention Weights (Example for first sample, first layer, first head)
         if all_attention_weights:
