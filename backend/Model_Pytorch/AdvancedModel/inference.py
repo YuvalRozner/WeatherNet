@@ -1,7 +1,6 @@
 # inference.py
 
 import torch
-import numpy as np
 import pickle
 import os
 from tqdm import tqdm
@@ -289,7 +288,7 @@ if __name__ == "__main__":
     model = load_model_for_inference(checkpoint_path, model_params, device=device)
 
     # Define prediction mode
-    prediction_mode = 'live'  # Options: 'live', 'analyze'
+    prediction_mode = 'analyze'  # Options: 'live', 'analyze'
     target_col_index = label_columns[0]
 
     

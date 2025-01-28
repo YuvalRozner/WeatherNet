@@ -34,7 +34,53 @@ def normalize_coordinates(x_coords, y_coords):
     y_normalized = torch.tensor(y_normalized, dtype=torch.float32).unsqueeze(1)  # [num_stations, 1]
 
     return x_normalized, y_normalized 
+def drop_nan_rows_multiple_custom(df_list,custom_na =['-']):
+    """
+    Removes rows from all DataFrames in the list where any DataFrame has NaN or custom NaN representations in any column.
 
+    Parameters:
+    df_list (List[pd.DataFrame]): List of DataFrames to process.
+    reset_indices (bool): Whether to reset the index after dropping rows. Defaults to True.
+    custom_na (List[str]): List of custom strings to be treated as NaN. Defaults to ['-'].
+
+    Returns:
+    List[pd.DataFrame]: List of cleaned DataFrames.
+    """
+    if not df_list:
+        raise ValueError("The list of DataFrames is empty.")
+
+    # Ensure all DataFrames have the same number of rows
+    num_rows = df_list[0].shape[0]
+    for df in df_list:
+        if df.shape[0] != num_rows:
+            raise ValueError("All DataFrames must have the same number of rows.")
+
+    # Step 0: Replace custom NaN representations with np.nan
+    cleaned_df_list_initial = []
+    for df in df_list:
+        df_cleaned = df.replace(custom_na, np.nan)
+        cleaned_df_list_initial.append(df_cleaned)
+
+    # Step 1: Identify rows with any NaN in each DataFrame
+    nan_indices_list = [df.isnull().any(axis=1) for df in cleaned_df_list_initial]
+
+    # Step 2: Combine the indices where NaNs are present in any DataFrame
+    combined_nan = pd.Series([False] * num_rows, index=df_list[0].index)
+    for nan_mask in nan_indices_list:
+        combined_nan = combined_nan | nan_mask
+
+    # Get the indices to drop
+    indices_to_drop = combined_nan[combined_nan].index
+
+    # Step 3: Drop the identified indices from all DataFrames
+    cleaned_df_list = []
+    for df in tqdm(cleaned_df_list_initial, desc="Dropping NaN rows"):
+        cleaned_df = df.drop(indices_to_drop)
+        if True:
+            cleaned_df = cleaned_df.reset_index(drop=True)
+        cleaned_df_list.append(cleaned_df)
+
+    return cleaned_df_list
 def drop_nan_rows_multiple(df_list, reset_indices=True):
     """
     Removes rows from all DataFrames in the list where any DataFrame has NaN in any column.
@@ -48,7 +94,8 @@ def drop_nan_rows_multiple(df_list, reset_indices=True):
     """
     if not df_list:
         raise ValueError("The list of DataFrames is empty.")
-    
+    #for df in df_list:
+    #    df.reset_index(drop=True, inplace=True)
     # Ensure all DataFrames have the same number of rows
     num_rows = df_list[0].shape[0]
     for df in df_list:

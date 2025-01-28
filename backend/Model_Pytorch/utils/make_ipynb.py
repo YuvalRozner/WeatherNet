@@ -3,6 +3,7 @@ import nbformat
 from nbformat.v4 import new_notebook, new_code_cell
 import re
 import os
+
 def remove_code_above_main(code):
     """
     Removes all lines above the 'if __name__ == "__main__":' statement.
@@ -21,7 +22,6 @@ def remove_code_above_main(code):
         if 'if __name__ == "__main__":' in line:
             main_found = True
             # Optionally include the 'if __name__ == "__main__":' line
-            # Uncomment the next line if you want to keep it
             new_lines.append(line)
             # If you don't want to keep it, comment out the above line
             continue
@@ -50,19 +50,49 @@ def apply_alterations(code, alterations):
         code = re.sub(pattern, replacement, code)
     return code
 
-def create_notebook_from_scripts(file_paths, output_notebook, alteration_rules=None):
+def add_code_block_to_start(nb, code_str, markdown=None):
+    """
+    Adds a code block to the beginning of the given notebook from a string.
+    
+    Parameters:
+    - nb (nbformat.notebooknode.NotebookNode): The notebook object to prepend the code cell to.
+    - code_str (str): The code string to add as a code cell.
+    - markdown (str, optional): Optional markdown text to add before the code cell.
+    """
+    # List to hold the new cells to be prepended
+    new_cells = []
+    
+    # Optionally add a markdown cell before the code cell
+    if markdown:
+        markdown_cell = nbformat.v4.new_markdown_cell(markdown)
+        new_cells.append(markdown_cell)
+    
+    # Create the new code cell
+    code_cell = new_code_cell(code_str)
+    new_cells.append(code_cell)
+    
+    # Prepend the new cells to the existing notebook cells
+    nb.cells = new_cells + nb.cells
+
+def create_notebook_from_scripts(file_paths, output_notebook, alteration_rules=None, initial_code_blocks=None):
     """
     Creates a Jupyter Notebook with each Python file's content in separate code cells,
-    applying any specified alterations.
+    applying any specified alterations, and optionally adding initial code blocks at the start.
     
     Parameters:
     - file_paths (list of str): List of paths to the Python (.py) files.
     - output_notebook (str): Path where the output .ipynb file will be saved.
     - alteration_rules (dict): Optional. A dictionary mapping file paths to their
-      respective alteration rules, which can include regex patterns and functions.
+      respective alteration rules.
+    - initial_code_blocks (list of tuples): Optional. Each tuple contains optional markdown and code strings to add at the start.
     """
     # Create a new notebook object
     nb = new_notebook()
+
+    # Add initial code blocks if any
+    if initial_code_blocks:
+        for markdown, code in reversed(initial_code_blocks):
+            add_code_block_to_start(nb, code, markdown)
 
     # Mapping of function names to actual functions
     function_mapping = {
@@ -93,7 +123,7 @@ def create_notebook_from_scripts(file_paths, output_notebook, alteration_rules=N
                         print(f"Warning: Function '{func_name}' is not defined.")
 
             # Optionally, add a markdown cell with the file name
-            markdown_cell = f"### `{path}`"
+            markdown_cell = f"### `{os.path.basename(path)}`"
             nb.cells.append(nbformat.v4.new_markdown_cell(markdown_cell))
 
             # Create a new code cell with the (altered) file's content
@@ -116,8 +146,35 @@ def create_notebook_from_scripts(file_paths, output_notebook, alteration_rules=N
 if __name__ == "__main__":
     path_to_dir = os.path.dirname(os.path.abspath(__file__))
 
+    # Define your initial code and markdown
+    markdown_1 = "### numpy"
 
+    code_1 = """
+!pip uninstall numpy -y
+!pip install numpy
+!pip install --upgrade pandas
+"""
+    code_2 = """
+!pip install --upgrade --force-reinstall numpy pandas
+"""
+    code_3 = """
+import numpy as np
+print(np.__version__)
+"""
+    colab_mount = """### Colab Mount"""
+    code_4 = """
+from google.colab import drive
+drive.mount('/content/drive')
+"""
+    # Initialize initial_code_blocks with defined markdown and code
+    initial_code_blocks = [
+        (colab_mount,code_4)
+        #(markdown_1, code_1),
+        #(markdown_1, code_2),
+        #(markdown_1, code_3),
 
+        # Add more tuples if needed
+    ]
 
     # Hardcoded list of Python file paths
     python_files = [
@@ -133,31 +190,35 @@ if __name__ == "__main__":
     output_ipynb = os.path.join(path_to_dir, "AdvancedModel.ipynb")
 
     # Define alteration rules
-    # Example: Replace '/old/path/' with '/new/path/' in 'script2.py'
-    # and replace 'DEBUG = True' with 'DEBUG = False' in 'script3.py'
+    # Example: Replace '/old/path/' with '/new/path/' in 'parameters.py'
+    # and modify 'main.py' accordingly
     alteration_rules = {
-        python_files[4]: {
+        python_files[4]: {  # parameters.py
             "regex": [
-                (r"# parametes.py", "# parametes.ipynb"),
-                (r"# parametes.py", "# parametes.ipynb"),
+                (r"# parametes\.py", "# parametes.ipynb"),
+                (r"# parametes\.py", "# parametes.ipynb"),
             ],
             "functions": [
-                
+                # Add function names as strings if needed
             ]
         },
-        python_files[5]: {
+        python_files[5]: {  # main.py
             "regex": [
                 (r"fileNames", "paths_in_colab"),
                 (r"load_pkl_file", "pd.read_pickle"),
                 (r"STATIONS_COORDINATES", "STATIONS_COORDINATES_COLAB"),
-                (r"os\.path\.dirname\(__file__\)", "'out'"),
+                (r"os\.path\.dirname\(__file__\)", "'/content/drive/MyDrive/final data'"),
             ],
             "functions": [
                 "remove_code_above_main"
-
             ]
         },
     }
 
-    # Create the notebook with alterations
-    create_notebook_from_scripts(python_files, output_ipynb, alteration_rules)
+    # Create the notebook with alterations and initial code blocks
+    create_notebook_from_scripts(
+        file_paths=python_files, 
+        output_notebook=output_ipynb, 
+        alteration_rules=alteration_rules,
+        initial_code_blocks=initial_code_blocks  # Pass the initial code blocks here
+    )

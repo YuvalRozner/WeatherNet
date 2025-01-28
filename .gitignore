@@ -26,3 +26,19 @@ WeatherNet Website/weathernet/package-lock.json
 /backend/Model_Pytorch/AdvancedModel/__pycache__
 data code files/__pycache__/constantsParams.cpython-311.pyc
 data code files/__pycache__/import_and_process_data.cpython-311.pyc
+/backend/Model_Pytorch/AdvancedModel/dor_output
+backend/Model_Pytorch/AdvancedModel/output/Afula Nir Haemeq.csv
+backend/Model_Pytorch/AdvancedModel/output/Afula Nir Haemeq.pkl
+backend/Model_Pytorch/AdvancedModel/output/Eden Farm.csv
+backend/Model_Pytorch/AdvancedModel/output/Eden Farm.pkl
+backend/Model_Pytorch/AdvancedModel/output/En Hashofet.csv
+backend/Model_Pytorch/AdvancedModel/output/En Hashofet.pkl
+backend/Model_Pytorch/AdvancedModel/output/Eshhar.csv
+backend/Model_Pytorch/AdvancedModel/output/Eshhar.pkl
+backend/Model_Pytorch/AdvancedModel/output/Newe Yaar.csv
+backend/Model_Pytorch/AdvancedModel/output/Newe Yaar.pkl
+backend/Model_Pytorch/AdvancedModel/output/Tavor Kadoorie.csv
+backend/Model_Pytorch/AdvancedModel/output/Tavor Kadoorie.pkl
+/data_old
+backend/Model_Pytorch/AdvancedModel/output/Yavneel.pkl
+backend/Model_Pytorch/AdvancedModel/output/Yavneel.csv

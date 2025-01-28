@@ -10,15 +10,18 @@ def train_model(
         train_dataset,
         val_dataset,
         model,
-        epochs=10,
+        coordinates,
+        epochs=50,  # Increased epochs for better exploration
         batch_size=32,
-        lr=1e-5,
+        lr=1e-4,    # Updated learning rate as per recommendation
         checkpoint_dir='./checkpoints',
         resume=False,
-        device='cpu',
-        coord=[0, 0]
+        device='cuda' if torch.cuda.is_available() else 'cpu',
+        early_stopping_patience=10,
+        scheduler_patience=5,
+        scheduler_factor=0.5,
+        min_lr=1e-7
     ):
-    # DataLoaders
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
     val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
 
@@ -29,7 +32,18 @@ def train_model(
     criterion = nn.MSELoss()
     optimizer = optim.Adam(model.parameters(), lr=lr)
     
+    # Initialize scheduler
+    scheduler = optim.lr_scheduler.ReduceLROnPlateau(
+        optimizer,
+        mode='min',
+        factor=scheduler_factor,
+        patience=scheduler_patience,
+        verbose=True,
+        min_lr=min_lr
+    )
+    
     best_val_loss = float('inf')
+    patience_counter = 0
     start_epoch = 0
     
     os.makedirs(checkpoint_dir, exist_ok=True)
@@ -42,7 +56,7 @@ def train_model(
         model.load_state_dict(checkpoint['model_state_dict'])
         optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
         start_epoch = checkpoint['epoch'] + 1
-        best_val_loss = checkpoint['best_val_loss']
+        best_val_loss = checkpoint.get('best_val_loss', float('inf'))
         print(f"Resumed from epoch {start_epoch}, best_val_loss={best_val_loss:.4f}")
     
     for epoch in range(start_epoch, start_epoch + epochs):
@@ -51,9 +65,10 @@ def train_model(
         for batch_idx, (x_batch, y_batch) in enumerate(tqdm(train_loader, desc=f"Epoch {epoch+1}/{start_epoch + epochs}")):
             x_batch = x_batch.to(device)  # [batch_size, input_width, num_stations, num_features]
             y_batch = y_batch.to(device)  # [batch_size, num_label_features]
-            
+            coord1 = coordinates[0].to(device)
+            coord2 = coordinates[1].to(device)
             # Forward pass with coordinates
-            preds = model(x_batch, coord[0].to(device), coord[1].to(device))  # [batch_size, 1]
+            preds = model(x_batch, coord1, coord2)  # [batch_size, 1]
             
             # Flatten y_batch if necessary
             y_batch_single = y_batch.squeeze(-1)  # [batch_size]
@@ -66,7 +81,6 @@ def train_model(
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
-            
             # Accumulate loss
             epoch_loss += loss.item()
         
@@ -80,9 +94,10 @@ def train_model(
             for x_val, y_val in val_loader:
                 x_val = x_val.to(device)
                 y_val = y_val.to(device)
-                
+                coord1 = coordinates[0].to(device)
+                coord2 = coordinates[1].to(device)
                 # Forward pass with coordinates
-                preds_val = model(x_val, coord[0].to(device), coord[1].to(device))  # [batch_size, 1]
+                preds_val = model(x_val, coord1, coord2)  # [batch_size, 1]
                 
                 # Flatten predictions and labels
                 preds_val = preds_val.squeeze(-1)          # [batch_size]
@@ -97,17 +112,17 @@ def train_model(
         
         print(f"Epoch {epoch+1}/{start_epoch + epochs} | Train Loss: {train_loss:.4f} | Val Loss: {val_loss:.4f}")
         
-        # Checkpoint: always save the 'latest'
-        torch.save({
-            'epoch': epoch,
-            'model_state_dict': model.state_dict(),
-            'optimizer_state_dict': optimizer.state_dict(),
-            'best_val_loss': best_val_loss,
-        }, latest_ckpt)
-        
-        # If best val, save a special "best" checkpoint
+        # Step the scheduler based on validation loss
+        scheduler.step(val_loss)
+
+        current_lr = optimizer.param_groups[0]['lr']
+        print(f"  -> Current Learning Rate: {current_lr:.6f}")
+        # Early Stopping Logic
         if val_loss < best_val_loss:
             best_val_loss = val_loss
+            patience_counter = 0  # Reset counter if validation loss improves
+            
+            # Save the best model
             best_ckpt = os.path.join(checkpoint_dir, 'best_checkpoint.pth')
             torch.save({
                 'epoch': epoch,
@@ -116,3 +131,17 @@ def train_model(
                 'best_val_loss': best_val_loss,
             }, best_ckpt)
             print(f"  -> Best model saved at epoch {epoch+1} (val_loss={val_loss:.4f})")
+        else:
+            patience_counter += 1
+            print(f"  -> No improvement in validation loss for {patience_counter} epoch(s)")
+            if patience_counter >= early_stopping_patience:
+                print("Early stopping triggered.")
+                break  # Exit the training loop
+        
+        # Checkpoint: always save the 'latest'
+        torch.save({
+            'epoch': epoch,
+            'model_state_dict': model.state_dict(),
+            'optimizer_state_dict': optimizer.state_dict(),
+            'best_val_loss': best_val_loss,
+        }, latest_ckpt)

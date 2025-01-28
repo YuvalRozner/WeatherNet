@@ -3,7 +3,6 @@
 import torch
 import torch.nn as nn
 import math
-import numpy as np
 
 class StationCNN(nn.Module):
     def __init__(self, input_channels, cnn_channels, kernel_size, feature_dim):

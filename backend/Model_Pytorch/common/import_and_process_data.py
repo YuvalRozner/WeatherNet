@@ -524,36 +524,36 @@ def get_prccessed_latest_data_by_hour_and_station(stations_list, hours_back, beg
 def main():
   #menue: 
   ## load from:
-  get_data_from_ims = False # (including the first process)
+  get_data_from_ims = True # (including the first process)
   load_data_from_directory = not get_data_from_ims and True
   ## save to:
-  save_data_to_pickles_in_the_end = False
+  save_data_to_pickles_in_the_end = True
   ## sync:
-  sync = False #master switch
+  sync = True #master switch
   should_sort_dataframes = sync and True
   should_slice_dataframes_beginning = sync and True
   should_delete_rows_not_existing_in_all_dataframes = sync and True
   ## preprocessing:
-  preprocess = False
+  preprocess = True
   should_remove_unecessery_columns = preprocess and True
   should_format_the_time_column = preprocess and True
-  data_imputation = preprocess and False
+  data_imputation = preprocess and True
   should_fill_data_1_missing_value = data_imputation and True
   should_fill_data_2_missing_values = data_imputation and True
   should_fill_data_3_missing_values = data_imputation and True
   should_take_round_hours = preprocess and True
-  should_replace_time_with_cyclic_representation = preprocess and False #leave it false
+  should_replace_time_with_cyclic_representation = preprocess and True #leave it false
   should_vectorize_wind = preprocess and True
   should_drop_nan_rows = preprocess and True
     ## display:
-  should_display_heads_of_dataframes = True
-  should_print_length_of_dataframes = False
+  should_display_heads_of_dataframes = False
+  should_print_length_of_dataframes = True
   should_display_wind_before_vectorize = False
   should_display_wind_after_vectorize = should_vectorize_wind and False
 
 
   if get_data_from_ims:
-    dataframes = get_data_of_stations_from_ims_by_constants_params(STATIONS_LIST)
+    dataframes = get_data_of_stations_from_ims_by_constants_params(STATIONS_LIST, START_YEAR, END_YEAR)
 
   if load_data_from_directory:
     dataframes = load_dataframes_from_pickles(DATA_DIRECTORY)

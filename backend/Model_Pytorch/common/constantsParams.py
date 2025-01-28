@@ -3,12 +3,16 @@ ENDING_OF_YEAR = "12312350"
 START_YEAR = 2005
 END_YEAR = 2024
 
-DATA_DIRECTORY = "data/tryNew/"
+DATA_DIRECTORY = "data/"
 
 STATIONS_LIST = {
     "Newe Yaar": "186",
     "Tavor Kadoorie": "13",
-    "Yavneel": "11"
+    "Yavneel": "11",
+    "En Hashofet": "67",
+    "Eden Farm": "206",
+    "Eshhar": "205",
+    "Afula Nir Haemeq": "16"
 }
 
 columns = [
