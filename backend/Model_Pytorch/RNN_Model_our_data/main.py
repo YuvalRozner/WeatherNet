@@ -5,9 +5,9 @@ import pandas as pd
 
 from backend.Model_Pytorch.common.window_generator import WindowGenerator
 from backend.Model_Pytorch.common.data import preprocessing_our_df, normalize_data, load_pkl_file, timeEncode,drop_nan_rows_multiple
-from model import LSTMModel
-from train import train_model
-from parameters import PARAMS, WINDOW_PARAMS, LSTM_MODEL_PARAMS
+from backend.Model_Pytorch.AdvancedModel.model import LSTMModel
+from backend.Model_Pytorch.AdvancedModel.train import train_model
+from backend.Model_Pytorch.AdvancedModel.parameters import PARAMS, WINDOW_PARAMS, LSTM_MODEL_PARAMS
 import os
 
 
