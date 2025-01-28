@@ -18,7 +18,7 @@ from backend.Model_Pytorch.common.data import (
 from backend.Model_Pytorch.AdvancedModel.model import TargetedWeatherPredictionModel
 from backend.Model_Pytorch.AdvancedModel.parameters import PARAMS, WINDOW_PARAMS, ADVANCED_MODEL_PARAMS, STATIONS_COORDINATES, STATIONS_LIST
 from backend.Model_Pytorch.common.analyze import analyze
-
+from backend.Model_Pytorch.common.import_and_process_data import get_prccessed_latest_data_by_hour_and_station
 
 import numpy as np
 import json
@@ -127,6 +127,34 @@ def load_model_for_inference(checkpoint_path, model_params, device='cpu'):
     print(f"Model loaded from {checkpoint_path}")
     return model
 
+
+def load_window_multi_station_return_only_input_window(data_np, window_size, shift, scalers, idx=0):
+    total_window_size = window_size
+    if idx + total_window_size > len(data_np):
+        raise ValueError(f"Index {idx} with window size {total_window_size} exceeds data length {len(data_np)}.")
+
+    # Extract input window: shape (window_size, num_stations, num_features)
+    window = data_np[idx:idx + window_size, :, :]  # (window_size, num_stations, num_features)
+
+    # Apply individual scalers to each station's data
+    scaled_window = []
+    num_stations = window.shape[1]
+    for station_idx in range(num_stations):
+        station_data = window[:, station_idx, :]  # (window_size, num_features)
+        scaler = scalers[station_idx]
+        station_data_scaled = scaler.transform(station_data)  # (window_size, num_features)
+        scaled_window.append(station_data_scaled)
+
+    # Stack scaled data: shape (window_size, num_stations, num_features)
+    scaled_window = np.stack(scaled_window, axis=1)
+
+    # Convert to torch.Tensor and reshape to (1, num_stations, time_steps, feature_dim)
+    window_tensor = torch.tensor(scaled_window, dtype=torch.float32).unsqueeze(0)
+    # batch_size, num_stations, time_steps, feature_dim = x.size()
+
+    window_tensor = window_tensor.permute(0, 2, 1, 3)
+
+    return window_tensor
 def load_window_multi_station(data_np, window_size, shift, label_width, scalers, target_column_index, idx=0):
    
     total_window_size = window_size + shift - 1 + label_width
@@ -261,7 +289,7 @@ if __name__ == "__main__":
     model = load_model_for_inference(checkpoint_path, model_params, device=device)
 
     # Define prediction mode
-    prediction_mode = 'analyze'  # Options: 'single', 'batch', 'analyze'
+    prediction_mode = 'live'  # Options: 'live', 'analyze'
     target_col_index = label_columns[0]
 
     
@@ -321,14 +349,32 @@ if __name__ == "__main__":
         # getting the window to predict from function
         # need to implement in the future get_window_live(input_width)
         
-        input_window, last_hour, date_str = get_window_live(STATIONS_LIST, input_width)
+        dataframes, last_hour, last_date, success = get_prccessed_latest_data_by_hour_and_station(STATIONS_LIST, input_width)
+        last_hour = int(last_hour.split(':')[0])
+        print(f"len of df: {len(dataframes)}")
+        print(f"len of df[0]: {len(dataframes[list(dataframes.keys())[0]])}")
+        print(f"len of df[1]: {len(dataframes[list(dataframes.keys())[1]])}")
+        print(f"Last hour: {last_hour}")
+        print(f"Last hour date: {last_date}")
+        print(f"success: {success}")
+        # datafreames is a dictionary with the station name as key and the dataframe as value - convering it into a list of dataframes
+        dataframes_list = [dataframes[station] for station in STATIONS_LIST]
+
+        list_of_values = [df.values for df in dataframes_list]
+        combined_window = np.stack(list_of_values, axis=1) 
+        input_window = load_window_multi_station_return_only_input_window(
+            data_np=combined_window,
+            window_size=input_width,
+            shift=shift,
+            scalers=scalers
+        )
 
         y_pred_scaled = predict(model, input_window, east_normalized, north_normalized,  device=device)
         target_scaler = scalers[ADVANCED_MODEL_PARAMS['target_station_idx']]
         dummy = np.zeros((y_pred_scaled.shape[0], target_scaler.mean_.shape[0]))
         dummy[:, target_col_index] = y_pred_scaled[:, 0]
         y_pred_original = target_scaler.inverse_transform(dummy)[:, target_col_index]
-        generate_forecast_json(PARAMS['target_station_desplay_name'], date_str, last_hour+1, y_pred_original, "forecast.json")
+        generate_forecast_json(PARAMS['target_station_desplay_name'], last_date, last_hour+1, y_pred_original, "forecast.json")
 
 
     else:
