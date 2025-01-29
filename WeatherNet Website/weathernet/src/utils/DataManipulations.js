@@ -1,3 +1,4 @@
+// process only IMSs forecast
 export const processImsForecastData = (dataJson) => {
   // If dataJson or forecast_data is missing, safely return empty defaults
   if (!dataJson?.data?.forecast_data) {
@@ -61,6 +62,7 @@ export const processImsForecastData = (dataJson) => {
   };
 };
 
+// process only IMSs TRUE
 export const processImsTrueData = (dataJson) => {
   // If dataJson or forecast_data is missing, safely return empty defaults
   if (!dataJson?.data?.records) {
@@ -109,6 +111,7 @@ export const processImsTrueData = (dataJson) => {
   };
 };
 
+// process only WeatherNet's forecast
 export const processWeatherNetForecastData = (dataJson) => {
   // If dataJson or forecast_data is missing, safely return empty defaults
   if (!dataJson?.data?.forecast_data) {
@@ -158,8 +161,13 @@ export const processWeatherNetForecastData = (dataJson) => {
   };
 };
 
-export const processForecastDataMerge = (dataJsonIms, dataJsonWeatherNet) => {
-  // Process the two forecasts independently
+// process 3- IMSs forecast, WeatherNet's forecast, and IMSs TRUE data - merge them
+export const processForecastfromBothWithTrueMerge = (
+  dataJsonIms,
+  dataJsonOur,
+  dataJsonTrue
+) => {
+  // Process the three datasets independently
   const {
     dataset: datasetIms,
     minValue: minValIms,
@@ -171,7 +179,13 @@ export const processForecastDataMerge = (dataJsonIms, dataJsonWeatherNet) => {
     dataset2: datasetWn,
     minValue2: minValWn,
     maxValue2: maxValWn,
-  } = processWeatherNetForecastData(dataJsonWeatherNet);
+  } = processWeatherNetForecastData(dataJsonOur);
+
+  const {
+    dataset3: datasetTrue,
+    minValue3: minValTrue,
+    maxValue3: maxValTrue,
+  } = processImsTrueData(dataJsonTrue);
 
   // We'll store merged entries in a map keyed by utcTime
   const mergedMap = {};
@@ -183,19 +197,18 @@ export const processForecastDataMerge = (dataJsonIms, dataJsonWeatherNet) => {
 
   // Then, merge WeatherNet data
   datasetWn.forEach((item) => {
-    // If this utcTime doesn't exist yet, create a new entry
     if (!mergedMap[item.utcTime]) {
       mergedMap[item.utcTime] = {};
     }
+    Object.assign(mergedMap[item.utcTime], item);
+  });
 
-    // Destructure to rename the "ImsTemp" field from the second dataset
-    // so it won't overwrite the IMS "ImsTemp"
-    const { ImsTemp, ...restProps } = item;
-    // We'll call it "weatherNetTemp" if needed, or just skip it
-    // mergedMap[item.utcTime].weatherNetTemp = ImsTemp;
-
-    // Copy all other properties (like OurTemp, formattedTime, etc.)
-    Object.assign(mergedMap[item.utcTime], restProps);
+  // Finally, merge IMS TRUE data
+  datasetTrue.forEach((item) => {
+    if (!mergedMap[item.utcTime]) {
+      mergedMap[item.utcTime] = {};
+    }
+    Object.assign(mergedMap[item.utcTime], item);
   });
 
   // Convert merged map back to an array and sort by utcTime
@@ -222,9 +235,17 @@ export const processForecastDataMerge = (dataJsonIms, dataJsonWeatherNet) => {
     return newObj;
   });
 
-  // Compute final min and max from both sets
-  const finalMin = Math.min(minValIms ?? 999, minValWn ?? 999);
-  const finalMax = Math.max(maxValIms ?? -999, maxValWn ?? -999);
+  // Compute final min and max from all three sets
+  const finalMin = Math.min(
+    minValIms ?? 999,
+    minValWn ?? 999,
+    minValTrue ?? 999
+  );
+  const finalMax = Math.max(
+    maxValIms ?? -999,
+    maxValWn ?? -999,
+    maxValTrue ?? -999
+  );
 
   // Return the merged results
   return {
@@ -235,6 +256,7 @@ export const processForecastDataMerge = (dataJsonIms, dataJsonWeatherNet) => {
   };
 };
 
+// process both IMSs forecast and IMSs TRUE - merge them
 export const processImsForecastDataMergeWithTrueData = (
   forecastDataJson,
   trueDataJson
@@ -313,6 +335,7 @@ export const processImsForecastDataMergeWithTrueData = (
   };
 };
 
+// process both WeatherNet's forecast and IMSs TRUE - merge them
 export const processWeatherNerForecastDataMergeWithImsTrueData = (
   forecastDataJson,
   trueDataJson
