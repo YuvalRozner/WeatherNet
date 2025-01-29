@@ -10,7 +10,7 @@ import WeatherChart from "../../dataDisplays/weatherChart.js";
 import { chartSeriesIms } from "../../../utils/dataManipulations.js";
 
 const ImsForecast = () => {
-  const [dataJsonIms, setDataJsonIms] = useState(null);
+  const [forecastDataJson, setForecastDataJson] = useState(null);
   const [dataset, setDataset] = useState([]);
   const [slicedDataset, setSlicedDataset] = useState([]);
   const [city, setCity] = useState(3); // default city is 3 (Haifa)
@@ -24,20 +24,20 @@ const ImsForecast = () => {
 
   useEffect(() => {
     // Get IMS forecast data when city is changed
-    getImsForecast(city).then((data) => setDataJsonIms(data));
+    getImsForecast(city).then((data) => setForecastDataJson(data));
   }, [city]);
 
   useEffect(() => {
     // Process IMS forecast data when dataJson changes
-    if (!dataJsonIms) return;
+    if (!forecastDataJson) return;
 
     const { dataset, minValue, maxValue, country } =
-      processImsForecastData(dataJsonIms);
+      processImsForecastData(forecastDataJson);
     setDataset(dataset);
     setMinValue(minValue);
     setMaxValue(maxValue);
     setDailyCountryForecast(country);
-  }, [dataJsonIms]);
+  }, [forecastDataJson]);
 
   useEffect(() => {
     // Slice dataset based on chosen time period
