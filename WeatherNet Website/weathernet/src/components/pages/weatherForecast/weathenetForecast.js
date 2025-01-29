@@ -7,7 +7,7 @@ import { templateDataOur } from "../../../utils/forecast.js";
 import WeatherChart from "../../dataDisplays/weatherChart.js";
 import PeriodSlider from "../../dataDisplays/periodSlider.js";
 import { ChooseCityAndPeriodBox } from "./weatherForecast.style";
-import { getImsTrueData } from "../../../utils/network/weathernetServer";
+import { getImsTrueData } from "../../../utils/network/gateway.js";
 
 const WeathernetForecast = () => {
   const [ourDataJson, setOurDataJson] = useState(null);
