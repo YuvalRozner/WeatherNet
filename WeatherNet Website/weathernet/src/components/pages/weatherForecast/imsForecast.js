@@ -3,7 +3,7 @@ import { processImsForecastDataMergeWithTrueData } from "../../../utils/dataMani
 import {
   getImsForecast,
   getImsTrueData,
-} from "../../../utils/network/weathernetServer";
+} from "../../../utils/network/gateway.js";
 import ChooseCity from "../../dataDisplays/chooseCity.js";
 import PeriodSlider from "../../dataDisplays/periodSlider.js";
 import { ChooseCityAndPeriodBox } from "./weatherForecast.style";
