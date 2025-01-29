@@ -60,7 +60,7 @@ WINDOW_PARAMS = {
 TRAIN_PARAMS = {
     'epochs' :          50,  
     'batch_size':       32,
-    'lr':               1e-5,    
+    'lr':               1e-3,    
     'resume':           False,
     'device':           PARAMS['device'],
     'early_stopping_patience':10,

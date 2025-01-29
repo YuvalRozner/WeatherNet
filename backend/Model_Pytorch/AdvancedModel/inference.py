@@ -236,16 +236,12 @@ if __name__ == "__main__":
     for df in dfs:
         print(df.shape)
 
-    timeEncode(dfs)
-
-    df_cleaned_list = drop_nan_rows_multiple(dfs)
-
     print("Size of data after drop_nan_rows_multiple:")
-    for i, df in enumerate(df_cleaned_list):
+    for i, df in enumerate(dfs):
         print(f"Station {i}: {df.shape}")
 
     # Extract Feature Values (Use Cleaned Data)
-    list_of_values = [df.values for df in df_cleaned_list]
+    list_of_values = [df.values for df in dfs]
 
     # Train/Validation Split per Station
     train_size = int(0.8 * len(list_of_values[0]))
@@ -266,7 +262,7 @@ if __name__ == "__main__":
     shift = WINDOW_PARAMS['shift']
 
     # Ensure consistent column indexing
-    representative_df = df_cleaned_list[0]
+    representative_df = dfs[0]
     column_indices = {name: i for i, name in enumerate(representative_df.columns)}
     label_columns = [column_indices[WINDOW_PARAMS['label_columns'][0]]]
 
