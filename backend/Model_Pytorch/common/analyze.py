@@ -106,9 +106,9 @@ def plot_error_distribution(data, model_txt, path_to_save, percentages=False, th
             data['Error'],
             bins=50,
             kde=True,
-            color='purple',
             stat=stat,
-            edgecolor=edge_color
+            color='purple'
+            edgecolor=edge_color,
         )
 
         # Set labels based on the type of plot
@@ -121,6 +121,9 @@ def plot_error_distribution(data, model_txt, path_to_save, percentages=False, th
         )
         plt.xlabel('Error (°C)', color=text_color)
         plt.ylabel(ylabel, color=text_color)
+
+        # Define axis ranges
+        plt.xlim(-11, 11)  # Set x-axis range as needed
 
         # Customize tick labels
         ax = plt.gca()
@@ -142,6 +145,9 @@ def plot_error_distribution(data, model_txt, path_to_save, percentages=False, th
         # Change tick label colors explicitly
         plt.setp(ax.get_xticklabels(), color=tick_color)
         plt.setp(ax.get_yticklabels(), color=tick_color)
+
+        # Add "°" to each of the numbers in the x-axis
+        ax.set_xticklabels([f'{tick}°' for tick in ax.get_xticks()])
 
         # Adjust layout and save the figure
         plt.tight_layout()
@@ -186,8 +192,8 @@ def plot_time_series(data, graph_title, path_to_save, theme='both'):
         plt.figure(figsize=(15, 5), facecolor=face_color)
 
         # Plot Actual and Predicted
-        plt.plot(data['Actual'], label='Actual', color='blue')
-        plt.plot(data['Predicted'], label='Predicted', color='orange', alpha=0.7)
+        plt.plot(data['Actual'][:100], label='Actual', color='blue')
+        plt.plot(data['Predicted'][:100], label='Predicted', color='orange', alpha=0.7)
 
         # Customize titles and labels
         plt.title(graph_title, color=text_color)
@@ -254,7 +260,7 @@ def create_heatmap(dfs, graph_title, path_to_save, theme='both'):
         else:
             text_color = 'black'
             face_color = 'white'
-            grid = True
+            grid = False
             cmap = 'coolwarm'  # Suitable palette for light backgrounds
             line_color = 'black'
             title_suffix = 'light'
@@ -286,7 +292,7 @@ def create_heatmap(dfs, graph_title, path_to_save, theme='both'):
             fmt=".2f",
             cmap=cmap,
             xticklabels=percentiles,
-            yticklabels=[f"Model {i}" for i in range(len(dfs))],
+            yticklabels=[f"{window_prediction_str(i)}" for i in range(len(dfs))],
             cbar=True,
             linewidths=0.5,
             linecolor='gray' if current_theme == 'light' else 'white'
@@ -294,8 +300,8 @@ def create_heatmap(dfs, graph_title, path_to_save, theme='both'):
 
         # Customize titles and labels based on theme
         plt.title(graph_title, color=text_color, fontsize=16)
-        plt.xlabel('Percentile', color=text_color)
-        plt.ylabel('Model Index', color=text_color)
+        plt.xlabel('', color=text_color)
+        plt.ylabel('Predicted Hours', color=text_color)
 
         # Customize tick labels
         ax.tick_params(colors=tick_color)
@@ -316,6 +322,9 @@ def create_heatmap(dfs, graph_title, path_to_save, theme='both'):
         cbar.ax.tick_params(color=cbar_tick_color)
         cbar.ax.yaxis.label.set_color(cbar_label_color)
         cbar.ax.tick_params(labelsize=10, labelcolor=cbar_tick_color)
+        # Add "°C" to each of the numbers in the color bar
+        #cbar.set_ticks(cbar.get_ticks())
+        cbar.set_ticklabels([f'{tick}°' for tick in cbar.get_ticks()])
 
         # Remove or show grid lines based on theme
         if grid:
@@ -358,7 +367,7 @@ def plot_error_bar(df, graph_title, path_to_save, theme='both'):
         else:
             text_color = 'black'
             face_color = 'white'
-            grid = True
+            grid = False
             tick_color = 'black'
             spine_color = 'black'
             palette = 'viridis'  # Can choose a different palette if desired
@@ -383,8 +392,8 @@ def plot_error_bar(df, graph_title, path_to_save, theme='both'):
 
         # Customize titles and labels
         plt.title(graph_title, color=text_color, fontsize=16)
-        plt.xlabel('Percentile', color=label_color, fontsize=14)
-        plt.ylabel('Error', color=label_color, fontsize=14)
+        plt.xlabel('', color=label_color, fontsize=14)
+        plt.ylabel('Error (°C)', color=label_color, fontsize=14)
 
         # Customize tick labels
         ax.tick_params(colors=tick_color)
@@ -410,7 +419,7 @@ def plot_error_bar(df, graph_title, path_to_save, theme='both'):
         # Add error labels on top of each bar with contrasting color
         for p in ax.patches:
             height = p.get_height()
-            ax.annotate(f'{height:.2f}',
+            ax.annotate(f'{height:.2f}°',
                         (p.get_x() + p.get_width() / 2., height),
                         ha='center', va='bottom',
                         fontsize=10, color=annotate_color,
@@ -451,6 +460,15 @@ def prepare_data(dfs):
     print("prepare_data completed.")
     return percentile_dfs
 
+def window_prediction_str(i):
+    if i == 0:
+        return "1 - 12"
+    elif i == 1:
+        return "13 - 24"
+    elif i == 2:
+        return "25 - 36"
+    elif i == 3:
+        return "37 - 60"
 
 if __name__ == "__main__":
     # Define paths
@@ -463,13 +481,14 @@ if __name__ == "__main__":
         os.makedirs(folder_path_to_save)
     else:
         print(f"Folder {folder_path_to_save} already exists")
-        exit(1)
+        #exit(1)
 
     # Read all CSV files in the folder
     dfs = []
     for i, filename in enumerate(os.listdir(folder_path)):
         if filename.endswith(".csv"):
             df = pd.read_csv(os.path.join(folder_path, filename))
+            df = df.head(200)
             dfs.append(df)
             os.makedirs(os.path.join(folder_path_to_save, f"model_{i}"), exist_ok=True)
     if not dfs:
@@ -488,7 +507,7 @@ if __name__ == "__main__":
     for i, percentile_df in enumerate(percentile_dfs):
         plot_error_bar(
             df=percentile_df,
-            graph_title=f"Error per Percentage of Data. Model: {i}",
+            graph_title=f"Error per Percentage of Data\nPrediction of {window_prediction_str(i)} hours",
             path_to_save=os.path.join(folder_path_to_save, f"model_{i}","Error_per_Percentage_of_Data.png"),
             theme='both')
         print(f"Plotted error bar for model {i}")
@@ -496,7 +515,7 @@ if __name__ == "__main__":
     # Plot and save combined graphs
     plot_error_bar(
         df=percentile_dfs_combined,
-        graph_title="Error per Percentage of Data. Combined Models",
+        graph_title="Error per Percentage of Data\nPrediction of 1 - 60 hours",
         path_to_save=os.path.join(folder_path_to_save, "combined_Error_per_Percentage_of_Data.png"),
         theme='both'  # Generates both light and dark themed plots
     )
@@ -504,7 +523,7 @@ if __name__ == "__main__":
     # Create and save heatmaps
     create_heatmap(
         dfs=percentile_dfs,
-        graph_title='Forecast Error per Percentage of Data',
+        graph_title='Forecast Error per Percentage of Data (°C)',
         path_to_save=os.path.join(folder_path_to_save, "heatmap_forecast_error.png"),
         theme='both'  # Generates both light and dark themed heatmaps
     )
@@ -516,10 +535,10 @@ if __name__ == "__main__":
     for i, df in enumerate(dfs):
         # Perform per-hour analysis
         label_width = int(df['label_width'].iloc[0]) if 'label_width' in df.columns else 24  # Default to 24 if not present
-        per_hour_metrics = per_hour_analysis(df['Predicted'], df['Actual'], label_width=label_width, start_hour=start_hour)
+        #per_hour_metrics = per_hour_analysis(df['Predicted'], df['Actual'], label_width=label_width, start_hour=start_hour)
         start_hour += label_width
 
-        per_hour_metrics_list.append(per_hour_metrics)
+        #per_hour_metrics_list.append(per_hour_metrics)
 
         # Compute overall error metrics
         metrics = compute_error_metrics(df['Actual'], df['Predicted'])
