@@ -507,7 +507,7 @@ if __name__ == "__main__":
         os.makedirs(folder_path_to_save)
     else:
         print(f"Folder {folder_path_to_save} already exists")
-        #exit(1)
+        exit(1)
 
     # Read all CSV files in the folder
     dfs = []
@@ -561,10 +561,10 @@ if __name__ == "__main__":
     for i, df in enumerate(dfs):
         # Perform per-hour analysis
         label_width = int(df['label_width'].iloc[0]) if 'label_width' in df.columns else 24  # Default to 24 if not present
-        #per_hour_metrics = per_hour_analysis(df['Predicted'], df['Actual'], label_width=label_width, start_hour=start_hour)
+        per_hour_metrics = per_hour_analysis(df['Predicted'], df['Actual'], label_width=label_width, start_hour=start_hour)
         start_hour += label_width
 
-        #per_hour_metrics_list.append(per_hour_metrics)
+        per_hour_metrics_list.append(per_hour_metrics)
 
         # Compute overall error metrics
         metrics = compute_error_metrics(df['Actual'], df['Predicted'])
