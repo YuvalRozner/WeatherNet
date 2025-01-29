@@ -53,7 +53,7 @@ PARAMS = {
 WINDOW_PARAMS = {
     'input_width' :     72, #window input size
     'label_width' :     24, # how many hours to predict to the future
-    'shift' :           1,
+    'shift' :           12,
     'label_columns' :   ['TD (degC)'],
 }
 
@@ -69,6 +69,14 @@ TRAIN_PARAMS = {
     'min_lr':            1e-7
 }
 
+INFERENCE_PARAMS = {
+    'params_path':            ['output/0_12/parameters.py', 'output/12_24/parameters.py'],
+    'weights_paths':          ['output/0_12/checkpoints/best_checkpoint.pth','output/12_24/checkpoints/best_checkpoint.pth'],
+    'scaler_folder_path':     'output/0_12/scalers',
+    'analyze_output_folder_per_folder':  ['output/0_12/analyze_output', 'output/12_24/analyze_output'],
+    'analyze_output_folder':  'output/analyze_output',
+
+}
 ADVANCED_MODEL_PARAMS = {
     'num_stations':         len(PARAMS['fileNames']),
     'time_steps':           WINDOW_PARAMS['input_width'],
@@ -81,3 +89,4 @@ ADVANCED_MODEL_PARAMS = {
     'target_station_idx':   PARAMS['target_station_id'],
     'label_width':          WINDOW_PARAMS['label_width']
 }
+
