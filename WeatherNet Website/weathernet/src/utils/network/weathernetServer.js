@@ -10,6 +10,14 @@ export const getImsForecast = (cityId) => {
   }
 };
 
+export const getImsTrueData = (cityId) => {
+  // if (process.env.NODE_ENV === "development") {
+  return fetchWeatherData(`${local_weathernetServer}/getImsTrueData`, cityId);
+  // } else if (process.env.NODE_ENV === "production") {
+  //   return fetchWeatherData(deployed_weathernetServer, cityId);
+  // }
+};
+
 export const fetchWeatherData = async (requestUrl, cityId) => {
   try {
     const response = await fetch(`${requestUrl}?cityId=${cityId}`);

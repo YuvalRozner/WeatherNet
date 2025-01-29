@@ -10,12 +10,11 @@ export const processImsForecastData = (dataJson) => {
   }
 
   const newDataset = [];
-  const now = new Date();
   let minValueTemp = 100.0;
   let maxValueTemp = -100.0;
   const countryData = [];
 
-  Object.entries(dataJson.data.forecast_data).forEach(([date, data]) => {
+  Object.entries(dataJson.data.fixed_forecast_data).forEach(([date, data]) => {
     const formattedDate = new Date(date).toISOString().split("T")[0];
     if (data.country) {
       countryData.push({
@@ -25,7 +24,7 @@ export const processImsForecastData = (dataJson) => {
     }
   });
 
-  Object.entries(dataJson.data.forecast_data).forEach(
+  Object.entries(dataJson.data.fixed_forecast_data).forEach(
     ([date, forecastData]) => {
       const formattedDate = new Date(date).toISOString().split("T")[0];
       const hourlyForecast = forecastData.hourly;
@@ -40,15 +39,11 @@ export const processImsForecastData = (dataJson) => {
           maxValueTemp = temp;
         }
 
-        // Check if this timestamp is before or after "now"
-        const isPast = dateTime < now;
-
         newDataset.push({
           utcTime: dateTime.getTime(),
           formattedTime: formatTimeLabel(dateTime.getTime()),
-          ImsTemp: isPast ? null : temp,
-          // pastTemp: isPast ? temp : null,
-          // futureTemp: isPast ? null : temp,
+          ImsTemp: temp,
+          bothTemp: temp,
           rain_chance: forecast.rain_chance,
           wave_height: forecast.wave_height,
           relative_humidity: forecast.relative_humidity,
@@ -63,6 +58,54 @@ export const processImsForecastData = (dataJson) => {
     minValue: Math.floor(minValueTemp - 0.6, 0),
     maxValue: Math.ceil(maxValueTemp + 0.4, 0),
     country: countryData,
+  };
+};
+
+export const processImsTrueData = (dataJson) => {
+  // If dataJson or forecast_data is missing, safely return empty defaults
+  if (!dataJson?.data?.records) {
+    return {
+      dataset: [],
+      minValue: null,
+      maxValue: null,
+    };
+  }
+
+  const newDataset = [];
+  let minValueTemp = 100.0;
+  let maxValueTemp = -100.0;
+
+  dataJson.data.records.forEach((record) => {
+    const [datePart, timePart] = record.date.split(" ");
+    const [day, month, year] = datePart.split("/").map(Number);
+    const [hours, minutes] = timePart.split(":").map(Number);
+    if (minutes === 0) {
+      // Only process records with round hours
+      const dateTime = new Date(year, month - 1, day, hours, minutes);
+      const temp = parseFloat(record.TD);
+      if (temp < minValueTemp) {
+        minValueTemp = temp;
+      }
+      if (temp > maxValueTemp) {
+        maxValueTemp = temp;
+      }
+
+      newDataset.push({
+        utcTime: dateTime.getTime(),
+        formattedTime: formatTimeLabel(dateTime.getTime()),
+        truePastTemp: temp,
+        bothTemp: temp,
+        relative_humidity: parseFloat(record.RH),
+        wind_speed: parseFloat(record.WS),
+        rain_chance: parseFloat(record.Rain),
+      });
+    }
+  });
+
+  return {
+    dataset3: newDataset,
+    minValue3: Math.floor(minValueTemp - 0.6, 0),
+    maxValue3: Math.ceil(maxValueTemp + 0.4, 0),
   };
 };
 
@@ -162,7 +205,13 @@ export const processForecastDataMerge = (dataJsonIms, dataJsonWeatherNet) => {
 
   // From the merged dataset, pick only the desired keys
   const filteredDataset = mergedDataset.map((item) => {
-    const allowedKeys = ["utcTime", "formattedTime", "ImsTemp", "OurTemp"];
+    const allowedKeys = [
+      "utcTime",
+      "formattedTime",
+      "ImsTemp",
+      "OurTemp",
+      "truePastTemp",
+    ];
     const newObj = {};
 
     allowedKeys.forEach((key) => {
@@ -183,6 +232,153 @@ export const processForecastDataMerge = (dataJsonIms, dataJsonWeatherNet) => {
     minValue: finalMin,
     maxValue: finalMax,
     country: countryData, // or merge if second data also has country
+  };
+};
+
+export const processImsForecastDataMergeWithTrueData = (
+  forecastDataJson,
+  trueDataJson
+) => {
+  // Process the two forecasts independently
+  const {
+    dataset: datasetIms,
+    minValue: minValIms,
+    maxValue: maxValIms,
+    country: countryData,
+  } = processImsForecastData(forecastDataJson);
+
+  const {
+    dataset3: datasetTrue,
+    minValue3: minValTrue,
+    maxValue3: maxValTrue,
+  } = processImsTrueData(trueDataJson);
+
+  // We'll store merged entries in a map keyed by utcTime
+  const mergedMap = {};
+
+  // Populate from IMS data
+  datasetIms.forEach((item) => {
+    if (!mergedMap[item.utcTime]) {
+      mergedMap[item.utcTime] = {};
+    }
+    Object.assign(mergedMap[item.utcTime], item);
+  });
+
+  // Merge WeatherNet data
+  datasetTrue.forEach((item) => {
+    if (!mergedMap[item.utcTime]) {
+      mergedMap[item.utcTime] = {};
+    }
+    Object.assign(mergedMap[item.utcTime], item);
+  });
+
+  // Convert merged map back to an array and sort by utcTime
+  const mergedDataset = Object.values(mergedMap).sort(
+    (a, b) => a.utcTime - b.utcTime
+  );
+
+  // From the merged dataset, pick only the desired keys
+  const filteredDataset = mergedDataset.map((item) => {
+    const allowedKeys = [
+      "utcTime",
+      "formattedTime",
+      "ImsTemp",
+      "bothTemp",
+      "truePastTemp",
+      "rain_chance",
+      "wave_height",
+      "relative_humidity",
+      "wind_speed",
+    ];
+    const newObj = {};
+
+    allowedKeys.forEach((key) => {
+      if (item[key] !== undefined) {
+        newObj[key] = item[key];
+      }
+    });
+    return newObj;
+  });
+
+  // Compute final min and max from both sets
+  const finalMin = Math.min(minValIms ?? 999, minValTrue ?? 999);
+  const finalMax = Math.max(maxValIms ?? -999, maxValTrue ?? -999);
+
+  // Return the merged results
+  return {
+    dataset: filteredDataset,
+    minValue: finalMin,
+    maxValue: finalMax,
+    country: countryData, // or merge if second data also has country
+  };
+};
+
+export const processWeatherNerForecastDataMergeWithImsTrueData = (
+  forecastDataJson,
+  trueDataJson
+) => {
+  // Process the two forecasts independently
+  const {
+    dataset2: datasetIms,
+    minValue2: minValIms,
+    maxValue2: maxValIms,
+  } = processWeatherNetForecastData(forecastDataJson);
+
+  const {
+    dataset3: datasetTrue,
+    minValue3: minValTrue,
+    maxValue3: maxValTrue,
+  } = processImsTrueData(trueDataJson);
+
+  console.log(datasetIms);
+  console.log(datasetTrue);
+
+  // We'll store merged entries in a map keyed by utcTime
+  const mergedMap = {};
+
+  // Populate from IMS data
+  datasetIms.forEach((item) => {
+    if (!mergedMap[item.utcTime]) {
+      mergedMap[item.utcTime] = {};
+    }
+    Object.assign(mergedMap[item.utcTime], item);
+  });
+
+  // Merge WeatherNet data
+  datasetTrue.forEach((item) => {
+    if (!mergedMap[item.utcTime]) {
+      mergedMap[item.utcTime] = {};
+    }
+    Object.assign(mergedMap[item.utcTime], item);
+  });
+
+  // Convert merged map back to an array and sort by utcTime
+  const mergedDataset = Object.values(mergedMap).sort(
+    (a, b) => a.utcTime - b.utcTime
+  );
+
+  // From the merged dataset, pick only the desired keys
+  const filteredDataset = mergedDataset.map((item) => {
+    const allowedKeys = ["utcTime", "formattedTime", "OurTemp", "truePastTemp"];
+    const newObj = {};
+
+    allowedKeys.forEach((key) => {
+      if (item[key] !== undefined) {
+        newObj[key] = item[key];
+      }
+    });
+    return newObj;
+  });
+
+  // Compute final min and max from both sets
+  const finalMin = Math.min(minValIms ?? 999, minValTrue ?? 999);
+  const finalMax = Math.max(maxValIms ?? -999, maxValTrue ?? -999);
+
+  // Return the merged results
+  return {
+    dataset: filteredDataset,
+    minValue: finalMin,
+    maxValue: finalMax,
   };
 };
 

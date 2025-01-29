@@ -1,11 +1,10 @@
 import React from "react";
 import Slider from "@mui/material/Slider";
 
-const PeriodSlider = ({ period, setPeriod, minPeriod, beginDate }) => {
+const PeriodSlider = ({ period, setPeriod, minPeriod, maxPeriod, dataset }) => {
   const indexToHour = (value) => {
-    const startDate = new Date(beginDate);
-    // startDate.setHours(0, 0, 0, 0);
-    const date = new Date(startDate.getTime() + value * 60 * 60 * 1000);
+    if (dataset.length === 0) return "";
+    const date = new Date(dataset[value].utcTime);
     return `${date.getDate().toString().padStart(2, "0")}/${(date.getMonth() + 1).toString().padStart(2, "0")} ${date.getHours().toString().padStart(2, "0")}:00`;
   };
 
@@ -31,7 +30,7 @@ const PeriodSlider = ({ period, setPeriod, minPeriod, beginDate }) => {
     <Slider
       valueLabelDisplay="on"
       valueLabelFormat={(value) => indexToHour(value)}
-      max={93}
+      max={maxPeriod}
       sx={{ width: 500 }}
       getAriaLabel={() => "Time Period"}
       value={period}

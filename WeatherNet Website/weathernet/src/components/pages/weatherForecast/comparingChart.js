@@ -15,11 +15,9 @@ const ComparingChart = () => {
   const [slicedDataset, setSlicedDataset] = useState([]);
   const [city, setCity] = useState(3); // default city is 3 (Haifa)
   const [chosenTimePeriod, setChosenTimePeriod] = useState([6, 32]);
+  const [maxPeriod, setMaxPeriod] = useState(93);
   const [minValue, setMinValue] = useState(null);
   const [maxValue, setMaxValue] = useState(null);
-  const [beginDateForSlider, setBeginDateForSlider] = useState(
-    new Date().setHours(0, 0, 0, 0)
-  );
 
   useEffect(() => {
     // Get IMS forecast data when city is changed
@@ -31,13 +29,14 @@ const ComparingChart = () => {
     // Process IMS forecast data when dataJson changes
     if (!dataJsonIms) return;
 
-    const { dataset, minValue, maxValue, country } = processForecastDataMerge(
+    const { dataset, minValue, maxValue } = processForecastDataMerge(
       dataJsonIms,
       dataJsonOur
     );
     setDataset(dataset);
     setMinValue(minValue);
     setMaxValue(maxValue);
+    setMaxPeriod(dataset.length - 1);
   }, [dataJsonIms, dataJsonOur]);
 
   useEffect(() => {
@@ -45,10 +44,9 @@ const ComparingChart = () => {
     if (dataset.length === 0) return;
     const tempSlicedDataset = dataset.slice(
       chosenTimePeriod[0],
-      chosenTimePeriod[1]
+      chosenTimePeriod[1] + 1
     );
     setSlicedDataset(tempSlicedDataset);
-    setBeginDateForSlider(dataset[0].utcTime);
   }, [dataset, chosenTimePeriod]);
 
   return (
@@ -59,7 +57,8 @@ const ComparingChart = () => {
           period={chosenTimePeriod}
           setPeriod={setChosenTimePeriod}
           minPeriod={6}
-          beginDate={beginDateForSlider}
+          maxPeriod={maxPeriod}
+          dataset={dataset}
         />
       </ChooseCityAndPeriodBox>
       <WeatherChart

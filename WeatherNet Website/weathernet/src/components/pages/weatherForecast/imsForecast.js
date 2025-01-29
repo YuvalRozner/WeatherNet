@@ -1,6 +1,9 @@
-import React, { useEffect, useState } from "react";
-import { processImsForecastData } from "../../../utils/dataManipulations.js";
-import { getImsForecast } from "../../../utils/network/weathernetServer";
+import React, { useEffect, useState, useCallback } from "react";
+import { processImsForecastDataMergeWithTrueData } from "../../../utils/dataManipulations.js";
+import {
+  getImsForecast,
+  getImsTrueData,
+} from "../../../utils/network/weathernetServer";
 import ChooseCity from "../../dataDisplays/chooseCity.js";
 import PeriodSlider from "../../dataDisplays/periodSlider.js";
 import { ChooseCityAndPeriodBox } from "./weatherForecast.style";
@@ -11,43 +14,44 @@ import { chartSeriesIms } from "../../../utils/dataManipulations.js";
 
 const ImsForecast = () => {
   const [forecastDataJson, setForecastDataJson] = useState(null);
+  const [trueDataJson, setTrueDataJson] = useState(null);
   const [dataset, setDataset] = useState([]);
   const [slicedDataset, setSlicedDataset] = useState([]);
   const [city, setCity] = useState(3); // default city is 3 (Haifa)
   const [chosenTimePeriod, setChosenTimePeriod] = useState([6, 32]);
+  const [maxPeriod, setMaxPeriod] = useState(93);
   const [dailyCountryForecast, setDailyCountryForecast] = useState("");
   const [minValue, setMinValue] = useState(null);
   const [maxValue, setMaxValue] = useState(null);
-  const [beginDateForSlider, setBeginDateForSlider] = useState(
-    new Date().setHours(0, 0, 0, 0)
-  );
 
-  useEffect(() => {
-    // Get IMS forecast data when city is changed
+  const fetchForecastData = useCallback(() => {
     getImsForecast(city).then((data) => setForecastDataJson(data));
+    getImsTrueData(city).then((data) => setTrueDataJson(data));
   }, [city]);
 
   useEffect(() => {
-    // Process IMS forecast data when dataJson changes
-    if (!forecastDataJson) return;
+    fetchForecastData();
+  }, [fetchForecastData]);
+
+  useEffect(() => {
+    if (!forecastDataJson || !trueDataJson) return;
 
     const { dataset, minValue, maxValue, country } =
-      processImsForecastData(forecastDataJson);
+      processImsForecastDataMergeWithTrueData(forecastDataJson, trueDataJson);
     setDataset(dataset);
     setMinValue(minValue);
     setMaxValue(maxValue);
     setDailyCountryForecast(country);
-  }, [forecastDataJson]);
+    setMaxPeriod(dataset.length - 1);
+  }, [forecastDataJson, trueDataJson]);
 
   useEffect(() => {
-    // Slice dataset based on chosen time period
     if (dataset.length === 0) return;
     const tempSlicedDataset = dataset.slice(
       chosenTimePeriod[0],
-      chosenTimePeriod[1]
+      chosenTimePeriod[1] + 1
     );
     setSlicedDataset(tempSlicedDataset);
-    setBeginDateForSlider(dataset[0].utcTime);
   }, [dataset, chosenTimePeriod]);
 
   return (
@@ -59,7 +63,8 @@ const ImsForecast = () => {
           period={chosenTimePeriod}
           setPeriod={setChosenTimePeriod}
           minPeriod={6}
-          beginDate={beginDateForSlider}
+          maxPeriod={maxPeriod}
+          dataset={dataset}
         />
       </ChooseCityAndPeriodBox>
       <WeatherChart
