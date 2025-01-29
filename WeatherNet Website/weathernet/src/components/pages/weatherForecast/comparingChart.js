@@ -4,7 +4,6 @@ import {
   getImsForecast,
   getImsTrueData,
 } from "../../../utils/network/gateway.js";
-import ChooseCity from "../../dataDisplays/chooseCity.js";
 import PeriodSlider from "../../dataDisplays/periodSlider.js";
 import { ChooseCityAndPeriodBox } from "./weatherForecast.style.js";
 import WeatherChart from "../../dataDisplays/weatherChart.js";
@@ -17,7 +16,6 @@ const ComparingChart = () => {
   const [dataJsonTrue, setDataJsonTrue] = useState(null);
   const [dataset, setDataset] = useState([]);
   const [slicedDataset, setSlicedDataset] = useState([]);
-  const [city, setCity] = useState(3); // default city is 3 (Haifa)
   const [chosenTimePeriod, setChosenTimePeriod] = useState([51, 114]);
   const [maxPeriod, setMaxPeriod] = useState(93);
   const [minValue, setMinValue] = useState(null);
@@ -25,10 +23,10 @@ const ComparingChart = () => {
 
   const fetchData = useCallback(() => {
     // Get IMS forecast data when city is changed
-    getImsForecast(city).then((data) => setDataJsonIms(data));
-    getImsTrueData(42).then((data) => setDataJsonTrue(data));
+    getImsForecast(3).then((data) => setDataJsonIms(data)); //TODO: change to city
+    getImsTrueData(42).then((data) => setDataJsonTrue(data)); //TODO: change to city
     setDataJsonOur(templateDataOur);
-  }, [city]);
+  }, []);
 
   useEffect(() => {
     fetchData();
@@ -63,7 +61,6 @@ const ComparingChart = () => {
   return (
     <>
       <ChooseCityAndPeriodBox>
-        <ChooseCity setCity={setCity} />
         <PeriodSlider
           period={chosenTimePeriod}
           setPeriod={setChosenTimePeriod}
