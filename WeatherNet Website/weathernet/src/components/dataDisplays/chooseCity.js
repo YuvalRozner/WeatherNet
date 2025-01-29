@@ -1,7 +1,7 @@
 import React from "react";
 import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
-import imsStations from "../../utils/staticData/imsStations";
+import imsStations from "../../utils/staticData/imsStationsIds_forForecast";
 
 const ChooseCity = ({ setCity }) => {
   return (
