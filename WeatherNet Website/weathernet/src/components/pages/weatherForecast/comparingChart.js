@@ -3,7 +3,7 @@ import { processForecastfromBothWithTrueMerge } from "../../../utils/dataManipul
 import {
   getImsForecast,
   getImsTrueData,
-} from "../../../utils/network/weathernetServer.js";
+} from "../../../utils/network/gateway.js";
 import ChooseCity from "../../dataDisplays/chooseCity.js";
 import PeriodSlider from "../../dataDisplays/periodSlider.js";
 import { ChooseCityAndPeriodBox } from "./weatherForecast.style.js";
