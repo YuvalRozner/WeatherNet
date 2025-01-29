@@ -353,9 +353,6 @@ export const processWeatherNerForecastDataMergeWithImsTrueData = (
     maxValue3: maxValTrue,
   } = processImsTrueData(trueDataJson);
 
-  console.log(datasetIms);
-  console.log(datasetTrue);
-
   // We'll store merged entries in a map keyed by utcTime
   const mergedMap = {};
 
