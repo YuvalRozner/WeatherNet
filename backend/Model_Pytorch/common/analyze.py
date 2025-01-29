@@ -61,6 +61,8 @@ def per_hour_analysis(predictions_series, actuals_series, label_width=24, start_
     return per_hour_metrics
 
 #################################################### plots ####################################################
+from matplotlib.colors import LogNorm
+
 
 def plot_error_distribution(data, model_txt, path_to_save, percentages=False, theme='both'):
     sns.reset_orig()
@@ -70,26 +72,26 @@ def plot_error_distribution(data, model_txt, path_to_save, percentages=False, th
 
     for current_theme in themes:
         # Define colors based on current_theme
-        if (current_theme == 'dark'):
+        if current_theme == 'dark':
             text_color = 'white'
             face_color = '#282c34'
             grid = False
             tick_color = 'white'
             edge_color = 'white'
-            palette = 'viridis'  # Suitable for dark backgrounds
             title_suffix = 'dark'
+            color = 'white'
         else:
             text_color = 'black'
             face_color = 'white'
-            grid = True
+            grid = False
             tick_color = 'black'
             edge_color = 'black'
-            palette = 'coolwarm'  # Suitable for light backgrounds
             title_suffix = 'light'
+            color = 'blue'
+
 
         # Determine the save path
         if theme == 'both':
-            # Insert the theme suffix before the file extension
             base, ext = os.path.splitext(path_to_save)
             save_path = f"{base}_{title_suffix}{ext}"
         else:
@@ -101,22 +103,44 @@ def plot_error_distribution(data, model_txt, path_to_save, percentages=False, th
         # Choose the statistic for the histogram
         stat = "percent" if percentages else "count"
 
-        # Create histogram
-        sns.histplot(
+        # Create histogram plot without facecolor (to set it manually later)
+        ax = sns.histplot(
             data['Error'],
-            bins=50,
+            bins=150,
             kde=True,
             stat=stat,
-            color='purple'
-            edgecolor=edge_color,
+            edgecolor='none',
+            facecolor='none',  # Disable default facecolor
+            color=color
         )
 
+        # Calculate bin centers
+        bin_edges = ax.patches[0].get_x()  # Starting x of the first bin
+        bins = ax.containers[0].datavalues if hasattr(ax.containers[0], 'datavalues') else [patch.get_x() for patch in ax.patches]
+        bin_edges = ax.patches[0].get_x()
+        bin_width = ax.patches[0].get_width()
+        bin_centers = [patch.get_x() + bin_width / 2 for patch in ax.patches]
+
+        # Define colormap
+        cmap = plt.get_cmap('viridis_r')
+        # Normalize based on the maximum absolute error to ensure symmetry
+        max_abs_error = max(abs(data['Error'].min()), abs(data['Error'].max()))
+
+        norm = LogNorm(vmin=0.1, vmax=max_abs_error)  # Log scale, avoiding zero
+
+        #norm = plt.Normalize(0, max_abs_error)
+        # Apply colormap to bars based on absolute bin centers
+        for patch, bin_center in zip(ax.patches, bin_centers):
+            color = cmap(norm(abs(bin_center)))
+            patch.set_facecolor(color)
+
+
         # Set labels based on the type of plot
-        ylabel = 'Percentage (%)' if percentages else 'Frequency'
+        ylabel = 'Percentage (%)' if percentages else 'Samples'
 
         # Customize titles and labels
         plt.title(
-            f'Distribution of Prediction Errors in {model_txt}, from {len(data["Error"])} samples',
+            f'Distribution of Prediction Errors across all Validation Set ({len(data["Error"])//1000}K samples)',
             color=text_color
         )
         plt.xlabel('Error (°C)', color=text_color)
@@ -126,7 +150,6 @@ def plot_error_distribution(data, model_txt, path_to_save, percentages=False, th
         plt.xlim(-11, 11)  # Set x-axis range as needed
 
         # Customize tick labels
-        ax = plt.gca()
         ax.tick_params(colors=tick_color)
 
         # Change the background color of axes
@@ -148,12 +171,15 @@ def plot_error_distribution(data, model_txt, path_to_save, percentages=False, th
 
         # Add "°" to each of the numbers in the x-axis
         ax.set_xticklabels([f'{tick}°' for tick in ax.get_xticks()])
-
+        if not percentages:
+            ax.set_yticklabels([f'{int(tick//1000)}K' for tick in ax.get_yticks()])
         # Adjust layout and save the figure
         plt.tight_layout()
         plt.savefig(save_path, facecolor=plt.gcf().get_facecolor())
         plt.close()
         print(f"Saved error distribution plot to {save_path}")
+
+
 
 def plot_time_series(data, graph_title, path_to_save, theme='both'):
     sns.reset_orig()
@@ -488,7 +514,7 @@ if __name__ == "__main__":
     for i, filename in enumerate(os.listdir(folder_path)):
         if filename.endswith(".csv"):
             df = pd.read_csv(os.path.join(folder_path, filename))
-            df = df.head(200)
+            #df = df.head(200)
             dfs.append(df)
             os.makedirs(os.path.join(folder_path_to_save, f"model_{i}"), exist_ok=True)
     if not dfs:
