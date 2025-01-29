@@ -28,8 +28,12 @@ const WeatherChart = ({ dataset, minValue, maxValue, chartSeries }) => {
         yAxis={formattedYAxis}
         series={forecastChartSeries}
         height={400}
-        margin={{ left: 60, right: 30, top: 30, bottom: 50 }}
+        margin={{ left: 80, right: 20, top: 30, bottom: 80 }}
         grid={{ vertical: true, horizontal: true }}
+        tickLabelStyle={{
+          whiteSpace: "pre-line",
+          lineHeight: 1.2,
+        }}
       />
     </ChartContainerBox>
   );

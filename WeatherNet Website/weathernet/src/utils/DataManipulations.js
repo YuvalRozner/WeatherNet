@@ -471,8 +471,13 @@ export const generateFormattedXAxis = () => [
   {
     scaleType: "utc",
     dataKey: "utcTime",
-    label: "Time",
+    // label: "Time",
     valueFormatter: formatTimeLabel,
+    tickLabelStyle: {
+      transform: "rotate(-25deg)",
+      textAnchor: "end",
+      dominantBaseline: "middle",
+    },
   },
 ];
 
