@@ -26,7 +26,7 @@ const ImsForecast = () => {
 
   const fetchForecastData = useCallback(() => {
     getImsForecast(city).then((data) => setForecastDataJson(data));
-    getImsTrueData(city).then((data) => setTrueDataJson(data));
+    getImsTrueData(42).then((data) => setTrueDataJson(data));
   }, [city]);
 
   useEffect(() => {
