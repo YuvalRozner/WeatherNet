@@ -43,3 +43,4 @@ backend/Model_Pytorch/AdvancedModel/output/Tavor Kadoorie.pkl
 /data_old
 backend/Model_Pytorch/AdvancedModel/output/Yavneel.pkl
 backend/Model_Pytorch/AdvancedModel/output/Yavneel.csv
+WeatherNet Website/weathernet-server/__pycache__/constantsParams.cpython-311.pyc
