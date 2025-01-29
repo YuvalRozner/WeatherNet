@@ -4,24 +4,49 @@ import torch
 import pickle
 import os
 from tqdm import tqdm
+import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler  
-
-from backend.Model_Pytorch.common.data import (
-    load_pkl_file ,
-    timeEncode,
-    normalize_coordinates, 
-    drop_nan_rows_multiple
-)
-
-from backend.Model_Pytorch.AdvancedModel.model import TargetedWeatherPredictionModel
-from backend.Model_Pytorch.AdvancedModel.parameters import PARAMS, WINDOW_PARAMS, ADVANCED_MODEL_PARAMS, STATIONS_COORDINATES, STATIONS_LIST
-from backend.Model_Pytorch.common.analyze import analyze
-from backend.Model_Pytorch.common.import_and_process_data import get_prccessed_latest_data_by_hour_and_station
-
 import numpy as np
 import json
 from datetime import datetime, timedelta
+import importlib.util
+import sys
+from pathlib import Path
+
+from backend.Model_Pytorch.common.data import load_pkl_file ,normalize_coordinates
+from backend.Model_Pytorch.AdvancedModel.model import TargetedWeatherPredictionModel
+from backend.Model_Pytorch.AdvancedModel.parameters import PARAMS, WINDOW_PARAMS, ADVANCED_MODEL_PARAMS, STATIONS_COORDINATES, STATIONS_LIST,INFERENCE_PARAMS
+from backend.Model_Pytorch.common.analyze import analyze
+from backend.Model_Pytorch.common.import_and_process_data import get_prccessed_latest_data_by_hour_and_station
+
+def load_params(params_path):
+    # Convert path to absolute if it's relative
+    params_path = Path(params_path).resolve()
+
+    # Create a module name dynamically (avoid conflicts)
+    module_name = "params_module"
+
+    # Load the module
+    spec = importlib.util.spec_from_file_location(module_name, params_path)
+    params_module = importlib.util.module_from_spec(spec)
+    sys.modules[module_name] = params_module
+    spec.loader.exec_module(params_module)
+
+    return params_module  # Now you can access its attributes
+
+
+def flatten_data(predictions, actuals):
+    flat_predictions = [temp for window in predictions for temp in window]
+    flat_actuals = [temp for window in actuals for temp in window]
+
+    data = pd.DataFrame({
+        'Predicted': flat_predictions,
+        'Actual': flat_actuals
+    })
+
+    data['Error'] = data['Predicted'] - data['Actual']
+    return data
 
 def generate_forecast_json(city_name, date_str, starting_hour, temperatures, output_file):
     """
@@ -127,7 +152,7 @@ def load_model_for_inference(checkpoint_path, model_params, device='cpu'):
     return model
 
 
-def load_window_multi_station_return_only_input_window(data_np, window_size, shift, scalers, idx=0):
+def load_window_multi_station_return_only_input_window(data_np, window_size, scalers, idx=0):
     total_window_size = window_size
     if idx + total_window_size > len(data_np):
         raise ValueError(f"Index {idx} with window size {total_window_size} exceeds data length {len(data_np)}.")
@@ -154,6 +179,7 @@ def load_window_multi_station_return_only_input_window(data_np, window_size, shi
     window_tensor = window_tensor.permute(0, 2, 1, 3)
 
     return window_tensor
+
 def load_window_multi_station(data_np, window_size, shift, label_width, scalers, target_column_index, idx=0):
    
     total_window_size = window_size + shift - 1 + label_width
@@ -217,160 +243,176 @@ def predict(model, input_window, lat, lon, device='cpu'):
 
 
 if __name__ == "__main__":
+    """
+    1. define INFERENCE_PARAMS in your file - all the INFERENCE_PARAMS are mendatory in addittion to that all the parameters that are in section 2
+
+    2. there is an assumption that yours parameters file (not what define in the infarance parameters nor what in the folders)
+        has the same values in these parameters:
+
+        PARAMS['fileNames'] - list of the stations names, if you have different names it wont make sense 
+        PARAMS['target_station_id'] - the index of the target station in the list of stations
+        ADVANCED_MODEL_PARAMS['target_station_idx'] - the index of the target station in the list of stations
+        WINDOW_PARAMS['label_columns'] - the label column
+        PARAMS['device']
+    3.  WINDOW_PARAMS['input_width'] - the window size - support defrrent sizes - didnt checkd yet
+
+
+    """
+    inference_mode = 'analyze'  # Options: 'live', 'analyze'
+    analyze_stop_at = 30  # Number of predictions to analyze
+
+    parameters_files = [] # load parameters files
+    for path in INFERENCE_PARAMS['params_path']:
+        parameters_files.append(load_params(os.path.join(os.path.dirname(__file__), path)))
+
     east = []
     north = []
-    # 3. Load DataFrames from CSVs
-    filenames = PARAMS['fileNames']  # List of 5 filenames
-    dfs = []
-    for filename in filenames:
-        df = load_pkl_file(filename)
-        dfs.append(df)
+    filenames = PARAMS['fileNames'] 
+    for filename in filenames: # get the coordinates of the stations
         east.append(STATIONS_COORDINATES[filename][0])
         north.append(STATIONS_COORDINATES[filename][1])
 
     east = np.array(east)
     north = np.array(north)
     east_normalized, north_normalized = normalize_coordinates(east, north)
-
-    print("Original size of data:")
-    for df in dfs:
-        print(df.shape)
-
-    print("Size of data after drop_nan_rows_multiple:")
-    for i, df in enumerate(dfs):
-        print(f"Station {i}: {df.shape}")
-
-    # Extract Feature Values (Use Cleaned Data)
-    list_of_values = [df.values for df in dfs]
-
-    # Train/Validation Split per Station
-    train_size = int(0.8 * len(list_of_values[0]))
-    list_of_train_data = []
-    list_of_val_data = []
-    for values in list_of_values:
-        train_data = values[:train_size]
-        val_data = values[train_size:]
-        list_of_train_data.append(train_data)
-        list_of_val_data.append(val_data)
-
-    # Combine Data into 3D Arrays
-    combined_train_data = np.stack(list_of_train_data, axis=1)  # (T_train, num_stations, num_features)
-    combined_val_data = np.stack(list_of_val_data, axis=1)  # (T_val, num_stations, num_features)
-
-    input_width = WINDOW_PARAMS['input_width']
-    label_width = WINDOW_PARAMS['label_width']
-    shift = WINDOW_PARAMS['shift']
-
-    # Ensure consistent column indexing
-    representative_df = dfs[0]
-    column_indices = {name: i for i, name in enumerate(representative_df.columns)}
-    label_columns = [column_indices[WINDOW_PARAMS['label_columns'][0]]]
-
-    # Define target station index
-    target_station_idx = PARAMS['target_station_id']  # Ensure this is 0-based and within range
-
-
-    scaler_dir = os.path.join(os.path.dirname(__file__), 'output', 'scalers')
-    checkpoint_path = os.path.join(os.path.dirname(__file__), 'output', 'checkpoints', 'best_checkpoint.pth')
-
-    # Load scalers
-    scalers = load_scalers(scaler_dir=scaler_dir)
-
-    # Load model parameters from ADVANCED_MODEL_PARAMS
-    model_params = ADVANCED_MODEL_PARAMS.copy()
-
-    # Load model
-    device = PARAMS['device']
-    model = load_model_for_inference(checkpoint_path, model_params, device=device)
-
-    # Define prediction mode
-    prediction_mode = 'analyze'  # Options: 'live', 'analyze'
-    target_col_index = label_columns[0]
+    
+    scalers = load_scalers(scaler_dir=os.path.join(os.path.dirname(__file__), INFERENCE_PARAMS['scaler_folder_path']))
+    #model_params = ADVANCED_MODEL_PARAMS.copy()
 
     
-    if prediction_mode == 'analyze':
-        # Comprehensive analysis over validation data
-        total_window_size = input_width + shift - 1 + label_width
-        end = len(combined_val_data) - total_window_size
-        predictions = []
-        actual_temps = []
-        for i in tqdm(range(0, end), desc="Predicting"):
-            try:
-                input_window, actual_temp = load_window_multi_station(
-                    data_np=combined_val_data,
-                    window_size=input_width,
-                    shift=shift,
-                    label_width=label_width,
-                    scalers=scalers,
-                    target_column_index=target_col_index,
-                    idx=i
-                )
-                y_pred_scaled = predict(model, input_window, east_normalized, north_normalized,  device=device)
+    model_params = []
+    for params_file in parameters_files:
+        model_params.append(params_file.ADVANCED_MODEL_PARAMS)
 
-                # Inverse transform
-                target_scaler = scalers[ADVANCED_MODEL_PARAMS['target_station_idx']]
-                dummy = np.zeros((y_pred_scaled.shape[0], target_scaler.mean_.shape[0]))
-                dummy[:, target_col_index] = y_pred_scaled[:, 0]
-                y_pred_original = target_scaler.inverse_transform(dummy)[:, target_col_index]
+    models = []
+    for i, path in enumerate(INFERENCE_PARAMS['weights_paths']):
+        model = load_model_for_inference(os.path.join(os.path.dirname(__file__), path), model_params[i], device=PARAMS['device'])
+        models.append(model)
 
-                if len(y_pred_original) != len(actual_temp):
-                    continue
-                predictions.append(y_pred_original)
-                actual_temps.append(actual_temp)
-            except ValueError as ve:
-                print(f"Skipping index {i}: {ve}")
-                continue
-        analyze(predictions, actual_temps,WINDOW_PARAMS['label_width'])
+    window_params = []
+    for params_file in parameters_files:
+        window_params.append(params_file.WINDOW_PARAMS)
+    
+    max_input_width = max([window_param['input_width'] for window_param in window_params])
 
-        # Perform analysis (assuming analyze is a custom function)
-        # You may need to adjust this based on your actual analyze function
-        # For demonstration, let's plot the results
-        plt.figure(figsize=(15, 7))
-        plt.plot(actual_temps, label='Actual Temperature', color='blue')
-        plt.plot(predictions, label='Predicted Temperature', color='red')
-        plt.xlabel('Time Steps')
-        plt.ylabel('Temperature (°C)')
-        plt.title('Temperature Prediction Analysis')
-        plt.legend()
-        plt.show()
-        
-        # You can also calculate metrics like MAE, RMSE, etc.
-        from sklearn.metrics import mean_absolute_error, mean_squared_error
-        mae = mean_absolute_error(actual_temps, predictions)
-        rmse = np.sqrt(mean_squared_error(actual_temps, predictions))
-        print(f"Mean Absolute Error (MAE): {mae:.2f} °C")
-        print(f"Root Mean Squared Error (RMSE): {rmse:.2f} °C")
-    elif prediction_mode == 'live':
-        # getting the window to predict from function
-        # need to implement in the future get_window_live(input_width)
-        
-        dataframes, last_hour, last_date, success = get_prccessed_latest_data_by_hour_and_station(STATIONS_LIST, input_width)
+    device = PARAMS['device']
+    target_station_idx = PARAMS['target_station_id']  
+
+    
+    if inference_mode == 'live':        
+        dataframes, last_hour, last_date, success = get_prccessed_latest_data_by_hour_and_station(STATIONS_LIST, max_input_width)
         last_hour = int(last_hour.split(':')[0])
-        print(f"len of df: {len(dataframes)}")
-        print(f"len of df[0]: {len(dataframes[list(dataframes.keys())[0]])}")
-        print(f"len of df[1]: {len(dataframes[list(dataframes.keys())[1]])}")
-        print(f"Last hour: {last_hour}")
-        print(f"Last hour date: {last_date}")
-        print(f"success: {success}")
+        if False:
+            print(f"len of df: {len(dataframes)}")
+            print(f"len of df[0]: {len(dataframes[list(dataframes.keys())[0]])}")
+            print(f"len of df[1]: {len(dataframes[list(dataframes.keys())[1]])}")
+            print(f"Last hour: {last_hour}")
+            print(f"Last hour date: {last_date}")
+            print(f"success: {success}")
         # datafreames is a dictionary with the station name as key and the dataframe as value - convering it into a list of dataframes
         dataframes_list = [dataframes[station] for station in STATIONS_LIST]
+        
+        representative_df = dataframes_list[0]
+        column_indices = {name: i for i, name in enumerate(representative_df.columns)}
+        label_columns = [column_indices[WINDOW_PARAMS['label_columns'][0]]]
+        target_col_index = label_columns[0]
 
         list_of_values = [df.values for df in dataframes_list]
         combined_window = np.stack(list_of_values, axis=1) 
-        input_window = load_window_multi_station_return_only_input_window(
-            data_np=combined_window,
-            window_size=input_width,
-            shift=shift,
-            scalers=scalers
-        )
-
-        y_pred_scaled = predict(model, input_window, east_normalized, north_normalized,  device=device)
+    
         target_scaler = scalers[ADVANCED_MODEL_PARAMS['target_station_idx']]
-        dummy = np.zeros((y_pred_scaled.shape[0], target_scaler.mean_.shape[0]))
-        dummy[:, target_col_index] = y_pred_scaled[:, 0]
-        y_pred_original = target_scaler.inverse_transform(dummy)[:, target_col_index]
-        generate_forecast_json(PARAMS['target_station_desplay_name'], last_date, last_hour+1, y_pred_original, "forecast.json")
+        predictions_of_models = []
+        for i, model in enumerate(models):
+            input_width = parameters_files[i].WINDOW_PARAMS['input_width']
+            input_window = load_window_multi_station_return_only_input_window(
+                data_np=    combined_window[-input_width:],
+                window_size=input_width,
+                scalers=    scalers
+            )
+            y_pred_scaled = predict(model, input_window, east_normalized, north_normalized,  device=device)
+            dummy = np.zeros((y_pred_scaled.shape[0], target_scaler.mean_.shape[0]))
+            dummy[:, target_col_index] = y_pred_scaled[:, 0]
+            y_pred_original = target_scaler.inverse_transform(dummy)[:, target_col_index]
+            predictions_of_models.append(y_pred_original)
 
+        generate_forecast_json(PARAMS['target_station_desplay_name'], last_date, last_hour+1, np.concatenate(predictions_of_models), "forecast.json")
 
+    elif inference_mode == 'analyze':
+        dfs = []
+        for filename in filenames:
+            df = load_pkl_file(filename)
+            dfs.append(df)
+
+        print("Original size of data:")
+        for i, df in enumerate(dfs):
+            print(f"Station {i}: {df.shape}")
+
+        list_of_values = [df.values for df in dfs]
+
+        # Train/Validation Split per Station
+        train_size = int(0.8 * len(list_of_values[0]))
+        list_of_train_data = []
+        list_of_val_data = []
+        for values in list_of_values:
+            train_data = values[:train_size]
+            val_data = values[train_size:]
+            list_of_train_data.append(train_data)
+            list_of_val_data.append(val_data)
+
+        # Combine Data into 3D Arrays
+        combined_train_data = np.stack(list_of_train_data, axis=1)  # (T_train, num_stations, num_features)
+        combined_val_data = np.stack(list_of_val_data, axis=1)  # (T_val, num_stations, num_features)
+
+        # Ensure consistent column indexing
+        representative_df = dfs[0]
+        column_indices = {name: i for i, name in enumerate(representative_df.columns)}
+        label_columns = [column_indices[WINDOW_PARAMS['label_columns'][0]]]
+
+        # Define target station index
+        target_col_index = label_columns[0]
+
+        for i, model in enumerate(models):
+            input_width = parameters_files[i].WINDOW_PARAMS['input_width']
+            shift = parameters_files[i].WINDOW_PARAMS['shift']
+            label_width = parameters_files[i].WINDOW_PARAMS['label_width']
+
+            total_window_size = input_width + shift - 1 + label_width
+            end = len(combined_val_data) - total_window_size if analyze_stop_at == 0 else min(analyze_stop_at, len(combined_val_data) - total_window_size)
+            
+            predictions = []
+            actual_temps = []
+            for j in tqdm(range(0, end), desc="Predicting"):
+                try:
+                    input_window, actual_temp = load_window_multi_station(
+                        data_np=combined_val_data,
+                        window_size=    input_width,
+                        shift=          shift,
+                        label_width=    label_width,
+                        scalers=        scalers,
+                        target_column_index=target_col_index,
+                        idx=    j
+                    )
+                    y_pred_scaled = predict(model, input_window, east_normalized, north_normalized,  device=device)
+                    # Inverse transform
+                    target_scaler = scalers[ADVANCED_MODEL_PARAMS['target_station_idx']]
+                    dummy = np.zeros((y_pred_scaled.shape[0], target_scaler.mean_.shape[0]))
+                    dummy[:, target_col_index] = y_pred_scaled[:, 0]
+                    y_pred_original = target_scaler.inverse_transform(dummy)[:, target_col_index]
+
+                    if len(y_pred_original) != len(actual_temp):
+                        continue
+                    predictions.append(y_pred_original)
+                    actual_temps.append(actual_temp)
+                except ValueError as ve:
+                    print(f"Skipping index {j}: {ve}")
+                    continue
+            
+            output_dir_for_all = os.path.join(os.path.dirname(__file__), INFERENCE_PARAMS['analyze_output_folder'])
+            os.makedirs(output_dir_for_all, exist_ok=True)
+            output_dir_per_folder = os.path.join(os.path.dirname(__file__), INFERENCE_PARAMS['analyze_output_folder_per_folder'][i])
+            os.makedirs(output_dir_per_folder, exist_ok=True)
+            predictions_actuals_df = flatten_data(predictions, actual_temps)
+            predictions_actuals_df.to_csv(os.path.join(output_dir_per_folder, f'{i}_predictions_{i}.csv'), index=False)
+            predictions_actuals_df.to_csv(os.path.join(output_dir_for_all, f'{i}_predictions_{i}.csv'), index=False)
     else:
-        print(f"Invalid prediction mode: {prediction_mode}. Choose from 'single', 'batch', 'analyze'.")
+        print(f"Invalid inference_mode : {inference_mode}.")
