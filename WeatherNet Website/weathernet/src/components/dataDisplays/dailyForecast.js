@@ -9,9 +9,26 @@ const DailyForecast = ({ dailyCountryForecast }) => {
       </Typography>
       {Array.isArray(dailyCountryForecast) ? (
         dailyCountryForecast.map((forecast, index) => (
-          <Typography key={index} variant="body1" sx={{ marginTop: "6px" }}>
-            <strong>{forecast.date}</strong>: {forecast.description}
-          </Typography>
+          <Box
+            key={index}
+            sx={{
+              display: "flex",
+              marginTop: "6px",
+            }}
+          >
+            <Box
+              sx={{
+                fontWeight: "bold",
+                minWidth: "100px", // Reduced width to bring content closer
+                textAlign: "left",
+              }}
+            >
+              <Typography variant="body1">{`${forecast.date}:`}</Typography>
+            </Box>
+            <Box sx={{ marginLeft: "5px", flex: 1 }}>
+              <Typography variant="body1">{forecast.description}</Typography>
+            </Box>
+          </Box>
         ))
       ) : (
         <Typography>No forecast data available</Typography>
