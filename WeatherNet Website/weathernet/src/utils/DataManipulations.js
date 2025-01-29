@@ -216,7 +216,7 @@ export const processForecastfromBothWithTrueMerge = (
     (a, b) => a.utcTime - b.utcTime
   );
 
-  // From the merged dataset, pick only the desired keys
+  // From the merged dataset, pick only the desired keys and ensure numeric values
   const filteredDataset = mergedDataset.map((item) => {
     const allowedKeys = [
       "utcTime",
@@ -229,7 +229,12 @@ export const processForecastfromBothWithTrueMerge = (
 
     allowedKeys.forEach((key) => {
       if (item[key] !== undefined) {
-        newObj[key] = item[key];
+        if (["ImsTemp", "OurTemp", "truePastTemp"].includes(key)) {
+          const num = Number(item[key]);
+          newObj[key] = isNaN(num) ? null : num;
+        } else {
+          newObj[key] = item[key];
+        }
       }
     });
     return newObj;
@@ -474,7 +479,7 @@ export const generateFormattedXAxis = () => [
     // label: "Time",
     valueFormatter: formatTimeLabel,
     tickLabelStyle: {
-      transform: "rotate(-25deg)",
+      transform: "rotate(-20deg)",
       textAnchor: "end",
       dominantBaseline: "middle",
     },

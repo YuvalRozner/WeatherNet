@@ -33,8 +33,7 @@ const ComparingChart = () => {
   }, [fetchData]);
 
   useEffect(() => {
-    // Process IMS forecast data when dataJson changes
-    if (!dataJsonIms) return;
+    if (!dataJsonIms || !dataJsonOur || !dataJsonTrue) return;
 
     const { dataset, minValue, maxValue } =
       processForecastfromBothWithTrueMerge(
@@ -60,7 +59,7 @@ const ComparingChart = () => {
 
   return (
     <>
-      <ChooseCityAndPeriodBox>
+      <ChooseCityAndPeriodBox style={{ marginTop: "10px" }}>
         <PeriodSlider
           period={chosenTimePeriod}
           setPeriod={setChosenTimePeriod}
