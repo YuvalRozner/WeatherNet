@@ -4,7 +4,7 @@ import torch
 device = 'cuda' if torch.cuda.is_available() else 'cpu'  # Determine device
 
 PARAMS = {
-    'fileName' : 'Newe Yaar_data_2005_2024',
+    'fileName' : 'Tavor Kadoorie',
     'epochs' : 20,
     'resume' : False, # resume train or start new
     'device' : device,
@@ -13,7 +13,7 @@ PARAMS = {
 
 WINDOW_PARAMS = {
     'input_width' : 72, #window input size
-    'label_width' : 24, # how many hours to predict to the future
+    'label_width' : 12, # how many hours to predict to the future
     'shift' : 1,
     'label_columns' : ['TD (degC)'],
 }

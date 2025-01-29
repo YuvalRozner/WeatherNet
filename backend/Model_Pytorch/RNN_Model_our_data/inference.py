@@ -5,15 +5,12 @@ import numpy as np
 import pandas as pd
 
 from backend.Model_Pytorch.RNN_Model_our_data.model import LSTMModel
-from backend.Model_Pytorch.common.data import preprocessing_tensor_df
 import pickle
 import os
 from backend.Model_Pytorch.RNN_Model_our_data.parameters import PARAMS, WINDOW_PARAMS, LSTM_MODEL_PARAMS
 from tqdm import tqdm
 import matplotlib.pyplot as plt
-from backend.Model_Pytorch.common.data import preprocessing_our_df, normalize_data, load_pkl_file, timeEncode,drop_nan_rows_multiple
-from backend.Model_Pytorch.common.analyze import analyze
-from backend.Model_Pytorch.common.window_generator import WindowGenerator
+from backend.Model_Pytorch.common.data import load_pkl_file
 
 
 # inference.py
@@ -105,12 +102,20 @@ def get_val_data(df):
 def load_data_and_preprocess(data_path, target_column, fileName=True):
     if fileName:
         df = load_pkl_file(PARAMS['fileName'])
-        timeEncode([df])
-        df = df.dropna()
 
     target_index = df.columns.get_loc(target_column)
     return df, target_index
+def flatten_data(predictions, actuals):
+    flat_predictions = [temp for window in predictions for temp in window]
+    flat_actuals = [temp for window in actuals for temp in window]
 
+    data = pd.DataFrame({
+        'Predicted': flat_predictions,
+        'Actual': flat_actuals
+    })
+
+    data['Error'] = data['Predicted'] - data['Actual']
+    return data
 if __name__ == "__main__":
     # Define parameters directly in main
 
@@ -198,8 +203,12 @@ if __name__ == "__main__":
                 continue
             predictions.append(y_pred)
             actual_temps.append(actual_temp)
+        predictions_actuals_df = flatten_data(predictions, actual_temps)
+        predictions_actuals_df['input_width'] = window_size
+        predictions_actuals_df['label_width'] = model_params['label_width']
+        predictions_actuals_df.to_csv('predictionsRnn.csv', index=False)
 
-        analyze(predictions, actual_temps,WINDOW_PARAMS['label_width'])
+        #analyze(predictions, actual_temps,WINDOW_PARAMS['label_width'])
 
     else:
         print(f"Invalid prediction mode: {prediction_mode}.")

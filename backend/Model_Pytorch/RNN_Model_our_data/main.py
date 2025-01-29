@@ -4,10 +4,10 @@ import torch
 import pandas as pd
 
 from backend.Model_Pytorch.common.window_generator import WindowGenerator
-from backend.Model_Pytorch.common.data import preprocessing_our_df, normalize_data, load_pkl_file, timeEncode,drop_nan_rows_multiple
-from backend.Model_Pytorch.AdvancedModel.model import LSTMModel
-from backend.Model_Pytorch.AdvancedModel.train import train_model
-from backend.Model_Pytorch.AdvancedModel.parameters import PARAMS, WINDOW_PARAMS, LSTM_MODEL_PARAMS
+from backend.Model_Pytorch.common.data import normalize_data, load_pkl_file
+from backend.Model_Pytorch.RNN_Model_our_data.model import LSTMModel
+from backend.Model_Pytorch.RNN_Model_our_data.train import train_model
+from backend.Model_Pytorch.RNN_Model_our_data.parameters import PARAMS, WINDOW_PARAMS, LSTM_MODEL_PARAMS
 import os
 
 
@@ -15,8 +15,6 @@ if __name__ == "__main__":
 
     # 1) Load data
     df = load_pkl_file(PARAMS['fileName'])
-    timeEncode([df])
-    df = df.dropna()
     # 2) Convert to numpy array
     data_np = df.values  # shape (T, in_channels)
     
