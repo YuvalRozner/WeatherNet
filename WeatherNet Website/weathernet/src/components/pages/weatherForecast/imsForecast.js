@@ -11,8 +11,8 @@ import { chartSeriesIms } from "../../../utils/dataManipulations.js";
 
 const ImsForecast = () => {
   const [dataJsonIms, setDataJsonIms] = useState(null);
-  const [datasetIms, setDatasetIms] = useState([]);
-  const [slicedDatasetIms, setSlicedDatasetIms] = useState([]);
+  const [dataset, setDataset] = useState([]);
+  const [slicedDataset, setSlicedDataset] = useState([]);
   const [city, setCity] = useState(3); // default city is 3 (Haifa)
   const [chosenTimePeriod, setChosenTimePeriod] = useState([6, 32]);
   const [dailyCountryForecast, setDailyCountryForecast] = useState("");
@@ -33,7 +33,7 @@ const ImsForecast = () => {
 
     const { dataset, minValue, maxValue, country } =
       processImsForecastData(dataJsonIms);
-    setDatasetIms(dataset);
+    setDataset(dataset);
     setMinValue(minValue);
     setMaxValue(maxValue);
     setDailyCountryForecast(country);
@@ -41,14 +41,14 @@ const ImsForecast = () => {
 
   useEffect(() => {
     // Slice dataset based on chosen time period
-    if (datasetIms.length === 0) return;
-    const tempSlicedDataset = datasetIms.slice(
+    if (dataset.length === 0) return;
+    const tempSlicedDataset = dataset.slice(
       chosenTimePeriod[0],
       chosenTimePeriod[1]
     );
-    setSlicedDatasetIms(tempSlicedDataset);
-    setBeginDateForSlider(datasetIms[0].utcTime);
-  }, [datasetIms, chosenTimePeriod]);
+    setSlicedDataset(tempSlicedDataset);
+    setBeginDateForSlider(dataset[0].utcTime);
+  }, [dataset, chosenTimePeriod]);
 
   return (
     <>
@@ -63,12 +63,12 @@ const ImsForecast = () => {
         />
       </ChooseCityAndPeriodBox>
       <WeatherChart
-        dataset={slicedDatasetIms}
+        dataset={slicedDataset}
         minValue={minValue}
         maxValue={maxValue}
         chartSeries={chartSeriesIms}
       />
-      <WeatherTable dataset={slicedDatasetIms} />
+      <WeatherTable dataset={slicedDataset} />
     </>
   );
 };
