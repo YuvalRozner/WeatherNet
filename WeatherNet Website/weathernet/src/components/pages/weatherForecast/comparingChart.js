@@ -18,7 +18,7 @@ const ComparingChart = () => {
   const [dataset, setDataset] = useState([]);
   const [slicedDataset, setSlicedDataset] = useState([]);
   const [city, setCity] = useState(3); // default city is 3 (Haifa)
-  const [chosenTimePeriod, setChosenTimePeriod] = useState([6, 32]);
+  const [chosenTimePeriod, setChosenTimePeriod] = useState([51, 114]);
   const [maxPeriod, setMaxPeriod] = useState(93);
   const [minValue, setMinValue] = useState(null);
   const [maxValue, setMaxValue] = useState(null);

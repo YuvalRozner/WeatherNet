@@ -16,7 +16,7 @@ const WeathernetForecast = () => {
   const [slicedDataset, setSlicedDataset] = useState([]);
   const [minValue, setMinValue] = useState(null);
   const [maxValue, setMaxValue] = useState(null);
-  const [chosenTimePeriod, setChosenTimePeriod] = useState([6, 32]);
+  const [chosenTimePeriod, setChosenTimePeriod] = useState([56, 96]);
   const [maxPeriod, setMaxPeriod] = useState(93);
 
   const fetchData = useCallback(() => {
