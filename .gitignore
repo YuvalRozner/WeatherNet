@@ -26,6 +26,7 @@ WeatherNet Website/weathernet/package-lock.json
 /backend/Model_Pytorch/AdvancedModel/__pycache__
 data code files/__pycache__/constantsParams.cpython-311.pyc
 data code files/__pycache__/import_and_process_data.cpython-311.pyc
+/WeatherNet Website/weathernet-server/venv
 /backend/Model_Pytorch/AdvancedModel/dor_output
 backend/Model_Pytorch/AdvancedModel/output/Afula Nir Haemeq.csv
 backend/Model_Pytorch/AdvancedModel/output/Afula Nir Haemeq.pkl
