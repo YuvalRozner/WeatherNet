@@ -15,7 +15,7 @@ const PeriodSlider = ({ period, setPeriod, minPeriod, maxPeriod, dataset }) => {
 
     if (newValue[1] - newValue[0] < minPeriod) {
       if (activeThumb === 0) {
-        const clamped = Math.min(newValue[0], 100 - minPeriod);
+        const clamped = Math.min(newValue[0], maxPeriod - minPeriod);
         setPeriod([clamped, clamped + minPeriod]);
       } else {
         const clamped = Math.max(newValue[1], minPeriod);
