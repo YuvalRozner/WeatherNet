@@ -17,7 +17,6 @@ from pathlib import Path
 from backend.Model_Pytorch.common.data import load_pkl_file ,normalize_coordinates
 from backend.Model_Pytorch.AdvancedModel.model import TargetedWeatherPredictionModel
 from backend.Model_Pytorch.AdvancedModel.parameters import PARAMS, WINDOW_PARAMS, ADVANCED_MODEL_PARAMS, STATIONS_COORDINATES, STATIONS_LIST,INFERENCE_PARAMS
-from backend.Model_Pytorch.common.analyze import analyze
 from backend.Model_Pytorch.common.import_and_process_data import get_prccessed_latest_data_by_hour_and_station
 
 def load_params(params_path):
@@ -412,6 +411,8 @@ if __name__ == "__main__":
             output_dir_per_folder = os.path.join(os.path.dirname(__file__), INFERENCE_PARAMS['analyze_output_folder_per_folder'][i])
             os.makedirs(output_dir_per_folder, exist_ok=True)
             predictions_actuals_df = flatten_data(predictions, actual_temps)
+            predictions_actuals_df['input_width'] = input_width
+            predictions_actuals_df['label_width'] = label_width
             predictions_actuals_df.to_csv(os.path.join(output_dir_per_folder, f'{i}_predictions_{i}.csv'), index=False)
             predictions_actuals_df.to_csv(os.path.join(output_dir_for_all, f'{i}_predictions_{i}.csv'), index=False)
     else:
