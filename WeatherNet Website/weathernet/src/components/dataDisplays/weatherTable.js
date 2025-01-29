@@ -33,7 +33,6 @@ const WeatherTable = ({ dataset }) => {
     const paramRows = [
       { parameter: "Temperature (°C)", paramKey: "bothTemp" },
       { parameter: "Rain Chance (%)", paramKey: "rain_chance" },
-      { parameter: "Wave Height (m)", paramKey: "wave_height" },
       { parameter: "Relative Humidity (%)", paramKey: "relative_humidity" },
       { parameter: "Wind Speed (km/h)", paramKey: "wind_speed" },
     ];
