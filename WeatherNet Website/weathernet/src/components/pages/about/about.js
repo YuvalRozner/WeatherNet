@@ -13,16 +13,21 @@ import {
   LabelNavigateButton,
   ClickableImage,
 } from "./about.style";
-import { useTheme, Tooltip } from "@mui/material";
+import { useTheme, Tooltip, Skeleton } from "@mui/material";
 import ImageDialog from "../../dataDisplays/imageDialog";
 
 export default function VerticalLinearStepper() {
   const [activeStep, setActiveStep] = React.useState(0);
   const [open, setOpen] = React.useState(false);
   const [selectedImage, setSelectedImage] = React.useState(null);
+  const [imageLoaded, setImageLoaded] = React.useState(false);
   const theme = useTheme();
   const themeMode = theme.palette.mode;
   const content = getContent(themeMode);
+
+  React.useEffect(() => {
+    setImageLoaded(false);
+  }, [activeStep]);
 
   const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -41,6 +46,10 @@ export default function VerticalLinearStepper() {
       setSelectedImage(imageData);
       setOpen(true);
     }
+  };
+
+  const handleImageLoad = () => {
+    setImageLoaded(true);
   };
 
   return (
@@ -87,8 +96,8 @@ export default function VerticalLinearStepper() {
             ))}
           </Stepper>
           {activeStep === content.length && (
-            <Paper square elevation={0} style={{ p: 3 }}>
-              <Typography> That was WeatherNet!</Typography>
+            <Paper square elevation={0} style={{ padding: 3 }}>
+              <Typography>That was WeatherNet!</Typography>
               <LabelNavigateButton onClick={handleReset}>
                 Explore WeatherNet again
               </LabelNavigateButton>
@@ -99,20 +108,53 @@ export default function VerticalLinearStepper() {
           (content[activeStep].image &&
           content[activeStep].imageTitle &&
           content[activeStep].imageDescription ? (
-            <Tooltip title="Click to open wider, with description">
-              <ClickableImage
-                src={content[activeStep].image}
-                alt={content[activeStep].label}
-                onClick={() => handleImageClick(content[activeStep])}
-                style={{ cursor: "pointer" }}
-              />
-            </Tooltip>
+            <>
+              {!imageLoaded && (
+                <Skeleton
+                  variant="rectangular"
+                  width="100%"
+                  height={200}
+                  style={{ borderRadius: "4px", marginBottom: "16px" }}
+                />
+              )}
+              <Tooltip title="Click to open wider, with description">
+                <ClickableImage
+                  src={content[activeStep].image}
+                  alt={content[activeStep].label}
+                  onClick={() => handleImageClick(content[activeStep])}
+                  onLoad={handleImageLoad}
+                  style={{
+                    cursor: "pointer",
+                    display: imageLoaded ? "block" : "none",
+                  }}
+                />
+              </Tooltip>
+            </>
           ) : (
-            <ClickableImage
-              src={content[activeStep].image}
-              alt={content[activeStep].label}
-              style={{ cursor: "default" }}
-            />
+            <>
+              {!imageLoaded &&
+                content[activeStep].image &&
+                content[activeStep].image !== " " && (
+                  <Skeleton
+                    variant="rectangular"
+                    width="100%"
+                    height={200}
+                    style={{ borderRadius: "4px", marginBottom: "16px" }}
+                  />
+                )}
+              {content[activeStep].image &&
+              content[activeStep].image !== " " ? (
+                <ClickableImage
+                  src={content[activeStep].image}
+                  alt={content[activeStep].label}
+                  onLoad={handleImageLoad}
+                  style={{
+                    cursor: "default",
+                    display: imageLoaded ? "block" : "none",
+                  }}
+                />
+              ) : null}
+            </>
           ))}
       </AboutContainer>
       <ImageDialog
