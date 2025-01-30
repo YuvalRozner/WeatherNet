@@ -95,11 +95,4 @@ export const OverallValue = styled.span`
 `;
 
 // Styled component to override BarChart bar styles
-export const StyledBarChart = styled(BarChart)`
-  & .MuiBarChart-bar {
-    fill: white; /* Set bar fill to white */
-    stroke: ${(props) =>
-      props.borderColor}; /* Set bar border to card border color */
-    stroke-width: 2px; /* Define bar border thickness */
-  }
-`;
+export const StyledBarChart = styled(BarChart)``;

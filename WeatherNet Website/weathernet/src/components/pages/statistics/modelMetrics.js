@@ -46,7 +46,6 @@ export default function ModelMetrics() {
 
               <ChartWrapper>
                 <StyledBarChart
-                  borderColor={borderColors[i % borderColors.length]}
                   xAxis={[
                     {
                       data: subIntervals,

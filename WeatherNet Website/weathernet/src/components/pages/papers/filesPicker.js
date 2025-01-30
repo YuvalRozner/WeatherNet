@@ -25,7 +25,7 @@ const FilesPicker = ({ onSelectPaper, selectedCardId }) => {
   const cards = useMemo(() => {
     return (
       papersAndManuals?.children?.map((child, index) => ({
-        id: index,
+        id: `${child.segment}-${index}`, // Ensure unique key by combining segment and index
         segment: child.segment,
         title: child.title,
         fileName: child.fileName,
@@ -43,8 +43,8 @@ const FilesPicker = ({ onSelectPaper, selectedCardId }) => {
   return (
     <GridBox $columns={cards.length}>
       {cards.map((card, index) => (
-        <Tooltip title="Switch file" arrow placement="top-end">
-          <Card key={card.id}>
+        <Tooltip key={card.id} title="Switch file" arrow placement="top-end">
+          <Card>
             <CardActionArea
               onClick={() => handleCardClick(index, card.segment)}
               data-active={selectedCard === index ? "" : undefined}
