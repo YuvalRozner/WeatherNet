@@ -8,8 +8,11 @@ import Skeleton from "@mui/material/Skeleton";
 import styled from "styled-components";
 
 const DialogImage = styled.img`
-  width: 100%;
+  max-height: 700px;
+  max-width: 100%;
+  height: auto; // Ensures the image maintains its original aspect ratio
   display: ${(props) => (props.loaded ? "block" : "none")};
+  margin: 0 auto; // Centers the image horizontally
 `;
 
 export default function ImageDialog({
@@ -18,6 +21,7 @@ export default function ImageDialog({
   image,
   title,
   description,
+  isDescriptionAbove = false,
 }) {
   const [dialogImageLoaded, setDialogImageLoaded] = useState(false);
 
@@ -51,6 +55,16 @@ export default function ImageDialog({
             sx={{ borderRadius: "4px" }}
           />
         )}
+        {dialogImageLoaded && description && isDescriptionAbove && (
+          <DialogContentText style={{ fontSize: "1.2rem" }}>
+            {description.split("\n").map((line, idx) => (
+              <React.Fragment key={idx}>
+                {line}
+                <br />
+              </React.Fragment>
+            ))}
+          </DialogContentText>
+        )}
         {image && (
           <DialogImage
             src={image}
@@ -59,7 +73,7 @@ export default function ImageDialog({
             onLoad={() => setDialogImageLoaded(true)}
           />
         )}
-        {dialogImageLoaded && description && (
+        {dialogImageLoaded && description && !isDescriptionAbove && (
           <DialogContentText style={{ fontSize: "1.2rem" }}>
             {description.split("\n").map((line, idx) => (
               <React.Fragment key={idx}>
