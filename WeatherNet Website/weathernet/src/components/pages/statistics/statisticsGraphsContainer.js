@@ -1,10 +1,5 @@
 import { useState, useEffect } from "react";
 import { useTheme } from "@mui/material/styles";
-import Dialog from "@mui/material/Dialog";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
-import Button from "@mui/material/Button";
 import Divider from "@mui/material/Divider";
 import Skeleton from "@mui/material/Skeleton";
 import { getStatisticsData } from "../../../utils/staticData/statisticsData";
@@ -16,6 +11,7 @@ import {
   HiddenImage,
 } from "./statistics.style";
 import React from "react";
+import ImageDialog from "../../dataDisplays/imageDialog";
 
 const DialogImage = styled.img`
   width: 100%;
@@ -26,7 +22,6 @@ export default function StatisticsGraphsContainer() {
   const [open, setOpen] = useState(false);
   const [selectedData, setSelectedData] = useState(null);
   const [imagesLoaded, setImagesLoaded] = useState([]);
-  const [dialogImageLoaded, setDialogImageLoaded] = useState(false);
   const theme = useTheme();
   const themeMode = theme.palette.mode;
 
@@ -46,14 +41,12 @@ export default function StatisticsGraphsContainer() {
 
   const handleClickOpen = (data) => {
     setSelectedData(data);
-    setDialogImageLoaded(false);
     setOpen(true);
   };
 
   const handleClose = () => {
     setOpen(false);
     setSelectedData(null);
-    setDialogImageLoaded(false);
   };
 
   return (
@@ -111,55 +104,13 @@ export default function StatisticsGraphsContainer() {
         </div>
       ))}
 
-      <Dialog open={open} onClose={handleClose} maxWidth="lg" fullWidth>
-        <DialogTitle>
-          {selectedData ? (
-            <b>{selectedData.title}</b>
-          ) : (
-            <Skeleton width="60%" sx={{ borderRadius: "4px" }} />
-          )}
-          <Button
-            onClick={handleClose}
-            sx={{
-              position: "absolute",
-              right: "10px",
-              top: "10px",
-              minWidth: "2.8rem",
-              borderRadius: "50%",
-            }}
-          >
-            <span style={{ fontSize: "2.2rem", lineHeight: "1" }}>×</span>
-          </Button>
-        </DialogTitle>
-        <DialogContent>
-          {!dialogImageLoaded && (
-            <Skeleton
-              variant="rectangular"
-              width="100%"
-              height={200}
-              sx={{ borderRadius: "4px" }}
-            />
-          )}
-          {selectedData && (
-            <DialogImage
-              src={selectedData.image}
-              alt={selectedData.title}
-              loaded={dialogImageLoaded}
-              onLoad={() => setDialogImageLoaded(true)}
-            />
-          )}
-          {dialogImageLoaded && selectedData && (
-            <DialogContentText style={{ fontSize: "1.2rem" }}>
-              {selectedData.description.split("\n").map((line, idx) => (
-                <React.Fragment key={idx}>
-                  {line}
-                  <br />
-                </React.Fragment>
-              ))}
-            </DialogContentText>
-          )}
-        </DialogContent>
-      </Dialog>
+      <ImageDialog
+        open={open}
+        handleClose={handleClose}
+        image={selectedData ? selectedData.image : ""}
+        title={selectedData ? selectedData.title : ""}
+        description={selectedData ? selectedData.description : ""}
+      />
     </Container>
   );
 }
