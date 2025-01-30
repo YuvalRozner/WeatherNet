@@ -426,19 +426,19 @@ export const chartSeriesMerged = () => [
     id: "pastTemp",
     dataKey: "truePastTemp",
     label: "Today Past (°C)",
-    color: "blue",
+    color: "#bb8588",
   },
   {
     id: "ImsTemp",
     dataKey: "ImsTemp",
     label: "IMS's Forecast (°C)",
-    color: "#02620f",
+    color: "#57cc99",
   },
   {
     id: "OurTemp",
     dataKey: "OurTemp",
     label: "WeatherNet's Forecast (°C)",
-    color: "#02b2af",
+    color: "#48bfe3",
   },
 ];
 
@@ -447,13 +447,13 @@ export const chartSeriesIms = () => [
     id: "pastTemp",
     dataKey: "truePastTemp",
     label: "Today Past (°C)",
-    color: "blue",
+    color: "#bb8588",
   },
   {
     id: "ImsTemp",
     dataKey: "ImsTemp",
     label: "IMS's Forecast (°C)",
-    color: "#02620f",
+    color: "#57cc99",
   },
 ];
 
@@ -462,13 +462,13 @@ export const chartSeriesWeatherNet = () => [
     id: "pastTemp",
     dataKey: "truePastTemp",
     label: "Today Past (°C)",
-    color: "blue",
+    color: "#bb8588",
   },
   {
     id: "OurTemp",
     dataKey: "OurTemp",
     label: "WeatherNet's Forecast (°C)",
-    color: "#02b2af",
+    color: "#48bfe3",
   },
 ];
 
