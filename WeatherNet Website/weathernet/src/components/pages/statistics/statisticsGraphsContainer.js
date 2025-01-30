@@ -3,7 +3,6 @@ import { useTheme } from "@mui/material/styles";
 import Divider from "@mui/material/Divider";
 import Skeleton from "@mui/material/Skeleton";
 import { getStatisticsData } from "../../../utils/staticData/statisticsData";
-import styled from "styled-components";
 import {
   Container,
   ImageContainer,
@@ -12,11 +11,6 @@ import {
 } from "./statistics.style";
 import React from "react";
 import ImageDialog from "../../dataDisplays/imageDialog";
-
-const DialogImage = styled.img`
-  width: 100%;
-  display: ${(props) => (props.loaded ? "block" : "none")};
-`;
 
 export default function StatisticsGraphsContainer() {
   const [open, setOpen] = useState(false);
