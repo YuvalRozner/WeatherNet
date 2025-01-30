@@ -60,6 +60,7 @@ const ComparingChart = () => {
   return (
     <>
       <ChooseCityAndPeriodBox style={{ marginTop: "10px" }}>
+        <b>Choose time period: </b>
         <PeriodSlider
           period={chosenTimePeriod}
           setPeriod={setChosenTimePeriod}
