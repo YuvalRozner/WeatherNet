@@ -21,13 +21,16 @@ export const getStatisticsData = (theme) => [
   },
 ];
 
+// TODO: update the data.
 export const getmodelMetricsData = () => [
   {
     type: "MAE",
-    model1: 1.04967,
-    model2: 1.432691,
-    model3: 1.04967,
-    model4: 1.432691,
+    models: {
+      "1-12": 1.04967,
+      "13-24": 1.432691,
+      "25-36": 1.04967,
+      "37-60": 1.432691,
+    },
     overall: 0.5,
     tooltip: "Mean Absolute Error",
     explanation:
@@ -35,10 +38,12 @@ export const getmodelMetricsData = () => [
   },
   {
     type: "MSE",
-    model1: 2.138306,
-    model2: 3.931717,
-    model3: 2.138306,
-    model4: 3.931717,
+    models: {
+      "1-12": 2.138306,
+      "13-24": 3.931717,
+      "25-36": 2.138306,
+      "37-60": 3.931717,
+    },
     overall: 0.5,
     tooltip: "Mean Squared Error",
     explanation:
@@ -46,10 +51,12 @@ export const getmodelMetricsData = () => [
   },
   {
     type: "RMSE",
-    model1: 1.462295,
-    model2: 1.982856,
-    model3: 1.462295,
-    model4: 1.982856,
+    models: {
+      "1-12": 1.462295,
+      "13-24": 1.982856,
+      "25-36": 1.462295,
+      "37-60": 1.982856,
+    },
     overall: 0.5,
     tooltip: "Root Mean Squared Error",
     explanation:
@@ -57,10 +64,12 @@ export const getmodelMetricsData = () => [
   },
   {
     type: "MAPE",
-    model1: 6.038863,
-    model2: 8.310858,
-    model3: 6.038863,
-    model4: 8.310858,
+    models: {
+      "1-12": 6.038863,
+      "13-24": 8.310858,
+      "25-36": 6.038863,
+      "37-60": 8.310858,
+    },
     overall: 0.5,
     tooltip: "Mean Absolute Percentage Error",
     explanation:
@@ -68,10 +77,12 @@ export const getmodelMetricsData = () => [
   },
   {
     type: "R2_Score",
-    model1: 0.963163,
-    model2: 0.932288,
-    model3: 0.963163,
-    model4: 0.932288,
+    models: {
+      "1-12": 0.963163,
+      "13-24": 0.932288,
+      "25-36": 0.963163,
+      "37-60": 0.932288,
+    },
     overall: 0.5,
     tooltip: "R2 Score",
     explanation:
