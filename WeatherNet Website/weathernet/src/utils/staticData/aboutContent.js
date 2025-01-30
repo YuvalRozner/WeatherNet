@@ -10,7 +10,11 @@ export const getContent = (theme) => [
     description: `The WeatherNet system consists of two primary components:
       \n\bThe backend:\b responsible for data processing, ML model training, and predictions.
       \bThe frontend:\b a user-friendly website for accessing forecasts.\n`,
-    image: "system architecture macro", // TODO: update the image
+    image: `/figures/general_system_architecture_${theme}.png`,
+    imageTitle: "WeatherNet System Architecture - Macro View",
+    imageDescription: `The WeatherNet system consists of two primary components:
+        - The backend: responsible for data processing, ML model training, and predictions.
+        - The frontend: a user-friendly website for accessing forecasts.\n`,
   },
   {
     label: "Our Approach to Weather Forecasting",
@@ -26,7 +30,9 @@ export const getContent = (theme) => [
     description: `We designed an architecture that first processes data through Convolutional Neural Networks (CNNs), where each feature is filtered independently.
     The output then transitions into a transformer phase, leveraging attention mechanisms to account for both temporal dependencies and geographical positioning.
     \nTo learn more about our architecture and how it enhances weather prediction, visit the 'Architecture' page.\n`,
-    image: "The Architecture", // TODO: update the image
+    image: `/figures/architecture_${theme}.png`,
+    imageTitle: "WeatherNet ML Architecture",
+    imageDescription: `To learn more about our architecture and how it enhances weather prediction, visit the 'Architecture' page.`,
   },
   {
     label: "Accuracy & Performance",
@@ -45,7 +51,7 @@ export const getContent = (theme) => [
     label: "Technology Stack",
     description: `WeatherNet leverages cutting-edge technology, including Python, PyTorch, NumPy, Pandas, React, and Node.js for data processing, the ML model, and the web application UI.
     \nOur system is deployed using Firebase Hosting and Firebase Functions, ensuring seamless scalability and real-time updates for weather forecasting.\n`,
-    image: "",
+    image: "/figures/tech_stack.png",
   },
   {
     label: "Project Workflow",
