@@ -1,18 +1,126 @@
-import React from "react";
+import React, { useState } from "react";
 import { WeatherNetLogoLayout } from "../../base/weathenetLogoLayout.js";
 import ModelMetrics from "../statistics/modelMetrics.js";
 import ComparingChart from "../weatherForecast/comparingChart.js";
-import { Divider } from "@mui/material";
+import { Divider, Skeleton, Tooltip, useTheme } from "@mui/material";
+import { ForecastContainer, ArchitectureContainer } from "./home.style.js";
+import ImageDialog from "../../dataDisplays/imageDialog.js";
 
 export function Home() {
+  const [mapImageLoaded, setMapImageLoaded] = useState(false);
+  const [dialogMapOpen, setDialogMapOpen] = useState(false);
+  const [architectureImageLoaded, setArchitectureImageLoaded] = useState(false);
+  const [dialogArchitectureOpen, setDialogArchitectureOpen] = useState(false);
+
+  const theme = useTheme();
+  const themeMode = theme.palette.mode;
+
+  const handleDialogMapOpen = () => {
+    setDialogMapOpen(true);
+  };
+
+  const handleDialogMapClose = () => {
+    setDialogMapOpen(false);
+  };
+
+  const handleDialogArchitectureOpen = () => {
+    setDialogArchitectureOpen(true);
+  };
+
+  const handleDialogArchitectureClose = () => {
+    setDialogArchitectureOpen(false);
+  };
+
   return (
     <>
       <ModelMetrics />
-      <Divider textAlign="left" variant="middle">
+      <Divider
+        textAlign="left"
+        variant="middle"
+        sx={{ margin: "1.2rem 0 2.7rem 0" }}
+      >
         <b style={{ fontSize: "1.6em" }}>Weather Forecast</b>
       </Divider>
-      <ComparingChart />
-      <WeatherNetLogoLayout />
+      <ForecastContainer
+        style={{ display: "flex", flexDirection: "row", alignItems: "center" }}
+      >
+        {!mapImageLoaded && (
+          <Skeleton
+            variant="rectangular"
+            width="30%"
+            height={200}
+            sx={{ marginRight: "1rem", borderRadius: "10px" }}
+          />
+        )}
+        <Tooltip title="Click to open wider" arrow>
+          <img
+            src="/figures/erea_forecast_ims-station_with_table.png"
+            alt="WeatherNet Architecture"
+            style={{
+              maxWidth: "30%",
+              height: "auto",
+              display: mapImageLoaded ? "block" : "none",
+              cursor: "pointer",
+            }}
+            onLoad={() => setMapImageLoaded(true)}
+            onClick={handleDialogMapOpen}
+          />
+        </Tooltip>
+        <div style={{ flex: 1 }}>
+          <ComparingChart />
+        </div>
+      </ForecastContainer>
+
+      <ImageDialog
+        open={dialogMapOpen}
+        handleClose={handleDialogMapClose}
+        image="/figures/erea_forecast_ims-station_with_table.png"
+        title="WeatherNet Architecture"
+        description="This Image shows the area of the forecasted weather and the IMS's measurement stations used for this forecast."
+      />
+
+      <Divider
+        textAlign="left"
+        variant="middle"
+        sx={{ margin: "1.2rem 0 2.7rem 0" }}
+      >
+        <b style={{ fontSize: "1.6em" }}>Our Architecture</b>
+      </Divider>
+      <ArchitectureContainer
+        style={{ display: "flex", flexDirection: "row", alignItems: "center" }}
+      >
+        {!architectureImageLoaded && (
+          <Skeleton
+            variant="rectangular"
+            width="70%"
+            height={200}
+            sx={{ marginRight: "1rem", borderRadius: "10px" }}
+          />
+        )}
+        <Tooltip title="Click to open wider" arrow>
+          <img
+            src={`/figures/architecture_${themeMode}.png`}
+            alt="WeatherNet Architecture"
+            style={{
+              maxWidth: "70%",
+              height: "auto",
+              display: architectureImageLoaded ? "block" : "none",
+              cursor: "pointer",
+            }}
+            onLoad={() => setArchitectureImageLoaded(true)}
+            onClick={handleDialogArchitectureOpen}
+          />
+        </Tooltip>
+        <WeatherNetLogoLayout />
+      </ArchitectureContainer>
+
+      <ImageDialog
+        open={dialogArchitectureOpen}
+        handleClose={handleDialogArchitectureClose}
+        image={`/figures/architecture_${themeMode}.png`}
+        title="WeatherNet Architecture"
+        description={`This Image shows the architecture of the WeatherNet model.\nLearn more about the architecture in the 'Architecture' page.`}
+      />
     </>
   );
 }

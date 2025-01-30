@@ -12,7 +12,8 @@ const AppLogoSpin = keyframes`
 `;
 
 export const AppLogo = styled.img`
-  height: 60vmin;
+  max-height: 30vmin;
+  margin: 0 0 0 50px;
   pointer-events: none;
 
   @media (prefers-reduced-motion: no-preference) {
