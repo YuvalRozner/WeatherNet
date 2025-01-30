@@ -52,28 +52,28 @@ PARAMS = {
 
 WINDOW_PARAMS = {
     'input_width' :     72, #window input size
-    'label_width' :     24, # how many hours to predict to the future
-    'shift' :           12,
+    'label_width' :     12, # how many hours to predict to the future
+    'shift' :           1,
     'label_columns' :   ['TD (degC)'],
 }
 
 TRAIN_PARAMS = {
     'epochs' :          50,  
     'batch_size':       32,
-    'lr':               1e-3,    
+    'lr':               1e-5,    
     'resume':           False,
     'device':           PARAMS['device'],
     'early_stopping_patience':10,
-    'scheduler_patience':5,
+    'scheduler_patience':3,
     'scheduler_factor':  0.5,
     'min_lr':            1e-7
 }
 
 INFERENCE_PARAMS = {
-    'params_path':            ['output/0_12/parameters.py', 'output/12_24/parameters.py'],
-    'weights_paths':          ['output/0_12/checkpoints/best_checkpoint.pth','output/12_24/checkpoints/best_checkpoint.pth'],
-    'scaler_folder_path':     'output/0_12/scalers',
-    'analyze_output_folder_per_folder':  ['output/0_12/analyze_output', 'output/12_24/analyze_output'],
+    'params_path':            ['output/parameters.py'],
+    'weights_paths':          ['output/checkpoints/best_checkpoint.pth'],
+    'scaler_folder_path':     'output/scalers',
+    'analyze_output_folder_per_folder':  ['output/analyze_output'],
     'analyze_output_folder':  'output/analyze_output',
 
 }
@@ -81,7 +81,7 @@ ADVANCED_MODEL_PARAMS = {
     'num_stations':         len(PARAMS['fileNames']),
     'time_steps':           WINDOW_PARAMS['input_width'],
     'feature_dim':          PARAMS['in_channels'],
-    'cnn_channels':         16,
+    'cnn_channels':         15,
     'kernel_size':          3,
     'd_model':              64,
     'nhead':                8,

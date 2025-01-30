@@ -258,7 +258,7 @@ if __name__ == "__main__":
 
     """
     inference_mode = 'analyze'  # Options: 'live', 'analyze'
-    analyze_stop_at = 30  # Number of predictions to analyze
+    analyze_stop_at = 0  # Number of predictions to analyze
 
     parameters_files = [] # load parameters files
     for path in INFERENCE_PARAMS['params_path']:

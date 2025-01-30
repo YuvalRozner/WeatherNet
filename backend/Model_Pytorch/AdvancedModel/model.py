@@ -7,15 +7,20 @@ import math
 class StationCNN(nn.Module):
     def __init__(self, input_channels, cnn_channels, kernel_size, feature_dim):
         super(StationCNN, self).__init__()
+        assert cnn_channels % input_channels == 0, "cnn_channels must be a multiple of input_channels"
+        assert feature_dim % cnn_channels == 0, "feature_dim must be a multiple of cnn_channels"
+        # Depthwise convolution: groups=input_channels
         self.conv1 = nn.Conv1d(in_channels=input_channels,
                                out_channels=cnn_channels,
                                kernel_size=kernel_size,
-                               padding=kernel_size // 2)
+                               padding=kernel_size // 2,
+                               groups=input_channels)  # Ensures independent convolution per channel
         self.relu1 = nn.ReLU()
         self.conv2 = nn.Conv1d(in_channels=cnn_channels,
                                out_channels=feature_dim,
                                kernel_size=kernel_size,
-                               padding=kernel_size // 2)
+                               padding=kernel_size // 2,
+                               groups=cnn_channels)  # Ensures independent convolution per channel
         self.relu2 = nn.ReLU()
 
     def forward(self, x):
