@@ -64,5 +64,3 @@ export const getContent = (theme) => [
     image: "/figures/weathernet_ims_together.png",
   },
 ];
-
-// WeatherNet was originally developed as a final-year project by Yuval Rozner and Dor Shabat during their Software Engineering degree.
