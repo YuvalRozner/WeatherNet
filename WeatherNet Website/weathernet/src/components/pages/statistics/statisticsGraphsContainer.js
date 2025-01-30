@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useTheme } from "@mui/material/styles";
 import Divider from "@mui/material/Divider";
 import Skeleton from "@mui/material/Skeleton";
+import Tooltip from "@mui/material/Tooltip";
 import { getStatisticsData } from "../../../utils/staticData/statisticsData";
 import {
   Container,
@@ -66,12 +67,18 @@ export default function StatisticsGraphsContainer() {
                 sx={{ borderRadius: "4px" }}
               />
             ) : (
-              <img
-                src={data.image}
-                alt={data.title}
-                style={{ marginRight: "20px", width: "65%", cursor: "pointer" }}
-                onClick={() => handleClickOpen(data)}
-              />
+              <Tooltip title="Click to open wider">
+                <img
+                  src={data.image}
+                  alt={data.title}
+                  style={{
+                    marginRight: "20px",
+                    width: "65%",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => handleClickOpen(data)}
+                />
+              </Tooltip>
             )}
             {imagesLoaded[index] ? (
               <Description>
