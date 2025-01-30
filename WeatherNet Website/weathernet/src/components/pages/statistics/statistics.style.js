@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import Button from "@mui/material/Button";
 import { BarChart } from "@mui/x-charts/BarChart";
+import { MyTheme } from "../../../utils/theme";
 
 export const Container = styled.div`
   /* Add any container-specific styles if needed */
@@ -41,9 +42,12 @@ export const CloseButton = styled(Button)`
 export const CardsContainer = styled.div`
   display: flex;
   flex-wrap: nowrap; /* force single row */
-  justify-content: space-evenly;
+  justify-content: center;
   align-items: center;
-  gap: 1rem;
+  gap: 2rem;
+  @media (max-width: ${MyTheme.breakpoints.values.xl}px) {
+    gap: 1rem;
+  }
   margin: 1rem 0;
   overflow-x: auto; // allow horizontal scroll if needed
 `;
@@ -51,7 +55,12 @@ export const CardsContainer = styled.div`
 // Each metric card has a dynamic border color and consistent styling:
 export const MetricCard = styled.div`
   flex: 0 0 auto; /* prevent card from growing/shrinking */
-  width: 216px; /* fixed card width */
+  width: 252px; /* fixed card width */
+
+  @media (max-width: ${MyTheme.breakpoints.values.xl}px) {
+    width: 216px !important;
+  }
+
   border-radius: 6px;
   padding: 0.5rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);

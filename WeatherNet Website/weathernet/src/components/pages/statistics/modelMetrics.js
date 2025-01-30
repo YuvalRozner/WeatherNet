@@ -10,12 +10,18 @@ import {
   ChartWrapper,
   StyledBarChart,
 } from "./statistics.style";
+import { MyTheme } from "../../../utils/theme";
 
 export default function ModelMetrics() {
   const metrics = getmodelMetricsData();
 
   // Cycle through a set of border colors for each card:
   const borderColors = ["#3498db", "#e74c3c", "#2ecc71", "#9b59b6", "#ff8c00"];
+
+  const chartsWidth =
+    window.innerWidth <= MyTheme.breakpoints.values.xl ? 210 : 235;
+  const chartsHeight =
+    window.innerWidth <= MyTheme.breakpoints.values.xl ? 90 : 80;
 
   return (
     <CardsContainer>
@@ -59,12 +65,12 @@ export default function ModelMetrics() {
                       },
                     },
                   ]}
-                  width={220} /* match card width */
-                  height={110} /* adjusted height for better fit */
+                  width={chartsWidth} /* match card width */
+                  height={chartsHeight} /* adjusted height for better fit */
                   margin={{
                     top: 12,
                     bottom: 20,
-                    left: 20,
+                    left: 25,
                     right: 20,
                   }} /* adjusted top margin */
                   legend={{ hidden: true }}
