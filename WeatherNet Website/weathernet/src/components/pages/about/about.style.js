@@ -21,6 +21,8 @@ export const LabelNavigateButton = styled(Button)`
   margin-right: 1;
 `;
 
-export const LabelImageContainer = styled.img`
-  width: 100%;
+export const ClickableImage = styled.img`
+  max-width: 100%;
+  max-height: 700px;
+  cursor: pointer;
 `;

@@ -11,12 +11,15 @@ import {
   AboutContentBox,
   NextLabelButtonContainer,
   LabelNavigateButton,
-  LabelImageContainer,
+  ClickableImage,
 } from "./about.style";
-import { useTheme } from "@mui/material";
+import { useTheme, Tooltip } from "@mui/material";
+import ImageDialog from "../../dataDisplays/imageDialog";
 
 export default function VerticalLinearStepper() {
   const [activeStep, setActiveStep] = React.useState(0);
+  const [open, setOpen] = React.useState(false);
+  const [selectedImage, setSelectedImage] = React.useState(null);
   const theme = useTheme();
   const themeMode = theme.palette.mode;
   const content = getContent(themeMode);
@@ -33,6 +36,13 @@ export default function VerticalLinearStepper() {
     setActiveStep(0);
   };
 
+  const handleImageClick = (imageData) => {
+    if (imageData.image && imageData.imageTitle && imageData.imageDescription) {
+      setSelectedImage(imageData);
+      setOpen(true);
+    }
+  };
+
   return (
     <>
       <AboutContainer>
@@ -40,13 +50,7 @@ export default function VerticalLinearStepper() {
           <Stepper activeStep={activeStep} orientation="vertical">
             {content.map((step, index) => (
               <Step key={step.label}>
-                <StepLabel
-                // optional={
-                //   index === content.length - 1 ? (
-                //     <Typography variant="caption">Last step</Typography>
-                //   ) : null
-                // }
-                >
+                <StepLabel>
                   <Typography variant="h6">
                     <b>{step.label}</b>
                   </Typography>
@@ -91,13 +95,34 @@ export default function VerticalLinearStepper() {
             </Paper>
           )}
         </AboutContentBox>
-        {activeStep !== content.length && (
-          <LabelImageContainer
-            src={content[activeStep].image}
-            alt={content[activeStep].image}
-          />
-        )}
+        {activeStep !== content.length &&
+          (content[activeStep].image &&
+          content[activeStep].imageTitle &&
+          content[activeStep].imageDescription ? (
+            <Tooltip title="Click to open wider, with description">
+              <ClickableImage
+                src={content[activeStep].image}
+                alt={content[activeStep].label}
+                onClick={() => handleImageClick(content[activeStep])}
+                style={{ cursor: "pointer" }}
+              />
+            </Tooltip>
+          ) : (
+            <ClickableImage
+              src={content[activeStep].image}
+              alt={content[activeStep].label}
+              style={{ cursor: "default" }}
+            />
+          ))}
       </AboutContainer>
+      <ImageDialog
+        open={open}
+        handleClose={() => setOpen(false)}
+        image={selectedImage ? selectedImage.image : ""}
+        title={selectedImage ? selectedImage.imageTitle : ""}
+        description={selectedImage ? selectedImage.imageDescription : ""}
+        isDescriptionAbove={true}
+      />
     </>
   );
 }
