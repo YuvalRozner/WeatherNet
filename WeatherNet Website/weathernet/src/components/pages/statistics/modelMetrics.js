@@ -16,10 +16,11 @@ export default function ModelMetrics() {
   const metrics = getmodelMetricsData();
 
   // Cycle through a set of border colors for each card:
-  const borderColors = ["#3498db", "#e74c3c", "#2ecc71", "#9b59b6", "#ff8c00"];
+  const borderColors = ["#40916c", "#6096ba", "#deaaff", "#f08080", "#bc4749"];
+  const barsColors = ["#74c69d", "#62b6cb", "#cfbaf0", "#f8ad9d", "#e56b6f"];
 
   const chartsWidth =
-    window.innerWidth <= MyTheme.breakpoints.values.xl ? 210 : 235;
+    window.innerWidth <= MyTheme.breakpoints.values.xl ? 208 : 250;
   const chartsHeight =
     window.innerWidth <= MyTheme.breakpoints.values.xl ? 90 : 80;
 
@@ -50,6 +51,10 @@ export default function ModelMetrics() {
                     {
                       data: subIntervals,
                       scaleType: "band",
+                      colorMap: {
+                        type: "ordinal",
+                        colors: [barsColors[i % barsColors.length]],
+                      },
                     },
                   ]}
                   series={[
@@ -74,6 +79,8 @@ export default function ModelMetrics() {
                     right: 20,
                   }} /* adjusted top margin */
                   legend={{ hidden: true }}
+                  borderRadius={6}
+                  // barLabel="value"
                   yAxis={[{ min: 0, max: Math.ceil(metMax) }]}
                 />
               </ChartWrapper>
