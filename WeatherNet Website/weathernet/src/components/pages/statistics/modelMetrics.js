@@ -25,7 +25,7 @@ export default function ModelMetrics() {
     window.innerWidth <= MyTheme.breakpoints.values.xl ? 90 : 80;
 
   return (
-    <CardsContainer>
+    <CardsContainer style={{ marginBottom: "1.6rem" }}>
       {metrics.map((item, i) => {
         // subIntervals are the keys in item.models: ["1-12", "13-24", ...]
         const subIntervals = Object.keys(item.models);

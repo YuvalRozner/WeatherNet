@@ -8,7 +8,7 @@ export function Home() {
   return (
     <>
       <ModelMetrics />
-      <Divider textAlign="left" variant="middle" sx={{ marginTop: "1rem" }}>
+      <Divider textAlign="left" variant="middle">
         <b style={{ fontSize: "1.6em" }}>Weather Forecast</b>
       </Divider>
       <ComparingChart />
