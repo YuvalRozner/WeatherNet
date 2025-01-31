@@ -41,9 +41,9 @@ WeatherNet consists of two primary components:
 
 ## Machine Learning Architecture
 
-<div style="text-align: center;">
+<p align="center">
     <img src="/logo/architecture_dark_framed.png" alt="ML Architecture" style="width: 80%;">
-</div>
+</p>
 
 Our model follows a **hybrid approach** combining:
 
