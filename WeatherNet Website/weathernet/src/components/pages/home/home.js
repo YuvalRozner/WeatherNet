@@ -57,7 +57,7 @@ export function Home() {
             src="/figures/erea_forecast_ims-station_with_table.png"
             alt="WeatherNet Architecture"
             style={{
-              maxWidth: "30%",
+              maxWidth: "350px",
               height: "auto",
               display: mapImageLoaded ? "block" : "none",
               cursor: "pointer",
