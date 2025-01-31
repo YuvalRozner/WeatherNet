@@ -5,8 +5,7 @@
     <div style="flex: 1; text-align: center;">
         <img src="/logo/pic4.png" alt="Weather Prediction Icon" width="250">
     </div>
-    
-    <!-- Table Container -->
+
     <div style="flex: 2;">
         <table border="1" style="border-collapse: collapse; width: 100%;">
             <tr>
@@ -39,6 +38,7 @@
             </tr>
         </table>
     </div>
+
 </div>
 
 ## About WeatherNet
