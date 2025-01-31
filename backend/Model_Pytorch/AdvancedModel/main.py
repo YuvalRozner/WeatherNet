@@ -6,17 +6,17 @@ from backend.Model_Pytorch.common.window_generator_multiple_stations import Wind
 from backend.Model_Pytorch.common.data import (
     load_pkl_file , 
     normalize_data_independent,
-    normalize_coordinates,
-    drop_nan_rows_multiple,
-    drop_nan_rows_multiple_custom,
-    normalize_data_collective
+    normalize_coordinates
 )
 from backend.Model_Pytorch.AdvancedModel.model import TargetedWeatherPredictionModel
 from backend.Model_Pytorch.AdvancedModel.train import train_model
 from backend.Model_Pytorch.AdvancedModel.parameters import PARAMS, WINDOW_PARAMS,TRAIN_PARAMS, ADVANCED_MODEL_PARAMS, STATIONS_COORDINATES
 
-
 if __name__ == "__main__":
+    if os.path.exists(PARAMS['output_path']) and TRAIN_PARAMS['resume'] is False:
+        print(f"Error: Directory {PARAMS['output_path']} already exists. Please remove it or set resume=True.")
+        exit(1)
+
     print(f"Using device: {PARAMS['device']}")
     east = []
     north = []
@@ -52,11 +52,10 @@ if __name__ == "__main__":
     combined_val_data = np.stack(list_of_val_data, axis=1)      # (T_val, num_stations, num_features)
 
     # Normalize Data Independently per Station
-    scaler_directory = os.path.join(os.path.dirname(__file__), 'output', 'scalers')
     train_data_scaled, val_data_scaled, scalers = normalize_data_independent(
         train_data=combined_train_data,
         val_data=combined_val_data,
-        scaler_dir=scaler_directory
+        scaler_dir=PARAMS['scalers_path']
     )
     representative_df = dfs[0]
     column_indices = {name: i for i, name in enumerate(representative_df.columns)}
@@ -91,7 +90,7 @@ if __name__ == "__main__":
         epochs=     TRAIN_PARAMS['epochs'],
         batch_size= TRAIN_PARAMS['batch_size'],
         lr=         TRAIN_PARAMS['lr'],
-        checkpoint_dir=os.path.join(os.path.dirname(__file__),'output','checkpoints'),
+        checkpoint_dir=TRAIN_PARAMS['checkpoint_dir'],
         resume=     TRAIN_PARAMS['resume'],
         device=     TRAIN_PARAMS['device'],
         early_stopping_patience= TRAIN_PARAMS['early_stopping_patience'],

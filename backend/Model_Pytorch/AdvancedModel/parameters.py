@@ -1,6 +1,19 @@
-# parametes.ipynb
 import torch
+import os
 device = 'cuda' if torch.cuda.is_available() else 'cpu'  # Determine device
+
+# for training - where the output will be saved
+file_path = os.path.dirname(__file__)
+
+# you need to put int inference_base_path, folders where each folder has the model files - inference_base_path/parameters.py, inference_base_path/output/scalers, inference_base_path/output/checkpoints. 
+inference_base_path = os.path.dirname(__file__) 
+
+models_paths_dirs =  [folder for folder in os.listdir(inference_base_path) if os.path.isdir(os.path.join(inference_base_path, folder))]
+
+output_path = os.path.join(file_path, 'output')
+checkpoints_path = os.path.join(output_path, 'checkpoints')
+scalers_path = os.path.join(output_path, 'scalers')
+inference_output_path = os.path.join(output_path, 'inference_output')
 
 STATIONS_COORDINATES = {
     'Tavor Kadoorie':           (238440, 734540),
@@ -47,7 +60,11 @@ PARAMS = {
     'target_station_desplay_name':   'Tavor Kadoorie',
     'target_station_id': 0,
     'device' :           device,
-    'in_channels' :      15 # how many features we have
+    'in_channels' :      15, # how many features we have
+    'output_path':       output_path,
+    'checkpoints_path':  checkpoints_path,
+    'scalers_path':      scalers_path,
+    'inference_output_path': inference_output_path
 }
 
 WINDOW_PARAMS = {
@@ -60,7 +77,8 @@ WINDOW_PARAMS = {
 TRAIN_PARAMS = {
     'epochs' :          50,  
     'batch_size':       32,
-    'lr':               1e-5,    
+    'lr':               1e-5,  
+    'checkpoint_dir' :  PARAMS['checkpoints_path'],  
     'resume':           False,
     'device':           PARAMS['device'],
     'early_stopping_patience':10,
@@ -69,28 +87,25 @@ TRAIN_PARAMS = {
     'min_lr':            1e-7
 }
 
-INFERENCE_PARAMS = {
-    'params_path':            ['output/parameters.py'],
-    'weights_paths':          ['output/checkpoints/best_checkpoint.pth'],
-    'scaler_folder_path':     'output/scalers',
-    'analyze_output_folder_per_folder':  ['output/analyze_output'],
-    'analyze_output_folder':  'output/analyze_output',
-
-}
-
 ADVANCED_MODEL_PARAMS = {
     'num_stations':         len(PARAMS['fileNames']),
     'time_steps':           WINDOW_PARAMS['input_width'],
     'feature_dim':          PARAMS['in_channels'],
-    'cnn_channels':         16,
     'kernel_size':          3,
     'd_model':              64,
     'nhead':                8,
     'num_layers':           4,
     'target_station_idx':   PARAMS['target_station_id'],
     'label_width':          WINDOW_PARAMS['label_width'],
-    'output_per_feature':     3,
+    'output_per_feature':   3,
     'use_batch_norm':       False,
     'use_residual':         False
 }
 
+INFERENCE_PARAMS = {
+    'params_path':             [os.path.join(inference_base_path, folder, 'parameters.py') for folder in models_paths_dirs],
+    'weights_paths':           [os.path.join(inference_base_path, folder, 'checkpoints/best_checkpoint.pth') for folder in models_paths_dirs],
+    'scaler_folder_path':      PARAMS['scalers_path'],
+    'inference_output_path_per_model':  models_paths_dirs, # for saving the output of the inference in the model folder for each model
+    'inference_output_path':  os.path.join(inference_base_path, 'analyze_output'), # for saving the output of the inference of all models in one folder (later analyze.py will use it)
+}

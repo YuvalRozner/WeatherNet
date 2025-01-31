@@ -257,12 +257,12 @@ if __name__ == "__main__":
 
 
     """
-    inference_mode = 'analyze'  # Options: 'live', 'analyze'
+    inference_mode = 'live'  # Options: 'live', 'analyze'
     analyze_stop_at = 0  # Number of predictions to analyze
 
     parameters_files = [] # load parameters files
     for path in INFERENCE_PARAMS['params_path']:
-        parameters_files.append(load_params(os.path.join(os.path.dirname(__file__), path)))
+        parameters_files.append(load_params(path))
 
     east = []
     north = []
@@ -275,7 +275,7 @@ if __name__ == "__main__":
     north = np.array(north)
     east_normalized, north_normalized = normalize_coordinates(east, north)
     
-    scalers = load_scalers(scaler_dir=os.path.join(os.path.dirname(__file__), INFERENCE_PARAMS['scaler_folder_path']))
+    scalers = load_scalers(scaler_dir=INFERENCE_PARAMS['scaler_folder_path'])
     #model_params = ADVANCED_MODEL_PARAMS.copy()
 
     
@@ -284,8 +284,8 @@ if __name__ == "__main__":
         model_params.append(params_file.ADVANCED_MODEL_PARAMS)
 
     models = []
-    for i, path in enumerate(INFERENCE_PARAMS['weights_paths']):
-        model = load_model_for_inference(os.path.join(os.path.dirname(__file__), path), model_params[i], device=PARAMS['device'])
+    for i, weights_path in enumerate(INFERENCE_PARAMS['weights_paths']):
+        model = load_model_for_inference(weights_path, model_params[i], device=PARAMS['device'])
         models.append(model)
 
     window_params = []

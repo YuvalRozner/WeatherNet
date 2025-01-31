@@ -142,7 +142,7 @@ class TemporalPositionalEncoding(nn.Module):
         return x
 
 class TargetedWeatherPredictionModel(nn.Module):
-    def __init__(self, num_stations, time_steps, feature_dim, cnn_channels, kernel_size,
+    def __init__(self, num_stations, time_steps, feature_dim, kernel_size,
                  d_model, nhead, num_layers, target_station_idx, label_width=1,
                  output_per_feature=3, use_batch_norm=False, use_residual=False):
         """
@@ -150,7 +150,6 @@ class TargetedWeatherPredictionModel(nn.Module):
             num_stations (int): Number of stations.
             time_steps (int): Number of time steps in the sliding window.
             feature_dim (int): Number of features per station.
-            cnn_channels (int): Number of channels in the CNN.
             kernel_size (int): Size of the CNN kernel.
             d_model (int): Dimension of the model (for Transformer).
             nhead (int): Number of attention heads in the Transformer.

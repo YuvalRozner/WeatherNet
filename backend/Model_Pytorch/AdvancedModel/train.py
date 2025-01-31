@@ -5,6 +5,35 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 import numpy as np
 from tqdm import tqdm
+import logging
+
+def setup_logger(log_dir, log_filename="training.log"):
+    
+    # Check if path exists, if not, return None
+    if not os.path.exists(log_dir):
+        print(f"Error: Directory {log_dir} does not exist.")
+        return None
+
+    # Define log file path
+    log_path = os.path.join(log_dir, log_filename)
+
+    # Create logger
+    logger = logging.getLogger("TrainingLogger")
+    logger.setLevel(logging.INFO)
+
+    # Check if the logger already has handlers (to avoid duplicate logs)
+    if not logger.handlers:
+        # Create a file handler
+        file_handler = logging.FileHandler(log_path, mode='a')
+        file_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+        
+        # Add handler to the logger
+        logger.addHandler(file_handler)
+
+    return logger
+def get_logger():
+    """Retrieve the logger instance."""
+    return logging.getLogger("TrainingLogger")
 
 def train_model(
         train_dataset,
@@ -20,8 +49,10 @@ def train_model(
         early_stopping_patience=10,
         scheduler_patience=5,
         scheduler_factor=0.5,
-        min_lr=1e-7
+        min_lr=1e-7,
+        logger_path=None
     ):
+    logger = setup_logger(logger_path)
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
     val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
 
@@ -58,6 +89,7 @@ def train_model(
         start_epoch = checkpoint['epoch'] + 1
         best_val_loss = checkpoint.get('best_val_loss', float('inf'))
         print(f"Resumed from epoch {start_epoch}, best_val_loss={best_val_loss:.4f}")
+        logger.info(f"Resumed from epoch {start_epoch}, best_val_loss={best_val_loss:.4f}")
     
     for epoch in range(start_epoch, start_epoch + epochs):
         model.train()
@@ -111,12 +143,13 @@ def train_model(
         val_loss = np.mean(val_losses)
         
         print(f"Epoch {epoch+1}/{start_epoch + epochs} | Train Loss: {train_loss:.4f} | Val Loss: {val_loss:.4f}")
-        
+        logger.info(f"Epoch {epoch+1}/{start_epoch + epochs} | Train Loss: {train_loss:.4f} | Val Loss: {val_loss:.4f}")
         # Step the scheduler based on validation loss
         scheduler.step(val_loss)
 
         current_lr = optimizer.param_groups[0]['lr']
         print(f"  -> Current Learning Rate: {current_lr:.6f}")
+        logger.info(f"  -> Current Learning Rate: {current_lr:.6f}")
         # Early Stopping Logic
         if val_loss < best_val_loss:
             best_val_loss = val_loss
@@ -131,11 +164,14 @@ def train_model(
                 'best_val_loss': best_val_loss,
             }, best_ckpt)
             print(f"  -> Best model saved at epoch {epoch+1} (val_loss={val_loss:.4f})")
+            logger.info(f"  -> Best model saved at epoch {epoch+1} (val_loss={val_loss:.4f})")
         else:
             patience_counter += 1
             print(f"  -> No improvement in validation loss for {patience_counter} epoch(s)")
+            logger.info(f"  -> No improvement in validation loss for {patience_counter} epoch(s)")
             if patience_counter >= early_stopping_patience:
                 print("Early stopping triggered.")
+                logger.info("Early stopping triggered.")
                 break  # Exit the training loop
         
         # Checkpoint: always save the 'latest'
