@@ -77,16 +77,20 @@ INFERENCE_PARAMS = {
     'analyze_output_folder':  'output/analyze_output',
 
 }
+
 ADVANCED_MODEL_PARAMS = {
     'num_stations':         len(PARAMS['fileNames']),
     'time_steps':           WINDOW_PARAMS['input_width'],
     'feature_dim':          PARAMS['in_channels'],
-    'cnn_channels':         15,
+    'cnn_channels':         16,
     'kernel_size':          3,
     'd_model':              64,
     'nhead':                8,
     'num_layers':           4,
     'target_station_idx':   PARAMS['target_station_id'],
-    'label_width':          WINDOW_PARAMS['label_width']
+    'label_width':          WINDOW_PARAMS['label_width'],
+    'output_per_feature':     3,
+    'use_batch_norm':       False,
+    'use_residual':         False
 }
 
