@@ -6,14 +6,14 @@
 
 ## Important Links
 
-| Module           | Link                                                            |
-| ---------------- | --------------------------------------------------------------- |
-| Website          | [weathernet-il.web.app](https://weathernet-il.web.app)          |
-| Github           | [WeatherNet Project](https://github.com/YuvalRozner/WeatherNet) |
-| User Manual      | [User Manual](#)                                                |
-| Developer Manual | [Developer Manual](#)                                           |
-| Phase A Paper    | [Link](#)                                                       |
-| Phase B Paper    | [Link](#)                                                       |
+| Module           | Link                                                             |
+| ---------------- | ---------------------------------------------------------------- |
+| Website          | [weathernet-il.web.app](https://weathernet-il.web.app)           |
+| Github           | [WeatherNet Project](https://github.com/YuvalRozner/WeatherNet)  |
+| User Manual      | [User Manual](#)                                                 |
+| Developer Manual | [Developer Manual](/Documents/WeatherNet - Developer Manual.pdf) |
+| Phase A Paper    | [Phase A Paper](#)                                               |
+| Phase B Paper    | [Phase B Paper](#)                                               |
 
 ## About WeatherNet
 
