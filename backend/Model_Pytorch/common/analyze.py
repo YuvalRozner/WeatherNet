@@ -9,6 +9,7 @@ from sklearn.metrics import (
     r2_score
 )
 import os
+import matplotlib.colors as mcolors
 
 def compute_error_metrics(actual, predicted):
     mae = mean_absolute_error(actual, predicted)
@@ -181,7 +182,7 @@ def plot_error_distribution(data, model_txt, path_to_save, percentages=False, th
 
 
 
-def plot_time_series(data, graph_title, path_to_save, theme='both'):
+def plot_time_series(data, graph_title, path_to_save,max_dot= 100, theme='both'):
     sns.reset_orig()
 
     # Define themes to process
@@ -197,67 +198,97 @@ def plot_time_series(data, graph_title, path_to_save, theme='both'):
             spine_color = 'white'
             legend_color = 'white'
             theme_suffix = 'dark'
+            line_actual = 'cyan'
+            line_predicted = 'magenta'
+            linestyle_actual = '-'  # Explicitly set to solid
+            linestyle_predicted = '-'  # Explicitly set to solid
         else:
             text_color = 'black'
             face_color = 'white'
-            grid = True
+            grid = False
             tick_color = 'black'
             spine_color = 'black'
             legend_color = 'black'
             theme_suffix = 'light'
+            line_actual = 'blue'
+            line_predicted = 'orange'
+            linestyle_actual = '-'  # Explicitly set to solid
+            linestyle_predicted = '-'  # Explicitly set to solid
 
         # Determine the save path
         if theme == 'both':
-            # Insert the theme suffix before the file extension
             base, ext = os.path.splitext(path_to_save)
             save_path = f"{base}_{theme_suffix}{ext}"
         else:
             save_path = path_to_save
 
-        # Create figure with specified facecolor
-        plt.figure(figsize=(15, 5), facecolor=face_color)
+        # Prepare data
+        data.loc[:, 'Difference'] = data.loc[:, 'Predicted'][:max_dot] - data.loc[:, 'Actual'][:max_dot]
 
-        # Plot Actual and Predicted
-        plt.plot(data['Actual'][:100], label='Actual', color='blue')
-        plt.plot(data['Predicted'][:100], label='Predicted', color='orange', alpha=0.7)
+        # Normalize differences for colormap
+        norm = mcolors.Normalize(vmin=data['Difference'].min(), vmax=data['Difference'].max())
+        cmap = plt.cm.bwr  # Blue-White-Red colormap
+        cmap = plt.cm.coolwarm  # Blue-White-Red colormap
+        cmap = plt.cm.viridis  # Suitable for light backgrounds
 
-        # Customize titles and labels
-        plt.title(graph_title, color=text_color)
-        plt.xlabel('Forecasted Time (hours) (concat)', color=text_color)
-        plt.ylabel('Temperature (°C)', color=text_color)
+        # Create figure and subplots with specified facecolor
+        fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(14, 10), sharex=True,
+                                     gridspec_kw={'height_ratios': [3, 1]})
+        
+        # Set overall face color
+        fig.patch.set_facecolor(face_color)
+        ax1.set_facecolor(face_color)
+        ax2.set_facecolor(face_color)
 
-        # Customize tick labels
-        ax = plt.gca()
-        ax.tick_params(colors=tick_color)
+        # Plot Actual and Predicted Temperatures with explicit linestyles
+        ax1.plot(data.index[:max_dot], data['Actual'][:max_dot], label='Actual Temperature', color=line_actual, linestyle=linestyle_actual)
+        ax1.plot(data.index[:max_dot], data['Predicted'][:max_dot], label='Predicted Temperature', color=line_predicted, alpha=0.7, linestyle=linestyle_predicted)
 
-        # Change the background color of axes
-        ax.set_facecolor(face_color)
-
-        # Remove or show grid lines based on theme
-        if grid:
-            ax.grid(color='gray', linestyle='--', linewidth=0.5)
-        else:
-            ax.grid(False)
-
-        # Change spine colors
-        for spine in ax.spines.values():
+        ax1.set_ylabel('Temperature (°C)', color=text_color)
+        ax1.set_title(graph_title, color=text_color)
+        ax1.legend()
+        ax1.tick_params(colors=tick_color)
+        for spine in ax1.spines.values():
             spine.set_edgecolor(spine_color)
 
-        # Change tick label colors explicitly
-        plt.setp(ax.get_xticklabels(), color=tick_color)
-        plt.setp(ax.get_yticklabels(), color=tick_color)
+        # Plot Differences as Bar Chart
+        colors = cmap(norm(data['Difference']))
+        ax2.bar(data.index, data['Difference'], color=colors, width=0.8, align='center')
+        ax2.set_ylabel('Difference (°C)', color=text_color)
+        ax2.set_xlabel('Index', color=text_color)
+        if grid:
+            ax2.grid(color='gray', linestyle='--', linewidth=0.5)
+        else:
+            ax2.grid(False)
+        ax2.tick_params(colors=tick_color)
+        for spine in ax2.spines.values():
+            spine.set_edgecolor(spine_color)
 
-        # Customize legend
-        legend = ax.legend()
-        for text in legend.get_texts():
-            text.set_color(legend_color)
+        # Customize tick labels colors
+        plt.setp(ax1.get_xticklabels(), color=tick_color)
+        plt.setp(ax1.get_yticklabels(), color=tick_color)
+        plt.setp(ax2.get_xticklabels(), color=tick_color)
+        plt.setp(ax2.get_yticklabels(), color=tick_color)
 
-        # Adjust layout and save the figure
+        # Remove x-axis labels
+        ax1.set_xticklabels([])
+        ax2.set_xticklabels([])
+
+        # Add a colorbar for the difference
+        sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
+        sm.set_array([])
+        #cbar = fig.colorbar(sm, ax=[ax1, ax2], orientation='vertical', fraction=0.02, pad=0.04)
+        #cbar.set_label('Difference Magnitude (°C)', color=text_color)
+        #cbar.ax.yaxis.set_tick_params(color=text_color)
+        #plt.setp(cbar.ax.yaxis.get_ticklabels(), color=text_color)
+
+        # Adjust layout
         plt.tight_layout()
-        plt.savefig(save_path, facecolor=plt.gcf().get_facecolor())
-        plt.close()
+        #plt.show()
+        # Save the figure with the current theme
+        plt.savefig(save_path, facecolor=fig.get_facecolor())
+        plt.close(fig)
         print(f"Saved time series plot to {save_path}")
-
 
 def create_heatmap(dfs, graph_title, path_to_save, theme='both'):
     sns.reset_orig()
@@ -513,6 +544,7 @@ if __name__ == "__main__":
     dfs = []
     for i, filename in enumerate(os.listdir(folder_path)):
         if filename.endswith(".csv"):
+            print(f"Reading file:{filename} in index {i}")
             df = pd.read_csv(os.path.join(folder_path, filename))
             #df = df.head(200)
             dfs.append(df)
@@ -573,7 +605,7 @@ if __name__ == "__main__":
 
         # Plot and save time series
         plot_time_series(
-            data=df,
+            data=df.iloc[::label_width],
             graph_title=f"Predicted vs Actuals in Model {i}",
             path_to_save=os.path.join(folder_path_to_save, f"model_{i}","time_series.png"),
             theme='both')
