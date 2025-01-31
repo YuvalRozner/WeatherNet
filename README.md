@@ -1,4 +1,6 @@
-<img src="/logo/pic4.png" alt="Weather Prediction Icon" width="200" height="150">
+<div style="text-align: center;">
+    <img src="/logo/pic4.png" alt="Weather Prediction Icon" width="250">
+</div>
 
 # WeatherNet
 
@@ -39,7 +41,9 @@ WeatherNet consists of two primary components:
 
 ## Machine Learning Architecture
 
-![ML Architecture](/logo/architecture_dark_framed.png)
+<div style="text-align: center;">
+    <img src="/logo/architecture_dark_framed.png" alt="ML Architecture" style="width: 90%;">
+</div>
 
 Our model follows a **hybrid approach** combining:
 
