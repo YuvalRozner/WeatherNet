@@ -2,12 +2,17 @@ import torch
 import os
 device = 'cuda' if torch.cuda.is_available() else 'cpu'  # Determine device
 
+# must define these 3 variables below!!!
+###########################################################################################################################################################
 # for training - where the output will be saved
 train_base_path = os.path.dirname(__file__) # in general we put the folder of the path that contains the parameters.py file
 
 # you need to put int inference_base_path,in it will be folders where each folder has the model files - inference_base_path/model_i/parameters.py, inference_base_path/model_i//scalers, inference_base_path/model_i/checkpoints.
 inference_base_path = os.path.dirname(__file__)
 models_paths_dir_names = ['model_1'] # for instance for alot of models we want to inference: ['model_1','model_2' ... ] for one : ['model_1']
+
+###########################################################################################################################################################
+
 
 
 output_path = os.path.join(train_base_path, 'output')
@@ -84,7 +89,8 @@ TRAIN_PARAMS = {
     'early_stopping_patience':10,
     'scheduler_patience':3,
     'scheduler_factor':  0.5,
-    'min_lr':            1e-7
+    'min_lr':            1e-7,
+    'logger_path':       PARAMS['output_path']
 }
 
 ADVANCED_MODEL_PARAMS = {

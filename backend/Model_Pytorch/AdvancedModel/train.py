@@ -53,6 +53,8 @@ def train_model(
         logger_path=None
     ):
     logger = setup_logger(logger_path)
+    logger.info(f"start logger")
+
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
     val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
 

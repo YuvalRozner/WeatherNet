@@ -96,5 +96,6 @@ if __name__ == "__main__":
         early_stopping_patience= TRAIN_PARAMS['early_stopping_patience'],
         scheduler_patience=TRAIN_PARAMS['scheduler_patience'],
         scheduler_factor=TRAIN_PARAMS['scheduler_factor'],
-        min_lr=TRAIN_PARAMS['min_lr']
+        min_lr=TRAIN_PARAMS['min_lr'],
+        logger_path = TRAIN_PARAMS['logger_path']
     )
