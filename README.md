@@ -1,38 +1,41 @@
 # WeatherNet
 
 <div style="display: flex; align-items: center;">
+    <!-- Image Container -->
     <div style="flex: 1; text-align: center;">
         <img src="/logo/pic4.png" alt="Weather Prediction Icon" width="250">
     </div>
+    
+    <!-- Table Container -->
     <div style="flex: 2;">
-        <table>
+        <table border="1" style="border-collapse: collapse; width: 100%;">
             <tr>
-                <th>Module</th>
-                <th>Link</th>
+                <th style="padding: 8px; text-align: left;">Module</th>
+                <th style="padding: 8px; text-align: left;">Link</th>
             </tr>
             <tr>
-                <td>Website</td>
-                <td><a href="https://weathernet-il.web.app">weathernet-il.web.app</a></td>
+                <td style="padding: 8px;">Website</td>
+                <td style="padding: 8px;"><a href="https://weathernet-il.web.app">weathernet-il.web.app</a></td>
             </tr>
             <tr>
-                <td>Github</td>
-                <td><a href="https://github.com/YuvalRozner/WeatherNet">WeatherNet Project</a></td>
+                <td style="padding: 8px;">Github</td>
+                <td style="padding: 8px;"><a href="https://github.com/YuvalRozner/WeatherNet">WeatherNet Project</a></td>
             </tr>
             <tr>
-                <td>User Manual</td>
-                <td><a href="#">User Manual</a></td>
+                <td style="padding: 8px;">User Manual</td>
+                <td style="padding: 8px;"><a href="#">User Manual</a></td>
             </tr>
             <tr>
-                <td>Developer Manual</td>
-                <td><a href="#">Developer Manual</a></td>
+                <td style="padding: 8px;">Developer Manual</td>
+                <td style="padding: 8px;"><a href="#">Developer Manual</a></td>
             </tr>
             <tr>
-                <td>Phase A Paper</td>
-                <td><a href="#">Link</a></td>
+                <td style="padding: 8px;">Phase A Paper</td>
+                <td style="padding: 8px;"><a href="#">Link</a></td>
             </tr>
             <tr>
-                <td>Phase B Paper</td>
-                <td><a href="#">Link</a></td>
+                <td style="padding: 8px;">Phase B Paper</td>
+                <td style="padding: 8px;"><a href="#">Link</a></td>
             </tr>
         </table>
     </div>
