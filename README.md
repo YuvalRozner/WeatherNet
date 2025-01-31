@@ -6,14 +6,14 @@
 
 ## Important Links
 
-| Module           | Link                                                                     |
-| ---------------- | ------------------------------------------------------------------------ |
-| Website          | [weathernet-il.web.app](https://weathernet-il.web.app)                   |
-| Github           | [WeatherNet Project](https://github.com/YuvalRozner/WeatherNet)          |
-| User Manual      | [User Manual](https://github.com/YuvalRozner/WeatherNet/Documents/)      |
-| Developer Manual | [Developer Manual](https://github.com/YuvalRozner/WeatherNet/Documents/) |
-| Phase A Paper    | [Phase A Paper](https://github.com/YuvalRozner/WeatherNet/Documents/)    |
-| Phase B Paper    | [Phase B Paper](https://github.com/YuvalRozner/WeatherNet/Documents)     |
+| Module           | Link                                                                                                                                                          |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Website          | [weathernet-il.web.app](https://weathernet-il.web.app)                                                                                                        |
+| Github           | [WeatherNet Project](https://github.com/YuvalRozner/WeatherNet)                                                                                               |
+| User Manual      | [User Manual](https://github.com/YuvalRozner/WeatherNet/Documents/)                                                                                           |
+| Developer Manual | [Developer Manual](https://github.com/YuvalRozner/WeatherNet/blob/a4e3e4454eb1c548f8ca8e4c897eca633328083d/Documents/WeatherNet%20-%20Developer%20Manual.pdf) |
+| Phase A Paper    | [Phase A Paper](https://github.com/YuvalRozner/WeatherNet/Documents/)                                                                                         |
+| Phase B Paper    | [Phase B Paper](https://github.com/YuvalRozner/WeatherNet/Documents)                                                                                          |
 
 ## About WeatherNet
 
