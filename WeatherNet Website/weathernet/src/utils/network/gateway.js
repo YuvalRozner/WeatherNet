@@ -1,22 +1,80 @@
 export const local_weathernetServer = "http://localhost:8080";
 export const deployed_weathernetServer_imsForecast =
-  "https://getimsforecast-3nuc7rzvbq-ew.a.run.app";
+  "https://getimsforecast-3nuc7rzvbqY-ew.a.run.app";
 export const deployed_weathernetServer_getImsTrueData =
-  "https://getimstruedata-3nuc7rzvbq-ew.a.run.app";
+  "https://getimstruedata-3nuc7rzvbqY-ew.a.run.app";
 
-export const getImsForecast = (cityId) => {
-  if (process.env.NODE_ENV === "development") {
-    return fetchWeatherData(`${local_weathernetServer}/imsForecast`, cityId);
-  } else if (process.env.NODE_ENV === "production") {
-    return fetchWeatherData(deployed_weathernetServer_imsForecast, cityId);
+export const getImsForecast = async (cityId) => {
+  try {
+    if (process.env.NODE_ENV === "development") {
+      return await fetchWeatherData(
+        `${local_weathernetServer}/imsForecast`,
+        cityId
+      );
+    } else if (process.env.NODE_ENV === "production") {
+      return await fetchWeatherData(
+        deployed_weathernetServer_imsForecast,
+        cityId
+      );
+    }
+  } catch (error) {
+    console.error(
+      "Primary server fetch failed, trying the alternative server:",
+      error
+    );
+    try {
+      if (process.env.NODE_ENV === "development") {
+        return await fetchWeatherData(
+          deployed_weathernetServer_imsForecast,
+          cityId
+        );
+      } else if (process.env.NODE_ENV === "production") {
+        return await fetchWeatherData(
+          `${local_weathernetServer}/imsForecast`,
+          cityId
+        );
+      }
+    } catch (secondaryError) {
+      console.error("Both server fetch attempts failed:", secondaryError);
+      throw secondaryError;
+    }
   }
 };
 
-export const getImsTrueData = (cityId) => {
-  if (process.env.NODE_ENV === "development") {
-    return fetchWeatherData(`${local_weathernetServer}/getImsTrueData`, cityId);
-  } else if (process.env.NODE_ENV === "production") {
-    return fetchWeatherData(deployed_weathernetServer_getImsTrueData, cityId);
+export const getImsTrueData = async (cityId) => {
+  try {
+    if (process.env.NODE_ENV === "development") {
+      return await fetchWeatherData(
+        `${local_weathernetServer}/getImsTrueData`,
+        cityId
+      );
+    } else if (process.env.NODE_ENV === "production") {
+      return await fetchWeatherData(
+        deployed_weathernetServer_getImsTrueData,
+        cityId
+      );
+    }
+  } catch (error) {
+    console.error(
+      "Primary server fetch failed, trying the alternative server:",
+      error
+    );
+    try {
+      if (process.env.NODE_ENV === "development") {
+        return await fetchWeatherData(
+          deployed_weathernetServer_getImsTrueData,
+          cityId
+        );
+      } else if (process.env.NODE_ENV === "production") {
+        return await fetchWeatherData(
+          `${local_weathernetServer}/getImsTrueData`,
+          cityId
+        );
+      }
+    } catch (secondaryError) {
+      console.error("Both server fetch attempts failed:", secondaryError);
+      throw secondaryError;
+    }
   }
 };
 
