@@ -1,8 +1,8 @@
 export const local_weathernetServer = "http://localhost:8080";
 export const deployed_weathernetServer_imsForecast =
-  "https://getimsforecast-3nuc7rzvbqY-ew.a.run.app";
+  "https://getimsforecast-3nuc7rzvbq-ew.a.run.app";
 export const deployed_weathernetServer_getImsTrueData =
-  "https://getimstruedata-3nuc7rzvbqY-ew.a.run.app";
+  "https://getimstruedata-3nuc7rzvbq-ew.a.run.app";
 
 export const getImsForecast = async (cityId) => {
   try {
