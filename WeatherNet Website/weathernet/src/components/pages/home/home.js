@@ -75,7 +75,7 @@ export function Home() {
         open={dialogMapOpen}
         handleClose={handleDialogMapClose}
         image="/figures/erea_forecast_ims-station_with_table.png"
-        title="WeatherNet Architecture"
+        title="Area of the forecasted weather"
         description="This Image shows the area of the forecasted weather and the IMS's measurement stations used for this forecast."
       />
 

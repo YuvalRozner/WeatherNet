@@ -8,3 +8,10 @@ export const ChooseCityAndPeriodBox = styled(Box)({
   justifyContent: "space-evenly",
   gap: 20,
 });
+
+export const MapContainer = styled(Box)({
+  display: "flex",
+  flexWrap: "wrap",
+  alignItems: "center",
+  justifyContent: "center",
+});
