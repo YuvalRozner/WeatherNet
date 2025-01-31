@@ -1,19 +1,42 @@
-<div style="text-align: center;">
-    <img src="/logo/pic4.png" alt="Weather Prediction Icon" width="250">
+<div style="display: flex; align-items: center;">
+    <div style="flex: 1; text-align: center;">
+        <img src="/logo/pic4.png" alt="Weather Prediction Icon" width="250">
+    </div>
+    <div style="flex: 2;">
+        <h1>WeatherNet</h1>
+        <h2>Important Links</h2>
+        <table>
+            <tr>
+                <th>Module</th>
+                <th>Link</th>
+            </tr>
+            <tr>
+                <td>Website</td>
+                <td><a href="https://weathernet-il.web.app">weathernet-il.web.app</a></td>
+            </tr>
+            <tr>
+                <td>Github</td>
+                <td><a href="https://github.com/YuvalRozner/WeatherNet">WeatherNet Project</a></td>
+            </tr>
+            <tr>
+                <td>User Manual</td>
+                <td><a href="#">User Manual</a></td>
+            </tr>
+            <tr>
+                <td>Developer Manual</td>
+                <td><a href="#">Developer Manual</a></td>
+            </tr>
+            <tr>
+                <td>Phase A Paper</td>
+                <td><a href="#">Link</a></td>
+            </tr>
+            <tr>
+                <td>Phase B Paper</td>
+                <td><a href="#">Link</a></td>
+            </tr>
+        </table>
+    </div>
 </div>
-
-# WeatherNet
-
-## Important Links
-
-| Module           | Link                                                            |
-| ---------------- | --------------------------------------------------------------- |
-| Website          | [weathernet-il.web.app](https://weathernet-il.web.app)          |
-| Github           | [WeatherNet Project](https://github.com/YuvalRozner/WeatherNet) |
-| User Manual      | [User Manual](#)                                                |
-| Developer Manual | [Developer Manual](#)                                           |
-| Phase A Paper    | [Link](#)                                                       |
-| Phase B Paper    | [Link](#)                                                       |
 
 ## About WeatherNet
 
@@ -42,7 +65,7 @@ WeatherNet consists of two primary components:
 ## Machine Learning Architecture
 
 <div style="text-align: center;">
-    <img src="/logo/architecture_dark_framed.png" alt="ML Architecture" style="width: 90%;">
+    <img src="/logo/architecture_dark_framed.png" alt="ML Architecture" style="width: 80%;">
 </div>
 
 Our model follows a **hybrid approach** combining:
