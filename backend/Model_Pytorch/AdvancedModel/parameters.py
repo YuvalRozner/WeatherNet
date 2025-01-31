@@ -7,7 +7,7 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'  # Determine device
 # for training - where the output will be saved
 train_base_path = os.path.dirname(__file__) # in general we put the folder of the path that contains the parameters.py file
 
-# you need to put int inference_base_path,in it will be folders where each folder has the model files - inference_base_path/model_i/parameters.py, inference_base_path/model_i//scalers, inference_base_path/model_i/checkpoints.
+# you need to put int inference_base_path,in it will be folders where each folder has the model files - inference_base_path/model_i/parameters.py, inference_base_path/model_i/scalers, inference_base_path/model_i/checkpoints.
 inference_base_path = os.path.dirname(__file__)
 models_paths_dir_names = ['model_1'] # for instance for alot of models we want to inference: ['model_1','model_2' ... ] for one : ['model_1']
 
