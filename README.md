@@ -1,53 +1,67 @@
+<img src="/logo/pic4.png" alt="Weather Prediction Icon" width="200" height="150">
+
 # WeatherNet
 
-![Weather Prediction Icon](/logo/readmeLogo.png)
+## Important Links
 
-## Weather Forecasting Using ML
+| Module           | Link                                                            |
+| ---------------- | --------------------------------------------------------------- |
+| Website          | [weathernet-il.web.app](https://weathernet-il.web.app)          |
+| Github           | [WeatherNet Project](https://github.com/YuvalRozner/WeatherNet) |
+| User Manual      | [User Manual](#)                                                |
+| Developer Manual | [Developer Manual](#)                                           |
+| Phase A Paper    | [Link](#)                                                       |
+| Phase B Paper    | [Link](#)                                                       |
 
-WeatherNet aims to develop an advanced machine learning model to predict weather conditions using historical weather data. Leveraging high-resolution data from Meteomatics, we seek to enhance the accuracy and reliability of weather forecasts.
+## About WeatherNet
 
-## Objectives
-
-- Collect and preprocess historical weather data from Meteomatics.
-- Perform exploratory data analysis (EDA) to uncover patterns and correlations.
-- Research and evaluate various machine learning algorithms for weather prediction.
-- Develop and validate initial models to identify the most promising approaches.
-- Document findings and methodologies for future development phases.
+WeatherNet is an advanced weather forecasting system designed to provide **accurate mid-term temperature predictions for Israel**. It leverages **machine learning** to analyze historical and real-time data, delivering reliable forecasts through a user-friendly web interface.
 
 ## Project Phases
 
-### Phase 1: Research and Initial Development (First Semester)
+The development of WeatherNet was divided into two primary phases:
 
-- **Data Collection and Preprocessing**: Gather and clean data using Python and Pandas.
-- **Exploratory Data Analysis (EDA)**: Visualize data using Matplotlib and Seaborn.
-- **Algorithm Research**: Investigate suitable machine learning models including Linear Regression, Random Forests, and LSTM.
-- **Model Development**: Create and evaluate initial models with cross-validation.
-- **Documentation**: Record research findings and methodologies.
+- **Phase A (Research & Proof of Concept - POC)**:  
+  Conducted in-depth research on weather forecasting methods and machine learning techniques, culminating in a proof-of-concept model to validate feasibility.
 
-## Expected Achievements (First Semester)
+- **Phase B (Development & Implementation)**:  
+  Transitioned from research to full-scale implementation, including **training the ML model, developing the user interface, and deploying the system**.
 
-- Comprehensive dataset and detailed exploratory data analysis.
-- Initial machine learning models developed and evaluated.
-- Identification of the most promising algorithms for accurate weather prediction.
-- Documentation of research findings to guide further development.
+## System Components
+
+WeatherNet consists of two primary components:
+
+- **Backend Machine Learning Model**:  
+  Processes weather data, trains on historical and real-time information, and generates accurate predictions.
+
+- **Frontend Web-Based Platform**:  
+  Provides an interactive interface for users to access forecasts, compare results, and explore model insights.
+
+## Machine Learning Architecture
+
+![ML Architecture](/logo/architecture_dark_framed.png)
+
+Our model follows a **hybrid approach** combining:
+
+- **1D Convolutional Neural Networks (CNNs)** for feature extraction.
+- **Positional Encodings** for both spatial and temporal context.
+- **Transformer Encoder** for modeling complex relationships between stations and across time.
+- **Fully Connected Layers** for generating final predictions.
+
+This architecture enables **high-accuracy weather forecasts** by capturing **both temporal dependencies and geographical relationships**.
 
 ## Team Members
 
-- Yuval Rozner
-- Dor Shabat
+- **Yuval Rozner**
+- **Dor Shabat**
 
 ## Tools and Technologies
 
-- Python
-- Pandas and NumPy
-- Scikit-learn
-- TensorFlow/Keras
-- Meteomatics API
-- Matplotlib and Seaborn
+- **Machine Learning & Data Processing**: Python, PyTorch, NumPy, Pandas, Scikit-learn
+- **Frontend Development**: React, Material-UI, Styled-Components
+- **Backend & Deployment**: Firebase Hosting, Firebase Functions, Git
 
 ## Contact
 
-For more information, please contact:
-
-- Yuval: yuvalrozner98@gmail.com
-- Dor: dorshabat55@gmail.com
+- **Yuval**: [yuvalrozner98@gmail.com](mailto:yuvalrozner98@gmail.com)
+- **Dor**: [dorshabat55@gmail.com](mailto:dorshabat55@gmail.com)
