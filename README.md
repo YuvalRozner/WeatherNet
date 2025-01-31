@@ -1,10 +1,10 @@
+        <h1>WeatherNet</h1>
+
 <div style="display: flex; align-items: center;">
     <div style="flex: 1; text-align: center;">
         <img src="/logo/pic4.png" alt="Weather Prediction Icon" width="250">
     </div>
     <div style="flex: 2;">
-        <h1>WeatherNet</h1>
-        <h2>Important Links</h2>
         <table>
             <tr>
                 <th>Module</th>
