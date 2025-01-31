@@ -8,7 +8,7 @@
 
 | Module           | Link                                                                               |
 | ---------------- | ---------------------------------------------------------------------------------- |
-| Website          | [weathernet-il.web.app](https://weathernet-il.web.app)                             |
+| Website          | [WeatherNet-il](https://weathernet-il.web.app)                                     |
 | Github           | [WeatherNet Project](https://github.com/YuvalRozner/WeatherNet)                    |
 | User Manual      | [User Manual](https://github.com/YuvalRozner/WeatherNet/tree/main/Documents/)      |
 | Developer Manual | [Developer Manual](https://github.com/YuvalRozner/WeatherNet/tree/main/Documents/) |
