@@ -147,7 +147,7 @@ export const NavigationList = [
         segment: "DeveloperManual",
         title: "Developer Manual",
         icon: <IntegrationInstructionsOutlined />,
-        fileName: "/papers/WeatherNet - Developer Manual.pdf", // TODO: update the file Developer Manual
+        fileName: "/papers/WeatherNet - Developer Manual.pdf",
         description: "Development guidelines for backend and frontend.",
         pageComponent: (
           <PaperContainer
