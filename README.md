@@ -1,4 +1,4 @@
-        <h1>WeatherNet</h1>
+# WeatherNet
 
 <div style="display: flex; align-items: center;">
     <div style="flex: 1; text-align: center;">
