@@ -257,7 +257,7 @@ if __name__ == "__main__":
 
 
     """
-    inference_mode = 'live'  # Options: 'live', 'analyze'
+    inference_mode = 'analyze'  # Options: 'live', 'analyze'
     analyze_stop_at = 0  # Number of predictions to analyze
 
     parameters_files = [] # load parameters files
@@ -406,9 +406,9 @@ if __name__ == "__main__":
                     print(f"Skipping index {j}: {ve}")
                     continue
             
-            output_dir_for_all = os.path.join(os.path.dirname(__file__), INFERENCE_PARAMS['analyze_output_folder'])
+            output_dir_for_all = os.path.join(os.path.dirname(__file__), INFERENCE_PARAMS['inference_output_path'])
             os.makedirs(output_dir_for_all, exist_ok=True)
-            output_dir_per_folder = os.path.join(os.path.dirname(__file__), INFERENCE_PARAMS['analyze_output_folder_per_folder'][i])
+            output_dir_per_folder = os.path.join(os.path.dirname(__file__), INFERENCE_PARAMS['inference_output_path_per_model'][i])
             os.makedirs(output_dir_per_folder, exist_ok=True)
             predictions_actuals_df = flatten_data(predictions, actual_temps)
             predictions_actuals_df['input_width'] = input_width

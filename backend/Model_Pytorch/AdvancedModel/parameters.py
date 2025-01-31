@@ -6,9 +6,9 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'  # Determine device
 file_path = os.path.dirname(__file__)
 
 # you need to put int inference_base_path, folders where each folder has the model files - inference_base_path/parameters.py, inference_base_path/output/scalers, inference_base_path/output/checkpoints. 
-inference_base_path = os.path.dirname(__file__) 
+inference_base_path = os.path.dirname(__file__)
+models_paths_dir_names =  ['model_1'] # for instance for alot of models we want to inference: ['model_1','model_2' ... ] for one : ['model_1']
 
-models_paths_dirs =  [folder for folder in os.listdir(inference_base_path) if os.path.isdir(os.path.join(inference_base_path, folder))]
 
 output_path = os.path.join(file_path, 'output')
 checkpoints_path = os.path.join(output_path, 'checkpoints')
@@ -102,10 +102,12 @@ ADVANCED_MODEL_PARAMS = {
     'use_residual':         False
 }
 
+models_paths_dir_names_full_paths = [os.path.join(inference_base_path, model_folder_name) for model_folder_name in models_paths_dir_names]
+
 INFERENCE_PARAMS = {
-    'params_path':             [os.path.join(inference_base_path, folder, 'parameters.py') for folder in models_paths_dirs],
-    'weights_paths':           [os.path.join(inference_base_path, folder, 'checkpoints/best_checkpoint.pth') for folder in models_paths_dirs],
+    'params_path':             [os.path.join(folder, 'parameters.py') for folder in models_paths_dir_names_full_paths],
+    'weights_paths':           [os.path.join(folder, 'checkpoints', 'best_checkpoint.pth') for folder in models_paths_dir_names_full_paths],
     'scaler_folder_path':      PARAMS['scalers_path'],
-    'inference_output_path_per_model':  models_paths_dirs, # for saving the output of the inference in the model folder for each model
+    'inference_output_path_per_model':  models_paths_dir_names_full_paths, # for saving the output of the inference in the model folder for each model
     'inference_output_path':  os.path.join(inference_base_path, 'analyze_output'), # for saving the output of the inference of all models in one folder (later analyze.py will use it)
 }
