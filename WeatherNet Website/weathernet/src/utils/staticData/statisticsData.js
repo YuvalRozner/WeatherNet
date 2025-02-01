@@ -26,12 +26,12 @@ export const getmodelMetricsData = () => [
   {
     type: "MAE",
     models: {
-      "1-12": 1.04967,
-      "13-24": 1.432691,
-      "25-36": 1.04967,
-      "37-60": 1.432691,
+      "1-12": 0.957917256613646,
+      "13-24": 1.40984387475643,
+      "25-36": 1.41232184725876,
+      "37-60": 1.94909789927995,
     },
-    overall: 0.5,
+    overall: 1.4322952194772,
     tooltip: "Mean Absolute Error",
     explanation:
       "Mean Absolute Error (MAE) is a measure of the average magnitude of the errors in a set of predictions, without considering their direction. It is the average of the absolute differences between prediction and actual observation values.",
@@ -39,12 +39,12 @@ export const getmodelMetricsData = () => [
   {
     type: "MSE",
     models: {
-      "1-12": 2.138306,
-      "13-24": 3.931717,
-      "25-36": 2.138306,
-      "37-60": 3.931717,
+      "1-12": 1.87285153437129,
+      "13-24": 3.88021908539729,
+      "25-36": 3.89498489236451,
+      "37-60": 7.3166124521578,
     },
-    overall: 0.5,
+    overall: 4.24116699107272,
     tooltip: "Mean Squared Error",
     explanation:
       "Mean Squared Error (MSE) is a measure of the average of the squares of the errors, or deviations, between predicted and actual observation values. It is the average of the squared differences between prediction and actual observation values.",
@@ -52,12 +52,12 @@ export const getmodelMetricsData = () => [
   {
     type: "RMSE",
     models: {
-      "1-12": 1.462295,
-      "13-24": 1.982856,
-      "25-36": 1.462295,
-      "37-60": 1.982856,
+      "1-12": 1.36852166017615,
+      "13-24": 1.9698271714537,
+      "25-36": 1.97357160811674,
+      "37-60": 2.70492374239234,
     },
-    overall: 0.5,
+    overall: 2.05940937918441,
     tooltip: "Root Mean Squared Error",
     explanation:
       "Root Mean Squared Error (RMSE) is the square root of the mean of the squares of the errors, or deviations, between predicted and actual observation values. It is the square root of the average of the squared differences between prediction and actual observation values.",
@@ -65,12 +65,12 @@ export const getmodelMetricsData = () => [
   {
     type: "MAPE",
     models: {
-      "1-12": 6.038863,
-      "13-24": 8.310858,
-      "25-36": 6.038863,
-      "37-60": 8.310858,
+      "1-12": 5.45277105887534,
+      "13-24": 8.09048062749564,
+      "25-36": 8.11832601892737,
+      "37-60": 12.0266230064599,
     },
-    overall: 0.5,
+    overall: 8.42205017793956,
     tooltip: "Mean Absolute Percentage Error",
     explanation:
       "Mean Absolute Percentage Error (MAPE) is a measure of the average of the absolute percentage differences between predicted and actual observation values. It is the average of the absolute percentage differences between prediction and actual observation values.",
@@ -78,12 +78,12 @@ export const getmodelMetricsData = () => [
   {
     type: "R2_Score",
     models: {
-      "1-12": 0.963163,
-      "13-24": 0.932288,
-      "25-36": 0.963163,
-      "37-60": 0.932288,
+      "1-12": 0.967722942678878,
+      "13-24": 0.933177153642848,
+      "25-36": 0.9329228656172,
+      "37-60": 0.878923271281989,
     },
-    overall: 0.5,
+    overall: 0.927703529814378,
     tooltip: "R2 Score",
     explanation:
       "R2 Score (R2) is a measure of the proportion of the variance in the dependent variable that is predictable from the independent variable. It is the square of the correlation coefficient between the predicted and actual observation values.",
