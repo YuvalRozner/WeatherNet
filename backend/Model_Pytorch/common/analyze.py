@@ -530,7 +530,7 @@ def window_prediction_str(i):
 if __name__ == "__main__":
     # Define paths
     path_to_file = os.path.abspath(os.path.dirname(__file__))  
-    folder_path = os.path.join(path_to_file, '..', 'AdvancedModel', 'output', 'analyze_output')
+    folder_path = os.path.join(path_to_file, '..', 'AdvancedModel', 'models', 'inference_output')
     folder_path_to_save = os.path.join(folder_path, 'analyze_the_hell_out_of_it')  # Corrected folder name
 
     # Create the folder if it doesn't exist
@@ -552,6 +552,13 @@ if __name__ == "__main__":
     if not dfs:
         print("No CSV files found in the specified folder.")
         exit(1)
+    # Find the minimum size among all DataFrames
+    min_size = min(len(df) for df in dfs)
+
+    # Slice all DataFrames to the minimum size
+    dfs = [df.iloc[:min_size] for df in dfs]
+    a = [len(df) for df in dfs]
+    print(a)
 
     # Combine all DataFrames
     dfs_combined = pd.concat(dfs)
@@ -593,10 +600,10 @@ if __name__ == "__main__":
     for i, df in enumerate(dfs):
         # Perform per-hour analysis
         label_width = int(df['label_width'].iloc[0]) if 'label_width' in df.columns else 24  # Default to 24 if not present
-        per_hour_metrics = per_hour_analysis(df['Predicted'], df['Actual'], label_width=label_width, start_hour=start_hour)
+        #per_hour_metrics = per_hour_analysis(df['Predicted'], df['Actual'], label_width=label_width, start_hour=start_hour)
         start_hour += label_width
 
-        per_hour_metrics_list.append(per_hour_metrics)
+        #per_hour_metrics_list.append(per_hour_metrics)
 
         # Compute overall error metrics
         metrics = compute_error_metrics(df['Actual'], df['Predicted'])
