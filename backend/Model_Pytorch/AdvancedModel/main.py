@@ -12,10 +12,10 @@ from backend.Model_Pytorch.AdvancedModel.model import TargetedWeatherPredictionM
 from backend.Model_Pytorch.AdvancedModel.train import train_model
 from backend.Model_Pytorch.AdvancedModel.parameters import PARAMS, WINDOW_PARAMS,TRAIN_PARAMS, ADVANCED_MODEL_PARAMS, STATIONS_COORDINATES
 
-if __name__ == "__main__":
+def main():
     if os.path.exists(PARAMS['output_path']) and TRAIN_PARAMS['resume'] is False:
         print(f"Error: Directory {PARAMS['output_path']} already exists. Please remove it or set resume=True.")
-        exit(1)
+        return
 
     print(f"Using device: {PARAMS['device']}")
     east = []
@@ -99,3 +99,5 @@ if __name__ == "__main__":
         min_lr=TRAIN_PARAMS['min_lr'],
         logger_path = TRAIN_PARAMS['logger_path']
     )
+
+main()

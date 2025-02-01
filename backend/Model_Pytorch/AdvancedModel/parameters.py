@@ -73,22 +73,55 @@ PARAMS = {
 }
 
 WINDOW_PARAMS = {
-    'input_width' :     72, #window input size
+    'input_width' :     72, # window input size
     'label_width' :     12, # how many hours to predict to the future
     'shift' :           1,
     'label_columns' :   ['TD (degC)'],
 }
 
+"""
+WINDOW_PARAMS = {
+    'input_width' :     72, # window input size
+    'label_width' :     12, # how many hours to predict to the future
+    'shift' :           1,
+    'label_columns' :   ['TD (degC)'],
+}
+"""
+"""
+WINDOW_PARAMS = {
+    'input_width' :     72, # window input size
+    'label_width' :     12, # how many hours to predict to the future
+    'shift' :           13,
+    'label_columns' :   ['TD (degC)'],
+}
+"""
+"""
+WINDOW_PARAMS = {
+    'input_width' :     72, # window input size
+    'label_width' :     12, # how many hours to predict to the future
+    'shift' :           25,
+    'label_columns' :   ['TD (degC)'],
+}
+"""
+"""
+WINDOW_PARAMS = {
+    'input_width' :     72, # window input size
+    'label_width' :     24, # how many hours to predict to the future
+    'shift' :           37,
+    'label_columns' :   ['TD (degC)'],
+}
+"""
+
 TRAIN_PARAMS = {
     'epochs' :          50,  
     'batch_size':       32,
-    'lr':               1e-5,  
+    'lr':               1e-5,                                   # 1e-3, 1e-4, 1e-5
     'checkpoint_dir' :  PARAMS['checkpoints_path'],  
     'resume':           False,
     'device':           PARAMS['device'],
-    'early_stopping_patience':10,
-    'scheduler_patience':3,
-    'scheduler_factor':  0.5,
+    'early_stopping_patience':10,                               # how many epochs to wait before stopping the training                       
+    'scheduler_patience':3,                                     # how many epochs to wait before reducing the learning rate
+    'scheduler_factor':  0.5,                                   # the factor to reduce the learning rate                                       
     'min_lr':            1e-7,
     'logger_path':       PARAMS['output_path']
 }
@@ -97,13 +130,13 @@ ADVANCED_MODEL_PARAMS = {
     'num_stations':         len(PARAMS['fileNames']),
     'time_steps':           WINDOW_PARAMS['input_width'],
     'feature_dim':          PARAMS['in_channels'],
-    'kernel_size':          3,
-    'd_model':              64,
-    'nhead':                8,
-    'num_layers':           4,
+    'kernel_size':          3,  # cnn filter size                       4, 5, 6, 7
+    'd_model':              64, # input for transformer size            64, 128
+    'nhead':                8,  # number of heads in the transformer    8, 16
+    'num_layers':           4,  # number of layers in the transformer - 6 - 12
     'target_station_idx':   PARAMS['target_station_id'],
     'label_width':          WINDOW_PARAMS['label_width'],
-    'output_per_feature':   3,
+    'output_per_feature':   3,                                          # 4 ,5            
     'use_batch_norm':       False,
     'use_residual':         False
 }
