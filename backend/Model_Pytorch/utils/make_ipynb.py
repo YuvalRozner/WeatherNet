@@ -96,7 +96,7 @@ def create_notebook_from_scripts(file_paths, output_notebook, alteration_rules=N
 
     # Mapping of function names to actual functions
     function_mapping = {
-        "remove_code_above_main": remove_code_above_main,
+        #"remove_code_above_main": remove_code_above_main,
         # Add more function mappings here if you introduce additional functions
     }
 
