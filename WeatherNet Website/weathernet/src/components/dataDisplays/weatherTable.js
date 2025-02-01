@@ -8,12 +8,20 @@ import {
 } from "@mui/material";
 import TableContainer from "@mui/material/TableContainer";
 import { useEffect, useState } from "react";
+import { useTheme } from "@mui/material/styles";
 
 const WeatherTable = ({ dataset }) => {
   const [columns, setColumns] = useState([]);
   const [rows, setRows] = useState([]);
 
+  const theme = useTheme();
+  const nowBackgroundColor1 =
+    theme.palette.mode === "dark" ? "#333840" : "#dee2e6";
+  const nowBackgroundColor2 =
+    theme.palette.mode === "dark" ? "#2D3239" : "#e9ecef";
+
   // Build columns & rows for the transposed table
+
   useEffect(() => {
     if (dataset.length === 0) {
       setColumns([]);
@@ -22,7 +30,7 @@ const WeatherTable = ({ dataset }) => {
     }
 
     const newColumns = [
-      { id: "parameter", label: "Parameter", minWidth: 180 },
+      { id: "parameter", label: "Parameter / Time", minWidth: 180 },
       ...dataset.map((item, index) => ({
         id: `time-${index}`,
         label: item.formattedTime,
@@ -59,18 +67,16 @@ const WeatherTable = ({ dataset }) => {
                 key={column.id}
                 align="left"
                 style={{ minWidth: column.minWidth }}
-                sx={
-                  column.id === "parameter"
-                    ? {
-                        position: "sticky",
-                        left: 0,
-                        backgroundColor: "#282c34",
-                        zIndex: 4,
-                        boxShadow: "2px 0px 3px -1px rgba(0,0,0,0.1)",
-                        fontWeight: "bold",
-                      }
-                    : {}
-                }
+                sx={{
+                  backgroundColor: nowBackgroundColor1,
+                  ...(column.id === "parameter" && {
+                    position: "sticky",
+                    left: 0,
+                    zIndex: 4,
+                    boxShadow: "2px 0px 3px -1px rgba(0,0,0,0.1)",
+                    fontWeight: "bold",
+                  }),
+                }}
               >
                 {column.label}
               </TableCell>
@@ -95,7 +101,7 @@ const WeatherTable = ({ dataset }) => {
                       ? {
                           position: "sticky",
                           left: 0,
-                          backgroundColor: "#282c34",
+                          backgroundColor: nowBackgroundColor2,
                           zIndex: 2,
                           boxShadow: "2px 0px 3px -1px rgba(0,0,0,0.1)",
                           fontWeight: "bold",
