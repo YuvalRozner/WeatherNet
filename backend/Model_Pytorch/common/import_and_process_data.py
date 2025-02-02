@@ -491,18 +491,17 @@ def get_prccessed_latest_data_by_hour_and_station(stations_list, hours_back, beg
   take_round_hours(dataframes)
   fill_1_missing_values(dataframes, VALUES_TO_FILL)
   fill_2_missing_values(dataframes, VALUES_TO_FILL)
-  vectorize_wind(dataframes)
-  latest_deleted_date = drop_nan_rows_multiple(dataframes)
-  if latest_deleted_date and isinstance(latest_deleted_date, datetime) and latest_deleted_date > end_datetime:
-    success = False
-    
   last_datetime = pd.to_datetime(dataframes[list(dataframes.keys())[0]]['Date Time'].iloc[-1], format="%d/%m/%Y %H:%M")
   last_hour = last_datetime.strftime("%H:%M")
   last_date = last_datetime.strftime("%Y-%m-%d")
   print(f"last hour: {last_hour}, last hour date: {last_date}")
 
   replace_time_with_cyclic_representation(dataframes)
-
+  vectorize_wind(dataframes)
+  latest_deleted_date = drop_nan_rows_multiple(dataframes)
+  if latest_deleted_date and isinstance(latest_deleted_date, datetime) and latest_deleted_date > end_datetime:
+    success = False
+    
   for df_name, df in dataframes.items(): # return only the last hours_back hours
       if len(df) > hours_back:
           dataframes[df_name] = df.iloc[-hours_back:].reset_index(drop=True)

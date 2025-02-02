@@ -88,8 +88,8 @@ class StationCNN(nn.Module):
 
         # Optional Residual Connection
         if self.use_residual:
-            residual = self.residual_conv(x)  # [batch_size, input_features * output_per_feature, time_steps]
-            out += residual
+            residual = self.residual_conv(x)
+            out = out + residual  # Ensures a new tensor is produced
             out = self.relu2(out)
 
         # Reshape to [batch_size, output_per_feature, input_features, time_steps]
