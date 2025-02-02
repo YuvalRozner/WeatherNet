@@ -472,7 +472,7 @@ def get_prccessed_latest_data_by_hour_and_station(stations_list, hours_back, beg
   end_datetime = begin_forecast_time.replace(minute=0, second=0, microsecond=0)
   start_datetime = end_datetime - pd.Timedelta(days=7) # 7 days back
   startYear, endYear = start_datetime.year, end_datetime.year
-  startDate, endDate = start_datetime.strftime("%m%d%Y"), end_datetime.strftime("%m%d%Y")
+  startDate, endDate = start_datetime.strftime("%m%d%H%M"), end_datetime.strftime("%m%d%H%M")
   print(f"startDate: {startDate}, endDate: {endDate}")
 
   dataframes = get_data_of_stations_from_ims_manual_time_range(stations_list, startYear, endYear, startDate, endDate)
