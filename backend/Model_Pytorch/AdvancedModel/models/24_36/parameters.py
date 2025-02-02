@@ -75,7 +75,7 @@ PARAMS = {
 WINDOW_PARAMS = {
     'input_width' :     72, # window input size
     'label_width' :     12, # how many hours to predict to the future
-    'shift' :           13,
+    'shift' :           25,
     'label_columns' :   ['TD (degC)'],
 }
 
@@ -112,9 +112,6 @@ WINDOW_PARAMS = {
 }
 """
 
-"""
-use_residual false to true
-"""
 TRAIN_PARAMS = {
     'epochs' :          50,
     'batch_size':       32,
@@ -141,7 +138,7 @@ ADVANCED_MODEL_PARAMS = {
     'label_width':          WINDOW_PARAMS['label_width'],
     'output_per_feature':   3,                                          # 4 ,5
     'use_batch_norm':       False,
-    'use_residual':         True
+    'use_residual':         False
 }
 
 models_paths_dir_names_full_paths = [os.path.join(inference_base_path, model_folder_name) for model_folder_name in models_paths_dir_names]

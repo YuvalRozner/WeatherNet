@@ -295,11 +295,13 @@ if __name__ == "__main__":
     max_input_width = max([window_param['input_width'] for window_param in window_params])
 
     device = PARAMS['device']
-    target_station_idx = PARAMS['target_station_id']  
+    target_station_idx = PARAMS['target_station_id']
 
-    
+    begin_forecast_time = datetime.now()
+    end_datetime = begin_forecast_time.replace(minute=0, second=0, microsecond=0)
+    start_datetime = end_datetime - pd.Timedelta(days=3)  # 7 days back
     if inference_mode == 'live':        
-        dataframes, last_hour, last_date, success = get_prccessed_latest_data_by_hour_and_station(STATIONS_LIST, max_input_width)
+        dataframes, last_hour, last_date, success = get_prccessed_latest_data_by_hour_and_station(STATIONS_LIST, max_input_width,start_datetime)
         last_hour = int(last_hour.split(':')[0])
         if False:
             print(f"len of df: {len(dataframes)}")
