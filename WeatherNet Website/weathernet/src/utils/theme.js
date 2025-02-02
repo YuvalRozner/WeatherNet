@@ -4,13 +4,24 @@ export const MyTheme = extendTheme({
   colorSchemes: {
     // Provide an object for `light` if needed
     light: {
-      // e.g. palette: { ... }
+      palette: {
+        background: {
+          paper: "rgb(247, 247, 247)",
+          default: "rgb(250, 250, 250)",
+        },
+        action: {
+          hover: "rgba(156, 210, 216, 0.7)",
+          helpButtonHover: "rgba(156, 210, 216, 0.7)",
+          disabled: "rgba(32, 32, 32, 0.3)",
+        },
+      },
     },
+
     dark: {
       palette: {
         background: {
-          paper: "#282c34",
-          default: "#282c34",
+          paper: "rgba(40, 44, 52, 1)",
+          default: "rgba(40, 44, 52, 1)",
         },
         action: {
           hover: "rgba(41, 184, 200, 0.7)",
