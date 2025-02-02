@@ -23,8 +23,8 @@ const ComparingChart = () => {
 
   const fetchData = useCallback(() => {
     // Get IMS forecast data when city is changed
-    getImsForecast(3).then((data) => setDataJsonIms(data)); //TODO: change to city
-    getImsTrueData(42).then((data) => setDataJsonTrue(data)); //TODO: change to city
+    getImsForecast(44).then((data) => setDataJsonIms(data));
+    getImsTrueData(13).then((data) => setDataJsonTrue(data));
     setDataJsonOur(templateDataOur);
   }, []);
 

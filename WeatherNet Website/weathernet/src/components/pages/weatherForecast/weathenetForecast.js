@@ -33,7 +33,7 @@ const WeathernetForecast = () => {
 
   const fetchData = useCallback(() => {
     setOurDataJson(templateDataOur);
-    getImsTrueData(42).then((data) => setTrueDataJson(data)); //TODO: change to city
+    getImsTrueData(13).then((data) => setTrueDataJson(data));
   }, []);
 
   useEffect(() => {
