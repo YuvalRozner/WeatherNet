@@ -47,3 +47,5 @@ WeatherNet Website/weathernet-server/__pycache__/constantsParams.cpython-311.pyc
 /backend/Model_Pytorch/AdvancedModel/output/0_12/__pycache__
 /backend/Model_Pytorch/AdvancedModel/output/12_24/__pycache__
 /backend/Model_Pytorch/AdvancedModel/output
+/Backend/.idea
+/backend/Model_Pytorch/AdvancedModel/models/12_24/__pycache__

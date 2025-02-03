@@ -5,8 +5,7 @@ import pickle
 import os
 from tqdm import tqdm
 import pandas as pd
-import matplotlib.pyplot as plt
-from sklearn.preprocessing import StandardScaler  
+from sklearn.preprocessing import StandardScaler
 import numpy as np
 import json
 from datetime import datetime, timedelta
@@ -14,10 +13,12 @@ import importlib.util
 import sys
 from pathlib import Path
 
-from Backend.Model_Pytorch.common.data import load_pkl_file ,normalize_coordinates
-from Backend.Model_Pytorch.AdvancedModel.model import TargetedWeatherPredictionModel
-from Backend.Model_Pytorch.AdvancedModel.parameters import PARAMS, WINDOW_PARAMS, ADVANCED_MODEL_PARAMS, STATIONS_COORDINATES, STATIONS_LIST,INFERENCE_PARAMS
-from Backend.Model_Pytorch.common.import_and_process_data import get_prccessed_latest_data_by_hour_and_station
+from Model_Pytorch.common.data import load_pkl_file, normalize_coordinates
+from Model_Pytorch.common.import_and_process_data import get_prccessed_latest_data_by_hour_and_station
+
+from model import TargetedWeatherPredictionModel
+from parameters import PARAMS, WINDOW_PARAMS, ADVANCED_MODEL_PARAMS, STATIONS_COORDINATES, STATIONS_LIST, INFERENCE_PARAMS
+
 
 def load_params(params_path):
     # Convert path to absolute if it's relative
@@ -117,6 +118,7 @@ def generate_forecast_json(city_name, date_str, starting_hour, temperatures, out
     
     print(f"Forecast data successfully written to {output_file}")
 
+
 def load_scalers(scaler_dir='./output/scalers'):
     """
     Load the previously saved scalers for each station.
@@ -134,6 +136,7 @@ def load_scalers(scaler_dir='./output/scalers'):
         print(f"Scaler for Station {i} loaded from {scaler_path}")
     return scalers
 
+
 def load_model_for_inference(checkpoint_path, model_params, device='cpu'):
     """
     Create a model with the same architecture,
@@ -143,7 +146,7 @@ def load_model_for_inference(checkpoint_path, model_params, device='cpu'):
         raise FileNotFoundError(f"Checkpoint file not found at {checkpoint_path}")
 
     model = TargetedWeatherPredictionModel(**model_params)
-    checkpoint = torch.load(checkpoint_path, map_location=device)
+    checkpoint = torch.load(checkpoint_path, map_location=device, weights_only=False)
     model.load_state_dict(checkpoint['model_state_dict'])
     model.to(device)
     model.eval()
@@ -179,6 +182,7 @@ def load_window_multi_station_return_only_input_window(data_np, window_size, sca
 
     return window_tensor
 
+
 def load_window_multi_station(data_np, window_size, shift, label_width, scalers, target_column_index, idx=0):
    
     total_window_size = window_size + shift - 1 + label_width
@@ -192,7 +196,7 @@ def load_window_multi_station(data_np, window_size, shift, label_width, scalers,
     target_start = idx + window_size + shift - 1
     target_end = target_start + label_width
     actual_target = data_np[target_start:target_end, ADVANCED_MODEL_PARAMS['target_station_idx'], target_column_index]
-    #actual_target_mean = actual_target.mean()  # Aggregate if label_width >1
+    # actual_target_mean = actual_target.mean()  # Aggregate if label_width >1
 
     # Apply individual scalers to each station's data
     scaled_window = []
@@ -208,11 +212,12 @@ def load_window_multi_station(data_np, window_size, shift, label_width, scalers,
 
     # Convert to torch.Tensor and reshape to (1, num_stations, time_steps, feature_dim)
     window_tensor = torch.tensor(scaled_window, dtype=torch.float32).unsqueeze(0)
-   # batch_size, num_stations, time_steps, feature_dim = x.size()
+    # batch_size, num_stations, time_steps, feature_dim = x.size()
 
     window_tensor = window_tensor.permute(0, 2, 1, 3)
 
     return window_tensor, actual_target
+
 
 @torch.no_grad()
 def predict(model, input_window, lat, lon, device='cpu'):
@@ -242,8 +247,10 @@ def predict(model, input_window, lat, lon, device='cpu'):
 
 
 if __name__ == "__main__":
+
+
     """
-    1. define INFERENCE_PARAMS in your file - all the INFERENCE_PARAMS are mendatory in addittion to that all the parameters that are in section 2
+    1. define INFERENCE_PARAMS in your file - all the INFERENCE_PARAMS are mandatory in addition to that all the parameters that are in section 2
 
     2. there is an assumption that yours parameters file (not what define in the infarance parameters nor what in the folders)
         has the same values in these parameters:
@@ -253,13 +260,12 @@ if __name__ == "__main__":
         ADVANCED_MODEL_PARAMS['target_station_idx'] - the index of the target station in the list of stations
         WINDOW_PARAMS['label_columns'] - the label column
         PARAMS['device']
-    3.  WINDOW_PARAMS['input_width'] - the window size - support defrrent sizes - didnt checkd yet
-
-
+    3.  WINDOW_PARAMS['input_width'] - the window size - support deterrent sizes - didn't checked yet
     """
     inference_mode = 'live'  # Options: 'live', 'analyze'
     analyze_stop_at = 0  # Number of predictions to analyze
 
+    verbos_get_prccessed_latest_data_by_hour_and_station = False
     parameters_files = [] # load parameters files
     for path in INFERENCE_PARAMS['params_path']:
         parameters_files.append(load_params(path))
@@ -276,7 +282,7 @@ if __name__ == "__main__":
     east_normalized, north_normalized = normalize_coordinates(east, north)
     
     scalers = load_scalers(scaler_dir=INFERENCE_PARAMS['scaler_folder_path'])
-    #model_params = ADVANCED_MODEL_PARAMS.copy()
+    # model_params = ADVANCED_MODEL_PARAMS.copy()
 
     
     model_params = []
@@ -297,13 +303,13 @@ if __name__ == "__main__":
     device = PARAMS['device']
     target_station_idx = PARAMS['target_station_id']
 
-    begin_forecast_time = datetime.now()
-    end_datetime = begin_forecast_time.replace(minute=0, second=0, microsecond=0)
-    start_datetime = end_datetime - pd.Timedelta(days=3)  # 7 days back
+    #begin_forecast_time = datetime.now()
+    #end_datetime = begin_forecast_time.replace(minute=0, second=0, microsecond=0)
+    #start_datetime = end_datetime - pd.Timedelta(days=3)  # 7 days back
     if inference_mode == 'live':        
-        dataframes, last_hour, last_date, success = get_prccessed_latest_data_by_hour_and_station(STATIONS_LIST, max_input_width,start_datetime)
+        dataframes, last_hour, last_date, success = get_prccessed_latest_data_by_hour_and_station(STATIONS_LIST, max_input_width)
         last_hour = int(last_hour.split(':')[0])
-        if False:
+        if verbos_get_prccessed_latest_data_by_hour_and_station:
             print(f"len of df: {len(dataframes)}")
             print(f"len of df[0]: {len(dataframes[list(dataframes.keys())[0]])}")
             print(f"len of df[1]: {len(dataframes[list(dataframes.keys())[1]])}")
