@@ -1,3 +1,4 @@
+// Start of Selection
 import React, { useState } from "react";
 import IconButton from "@mui/material/IconButton";
 import Menu from "@mui/material/Menu";
@@ -95,7 +96,7 @@ const Settings = () => {
             component="label"
             startIcon={<UploadIcon />}
             sx={{
-              color: "#fff",
+              color: "text.primary",
               "&:hover": {
                 backgroundColor: "rgba(41, 184, 200, 0.7)",
               },
@@ -120,7 +121,7 @@ const Settings = () => {
             startIcon={<OpenInNewIcon />}
             onClick={handleOpenColabNotebook}
             sx={{
-              color: "#fff",
+              color: "text.primary",
               "&:hover": {
                 backgroundColor: "rgba(41, 184, 200, 0.7)",
               },
