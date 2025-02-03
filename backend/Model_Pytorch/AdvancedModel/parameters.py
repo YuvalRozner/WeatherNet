@@ -6,7 +6,9 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'  # Determine device
 ###########################################################################################################################################################
 
 # for training - where the output will be saved
-base_path = 'C:\\Users\\dorsh\\Documents\\GitHub\\WeatherNet\\backend\\Model_Pytorch\\AdvancedModel\\models' # in general we put the folder of the path that contains the parameters.py file
+#base_path = 'C:\\Users\\dorsh\\Documents\\GitHub\\WeatherNet\\backend\\Model_Pytorch\\AdvancedModel\\models' # in general we put the folder of the path that contains the parameters.py file
+local_path = 'C:\\Users\\dorsh\\Documents\\GitHub\\WeatherNet\\backend\\Model_Pytorch\\AdvancedModel\\models' # in general we put the folder of the path that contains the parameters.py file
+colab_path = r'/content/models_for_inference'
 #'C:\\Users\\dorsh\\Documents\\GitHub\\WeatherNet\\backend\\Model_Pytorch\\AdvancedModel\\models'
 name_of_the_model_to_save_train = r'1_12'
 
@@ -14,7 +16,7 @@ name_of_the_model_to_save_train = r'1_12'
 models_paths_dir_names_for_inference = ['1_12','12_24','24_36','36_60'] # for instance for alot of models we want to inference: ['model_1','model_2' ... ] for one : ['model_1']
 
 ###########################################################################################################################################################
-
+base_path = local_path
 output_path = os.path.join(base_path, name_of_the_model_to_save_train)
 checkpoints_path = os.path.join(output_path, 'checkpoints')
 scalers_path = os.path.join(output_path, 'scalers')

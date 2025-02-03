@@ -166,9 +166,18 @@ print(np.__version__)
 from google.colab import drive
 drive.mount('/content/drive')
 """
+    unzip_weights = """### Unzip Weights"""
+    code_5 = """
+import zipfile
+zip_file_path = "/content/models_for_inference.zip"
+
+# Extract the zip file to a temporary directory
+with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
+    zip_ref.extractall("/content/models_for_inference")
+"""
     # Initialize initial_code_blocks with defined markdown and code
     initial_code_blocks = [
-        (colab_mount,code_4)
+        (unzip_weights,code_5)
         #(markdown_1, code_1),
         #(markdown_1, code_2),
         #(markdown_1, code_3),
@@ -179,10 +188,11 @@ drive.mount('/content/drive')
     # Hardcoded list of Python file paths
     python_files = [
         os.path.join(path_to_dir, "..", "common", "data.py"),                       # 0
-        os.path.join(path_to_dir, "..", "common", "import_and_process_data.py"),    # 1    
-        os.path.join(path_to_dir, "..", "AdvancedModel", "model.py"),               # 2
-        os.path.join(path_to_dir, "..", "AdvancedModel", "parameters.py"),          # 3
-        os.path.join(path_to_dir, "..", "AdvancedModel", "inference.py"),           # 4
+        os.path.join(path_to_dir, "..", "common", "constantsParams.py"),            # 1    
+        os.path.join(path_to_dir, "..", "common", "import_and_process_data.py"),    # 2    
+        os.path.join(path_to_dir, "..", "AdvancedModel", "model.py"),               # 3
+        os.path.join(path_to_dir, "..", "AdvancedModel", "parameters.py"),          # 4
+        os.path.join(path_to_dir, "..", "AdvancedModel", "inference.py"),           # 5
     ]
 
     # Specify the output notebook path
@@ -192,11 +202,31 @@ drive.mount('/content/drive')
     # Example: Replace '/old/path/' with '/new/path/' in 'parameters.py'
     # and modify 'main.py' accordingly
     alteration_rules = {
-        python_files[4]: {  # inference.py
+        python_files[2] : {  # import_and_process_data.py
+            "regex": [
+                (r"from Model_Pytorch.common.constantsParams import \*", ""),
+            ],
+            "functions": [
+                #"remove_code_above_main"
+            ]
+        },
+        python_files[4]: { # parameters.py
+            "regex": [
+                (r"local_path", "colab_path"),
+            ],
+            "functions": [
+                #"remove_code_above_main"
+            ]
+        },
+        python_files[5]: {  # inference.py
             "regex": [
                 (r"fileNames", "paths_in_colab"),
                 (r"load_pkl_file", "pd.read_pickle"),
                 (r"STATIONS_COORDINATES", "STATIONS_COORDINATES_COLAB"),
+                (r"from Model_Pytorch.common.data import pd.read_pickle, normalize_coordinates", ""),
+                (r"from Model_Pytorch.common.import_and_process_data import get_prccessed_latest_data_by_hour_and_station", ""),
+                (r"from model import TargetedWeatherPredictionModel", ""),
+                (r"from parameters import PARAMS, WINDOW_PARAMS, ADVANCED_MODEL_PARAMS, STATIONS_COORDINATES_COLAB, STATIONS_LIST, INFERENCE_PARAMS", ""),
                 #(r"os\.path\.dirname\(__file__\)", "'/content/drive/MyDrive/final data'"),
             ],
             "functions": [
