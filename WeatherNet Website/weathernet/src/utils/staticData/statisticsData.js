@@ -19,6 +19,29 @@ export const getStatisticsData = (theme) => [
   },
 ];
 
+export const getStatisticsModelsGraphsData = (theme) => [
+  {
+    title: "model 1-12 hours",
+    description: "model 1-12 hours",
+    image: `/figures/time_series_model0_${theme}.png`,
+  },
+  {
+    title: "model 12-24 hours",
+    description: "model 12-24 hours",
+    image: `/figures/time_series_model1_${theme}.png`,
+  },
+  {
+    title: "model 22-36 hours",
+    description: "model 24-36 hours",
+    image: `/figures/time_series_model2_${theme}.png`,
+  },
+  {
+    title: "model 36-60 hours",
+    description: "model 36-60 hours",
+    image: `/figures/time_series_model3_${theme}.png`,
+  },
+];
+
 export const getmodelMetricsData = () => [
   {
     type: "MAE",
