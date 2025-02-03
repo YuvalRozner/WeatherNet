@@ -6,7 +6,7 @@ import os
 import numpy as np# type: ignore
 import matplotlib.pyplot as plt # type: ignore
 from tqdm import tqdm # type: ignore
-from backend.Model_Pytorch.common.constantsParams import *
+from Backend.Model_Pytorch.common.constantsParams import *
 
 ##    function used for the first time to get the data from the IMS ##
 ######################################################################################################################

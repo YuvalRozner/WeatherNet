@@ -12,16 +12,16 @@ from torchinfo import summary
 from torchviz import make_dot
 import netron
 
-from backend.Model_Pytorch.common.data import (
+from Backend.Model_Pytorch.common.data import (
     load_pkl_file,
     timeEncode,
     normalize_coordinates,
     drop_nan_rows_multiple
 )
-from backend.Model_Pytorch.AdvancedModel.model import TargetedWeatherPredictionModel
-from backend.Model_Pytorch.AdvancedModel.parameters import PARAMS, WINDOW_PARAMS, ADVANCED_MODEL_PARAMS, \
+from Backend.Model_Pytorch.AdvancedModel.model import TargetedWeatherPredictionModel
+from Backend.Model_Pytorch.AdvancedModel.parameters import PARAMS, WINDOW_PARAMS, ADVANCED_MODEL_PARAMS, \
     STATIONS_COORDINATES
-from backend.Model_Pytorch.common.analyze import analyze
+from Backend.Model_Pytorch.common.analyze import analyze
 
 # Define dictionaries to store feature maps and attention weights
 cnn_feature_maps = {}

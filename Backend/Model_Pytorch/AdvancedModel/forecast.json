@@ -1,0 +1,199 @@
+{
+  "data": {
+    "title": "Tavor Kadoorie",
+    "forecast_data": {
+      "2025-01-31": {
+        "hourly": {
+          "12:00": {
+            "temperature": "19.0"
+          },
+          "13:00": {
+            "temperature": "19.9"
+          },
+          "14:00": {
+            "temperature": "20.7"
+          },
+          "15:00": {
+            "temperature": "21.0"
+          },
+          "16:00": {
+            "temperature": "20.5"
+          },
+          "17:00": {
+            "temperature": "19.1"
+          },
+          "18:00": {
+            "temperature": "17.4"
+          },
+          "19:00": {
+            "temperature": "15.3"
+          },
+          "20:00": {
+            "temperature": "13.8"
+          },
+          "21:00": {
+            "temperature": "13.0"
+          },
+          "22:00": {
+            "temperature": "12.2"
+          },
+          "23:00": {
+            "temperature": "11.8"
+          }
+        }
+      },
+      "2025-02-01": {
+        "hourly": {
+          "00:00": {
+            "temperature": "11.1"
+          },
+          "01:00": {
+            "temperature": "10.9"
+          },
+          "02:00": {
+            "temperature": "10.5"
+          },
+          "03:00": {
+            "temperature": "10.3"
+          },
+          "04:00": {
+            "temperature": "10.0"
+          },
+          "05:00": {
+            "temperature": "9.7"
+          },
+          "06:00": {
+            "temperature": "9.3"
+          },
+          "07:00": {
+            "temperature": "8.8"
+          },
+          "08:00": {
+            "temperature": "9.4"
+          },
+          "09:00": {
+            "temperature": "10.7"
+          },
+          "10:00": {
+            "temperature": "12.9"
+          },
+          "11:00": {
+            "temperature": "14.6"
+          },
+          "12:00": {
+            "temperature": "15.6"
+          },
+          "13:00": {
+            "temperature": "16.8"
+          },
+          "14:00": {
+            "temperature": "17.6"
+          },
+          "15:00": {
+            "temperature": "18.1"
+          },
+          "16:00": {
+            "temperature": "18.2"
+          },
+          "17:00": {
+            "temperature": "17.5"
+          },
+          "18:00": {
+            "temperature": "16.6"
+          },
+          "19:00": {
+            "temperature": "15.2"
+          },
+          "20:00": {
+            "temperature": "13.9"
+          },
+          "21:00": {
+            "temperature": "12.9"
+          },
+          "22:00": {
+            "temperature": "12.3"
+          },
+          "23:00": {
+            "temperature": "12.1"
+          }
+        }
+      },
+      "2025-02-02": {
+        "hourly": {
+          "00:00": {
+            "temperature": "12.4"
+          },
+          "01:00": {
+            "temperature": "12.0"
+          },
+          "02:00": {
+            "temperature": "11.9"
+          },
+          "03:00": {
+            "temperature": "11.5"
+          },
+          "04:00": {
+            "temperature": "11.0"
+          },
+          "05:00": {
+            "temperature": "10.5"
+          },
+          "06:00": {
+            "temperature": "10.2"
+          },
+          "07:00": {
+            "temperature": "10.2"
+          },
+          "08:00": {
+            "temperature": "10.9"
+          },
+          "09:00": {
+            "temperature": "12.2"
+          },
+          "10:00": {
+            "temperature": "14.4"
+          },
+          "11:00": {
+            "temperature": "15.8"
+          },
+          "12:00": {
+            "temperature": "17.1"
+          },
+          "13:00": {
+            "temperature": "18.1"
+          },
+          "14:00": {
+            "temperature": "18.9"
+          },
+          "15:00": {
+            "temperature": "19.0"
+          },
+          "16:00": {
+            "temperature": "18.8"
+          },
+          "17:00": {
+            "temperature": "17.9"
+          },
+          "18:00": {
+            "temperature": "16.8"
+          },
+          "19:00": {
+            "temperature": "15.4"
+          },
+          "20:00": {
+            "temperature": "14.3"
+          },
+          "21:00": {
+            "temperature": "13.5"
+          },
+          "22:00": {
+            "temperature": "12.8"
+          },
+          "23:00": {
+            "temperature": "12.6"
+          }
+        }
+      }
+    }
+  }
+}
