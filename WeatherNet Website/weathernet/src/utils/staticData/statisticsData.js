@@ -1,11 +1,9 @@
-// TODO: update the images.
-
 export const getStatisticsData = (theme) => [
   {
-    title: "Error per Percentage of Validation Data",
+    title: "Forecast Error Heatmap by Prediction Interval",
     description:
-      "This figure illustrates the error (difference between predicted and actual values) across various percentages of validation data. \n\nThe x-axis represents the percentage of data, while the y-axis shows the error in degrees Celsius. \n\nThe graph indicates that the error remains low for the majority of the data, increasing significantly only for a small portion.",
-    image: `/figures/combined_Error_per_Percentage_of_Data_${theme}.png`,
+      "Our forecast model predicts temperature at intervals from 1 to 60 hours. \n\nThis heatmap shows the forecast error across these intervals. \nRows represent prediction intervals, and columns indicate the percentage of validation data. \nColor intensity reflects error magnitude in degrees Celsius, with darker shades indicating higher errors. \n\nThis helps understand how forecast accuracy varies with different intervals.",
+    image: `/figures/heatmap_forecast_error_${theme}.png`,
   },
   {
     title: "Distribution of Prediction Errors",
@@ -14,19 +12,18 @@ export const getStatisticsData = (theme) => [
     image: `/figures/all_models_error_distribution_${theme}.png`,
   },
   {
-    title: "Forecast Error Heatmap by Prediction Interval",
+    title: "Error per Percentage of Validation Data",
     description:
-      "Our forecast model predicts temperature at intervals from 1 to 60 hours. \n\nThis heatmap shows the forecast error across these intervals. \nRows represent prediction intervals, and columns indicate the percentage of validation data. \nColor intensity reflects error magnitude in degrees Celsius, with darker shades indicating higher errors. \n\nThis helps understand how forecast accuracy varies with different intervals.",
-    image: `/figures/heatmap_forecast_error_${theme}.png`,
+      "This figure illustrates the error (difference between predicted and actual values) across various percentages of validation data. \n\nThe x-axis represents the percentage of data, while the y-axis shows the error in degrees Celsius. \n\nThe graph indicates that the error remains low for the majority of the data, increasing significantly only for a small portion.",
+    image: `/figures/combined_Error_per_Percentage_of_Data_${theme}.png`,
   },
 ];
 
-// TODO: update the data.
 export const getmodelMetricsData = () => [
   {
     type: "MAE",
     models: {
-      "1-12":0.958081564,
+      "1-12": 0.958081564,
       "13-24": 1.40994894893669,
       "25-36": 1.74030704221972,
       "37-60": 1.94939084908824,
