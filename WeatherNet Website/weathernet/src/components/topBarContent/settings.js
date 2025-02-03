@@ -55,7 +55,7 @@ const Settings = () => {
   return (
     <>
       <IconButton color="inherit" onClick={handleSettingsClick}>
-        <SettingsIcon />
+        <SettingsIcon style={{ color: "#58a6ff" }} />
       </IconButton>
       <Menu
         anchorEl={anchorEl}
