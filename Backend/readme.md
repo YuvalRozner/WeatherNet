@@ -1,4 +1,4 @@
-# installation in your local pc
+# Installation in your local pc
 
 1. create a virtual venv
 ```terminal
@@ -15,8 +15,8 @@ pip install torch torchvision torchaudio --index-url https://download.pytorch.or
 pip install -r requirements.txt
 ```
 
-# using ipynb file in google colab
+# Using ipynb file in google colab
 
 ## inference
-1. upload the inference.ipynb, models_for_inference.zip files from Model_Pytorch/utils folder
+1. upload the inference.ipynb from Model_Pytorch/utils folder
 2. Run and watch the weather prediction :)
