@@ -6,6 +6,7 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import Button from "@mui/material/Button";
 import { useNotifications } from "@toolpad/core/useNotifications";
 import UploadIcon from "@mui/icons-material/Upload";
+import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 
 const Settings = () => {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -50,6 +51,14 @@ const Settings = () => {
         autoHideDuration: 3000,
       });
     }
+  };
+
+  const handleOpenColabNotebook = () => {
+    window.open(
+      "https://colab.research.google.com/github/YuvalRozner/WeatherNet/blob/main/Backend/Model_Pytorch/utils/inference.ipynb",
+      "_blank"
+    );
+    handleSettingsClose();
   };
 
   return (
@@ -103,6 +112,25 @@ const Settings = () => {
               hidden
               onChange={handleFileUpload}
             />
+          </Button>
+        </MenuItem>
+        <MenuItem>
+          <Button
+            variant="outlined"
+            startIcon={<OpenInNewIcon />}
+            onClick={handleOpenColabNotebook}
+            sx={{
+              color: "#fff",
+              "&:hover": {
+                backgroundColor: "rgba(41, 184, 200, 0.7)",
+              },
+              padding: "8px 16px",
+              borderRadius: "8px",
+              textTransform: "none",
+              fontSize: "1rem",
+            }}
+          >
+            Open Colab Notebook
           </Button>
         </MenuItem>
       </Menu>
