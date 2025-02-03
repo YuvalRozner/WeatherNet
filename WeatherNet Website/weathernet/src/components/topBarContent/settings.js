@@ -131,7 +131,7 @@ const Settings = () => {
               fontSize: "1rem",
             }}
           >
-            Open Colab Notebook
+            Open Colab inference
           </Button>
         </MenuItem>
       </Menu>
