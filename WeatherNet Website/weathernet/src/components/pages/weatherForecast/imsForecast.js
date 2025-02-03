@@ -17,7 +17,7 @@ const ImsForecast = () => {
   const [trueDataJson, setTrueDataJson] = useState(null);
   const [dataset, setDataset] = useState([]);
   const [slicedDataset, setSlicedDataset] = useState([]);
-  const [city, setCity] = useState(3); // default city is 3 (Haifa)
+  const [city, setCity] = useState(["3", "42"]); // default city is 3 (Haifa)
   const [chosenTimePeriod, setChosenTimePeriod] = useState([56, 96]);
   const [maxPeriod, setMaxPeriod] = useState(93);
   const [dailyCountryForecast, setDailyCountryForecast] = useState("");
@@ -25,8 +25,8 @@ const ImsForecast = () => {
   const [maxValue, setMaxValue] = useState(null);
 
   const fetchForecastData = useCallback(() => {
-    getImsForecast(city).then((data) => setForecastDataJson(data));
-    getImsTrueData(42).then((data) => setTrueDataJson(data)); //TODO: change to city
+    getImsForecast(city[0]).then((data) => setForecastDataJson(data));
+    getImsTrueData(city[1]).then((data) => setTrueDataJson(data)); //TODO: change to city
   }, [city]);
 
   useEffect(() => {
