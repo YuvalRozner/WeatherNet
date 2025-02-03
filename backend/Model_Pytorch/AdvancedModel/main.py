@@ -2,15 +2,15 @@
 import os
 import numpy as np
 
-from backend.Model_Pytorch.common.window_generator_multiple_stations import WindowGeneratorMultipleStations
-from backend.Model_Pytorch.common.data import (
+from Backend.Model_Pytorch.common.window_generator_multiple_stations import WindowGeneratorMultipleStations
+from Backend.Model_Pytorch.common.data import (
     load_pkl_file , 
     normalize_data_independent,
     normalize_coordinates
 )
-from backend.Model_Pytorch.AdvancedModel.model import TargetedWeatherPredictionModel
-from backend.Model_Pytorch.AdvancedModel.train import train_model
-from backend.Model_Pytorch.AdvancedModel.parameters import PARAMS, WINDOW_PARAMS,TRAIN_PARAMS, ADVANCED_MODEL_PARAMS, STATIONS_COORDINATES
+from Backend.Model_Pytorch.AdvancedModel.model import TargetedWeatherPredictionModel
+from Backend.Model_Pytorch.AdvancedModel.train import train_model
+from Backend.Model_Pytorch.AdvancedModel.parameters import PARAMS, WINDOW_PARAMS,TRAIN_PARAMS, ADVANCED_MODEL_PARAMS, STATIONS_COORDINATES
 
 def main():
     if os.path.exists(PARAMS['output_path']) and TRAIN_PARAMS['resume'] is False:

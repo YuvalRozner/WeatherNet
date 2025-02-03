@@ -4,19 +4,18 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'  # Determine device
 
 # must define these 3 variables below!!!
 ###########################################################################################################################################################
-# for training - where the output will be saved
-train_base_path = 'C:\\Users\\dorsha\\Documents\\GitHub\\WeatherNet\\ackend\\Model_Pytorch\\AdvancedModel\\models' # in general we put the folder of the path that contains the parameters.py file
 
-# you need to put int inference_base_path,in it will be folders where each folder has the model files - inference_base_path/model_i/parameters.py, inference_base_path/model_i/scalers, inference_base_path/model_i/checkpoints.
-inference_base_path = 'C:\\Users\\dorsha\\Documents\\GitHub\\WeatherNet\\backend\\Model_Pytorch\\AdvancedModel\\models'
-models_paths_dir_names = ['1_12','12_24','24_36','36_60'] # for instance for alot of models we want to inference: ['model_1','model_2' ... ] for one : ['model_1']
+# for training - where the output will be saved
+base_path = 'C:\\Users\\dorsh\\Documents\\GitHub\\WeatherNet\\backend\\Model_Pytorch\\AdvancedModel\\models' # in general we put the folder of the path that contains the parameters.py file
+#'C:\\Users\\dorsh\\Documents\\GitHub\\WeatherNet\\backend\\Model_Pytorch\\AdvancedModel\\models'
+name_of_the_model_to_save_train = r'1_12'
+
+# for inference
+models_paths_dir_names_for_inference = ['1_12','12_24','24_36','36_60'] # for instance for alot of models we want to inference: ['model_1','model_2' ... ] for one : ['model_1']
 
 ###########################################################################################################################################################
 
-
-
-output_path = os.path.join(train_base_path, 'output')
-output_path = r'C:\Users\dorsha\Documents\GitHub\WeatherNet\backend\Model_Pytorch\AdvancedModel\models\1_12'
+output_path = os.path.join(base_path, name_of_the_model_to_save_train)
 checkpoints_path = os.path.join(output_path, 'checkpoints')
 scalers_path = os.path.join(output_path, 'scalers')
 inference_output_path = os.path.join(output_path, 'inference_output')
@@ -52,7 +51,6 @@ STATIONS_LIST = {
 }
 
 PARAMS = {
-    #'paths_in_colab': [f'/content/Newe Yaar_data_2005_2024.pkl', f'/content/Tavor Kadoorie_data_2005_2024.pkl'],
     'paths_in_colab': [
         f'/content/drive/MyDrive/final data/Tavor Kadoorie.pkl',
         f'/content/drive/MyDrive/final data/Newe Yaar.pkl',
@@ -114,15 +112,15 @@ WINDOW_PARAMS = {
 """
 
 TRAIN_PARAMS = {
-    'epochs' :          50,  
+    'epochs' :          50,
     'batch_size':       32,
     'lr':               1e-5,                                   # 1e-3, 1e-4, 1e-5
-    'checkpoint_dir' :  PARAMS['checkpoints_path'],  
+    'checkpoint_dir' :  PARAMS['checkpoints_path'],
     'resume':           False,
     'device':           PARAMS['device'],
-    'early_stopping_patience':10,                               # how many epochs to wait before stopping the training                       
+    'early_stopping_patience':10,                               # how many epochs to wait before stopping the training
     'scheduler_patience':3,                                     # how many epochs to wait before reducing the learning rate
-    'scheduler_factor':  0.5,                                   # the factor to reduce the learning rate                                       
+    'scheduler_factor':  0.5,                                   # the factor to reduce the learning rate
     'min_lr':            1e-7,
     'logger_path':       PARAMS['output_path']
 }
@@ -137,17 +135,17 @@ ADVANCED_MODEL_PARAMS = {
     'num_layers':           4,  # number of layers in the transformer - 6 - 12
     'target_station_idx':   PARAMS['target_station_id'],
     'label_width':          WINDOW_PARAMS['label_width'],
-    'output_per_feature':   3,                                          # 4 ,5            
+    'output_per_feature':   3,                                          # 4 ,5
     'use_batch_norm':       False,
-    'use_residual':         False
+    'use_residual':         True
 }
 
-models_paths_dir_names_full_paths = [os.path.join(inference_base_path, model_folder_name) for model_folder_name in models_paths_dir_names]
+models_paths_dir_names_full_paths = [os.path.join(base_path, model_folder_name) for model_folder_name in models_paths_dir_names_for_inference]
 
 INFERENCE_PARAMS = {
     'params_path':             [os.path.join(folder, 'parameters.py') for folder in models_paths_dir_names_full_paths],
     'weights_paths':           [os.path.join(folder, 'checkpoints', 'best_checkpoint.pth') for folder in models_paths_dir_names_full_paths],
     'scaler_folder_path':      PARAMS['scalers_path'],
     'inference_output_path_per_model':  models_paths_dir_names_full_paths, # for saving the output of the inference in the model folder for each model
-    'inference_output_path':  os.path.join(inference_base_path, 'inference_output'), # for saving the output of the inference of all models in one folder (later analyze.py will use it)
+    'inference_output_path':  os.path.join(base_path, 'inference_output'), # for saving the output of the inference of all models in one folder (later analyze.py will use it)
 }

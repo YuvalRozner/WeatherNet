@@ -14,10 +14,10 @@ import importlib.util
 import sys
 from pathlib import Path
 
-from backend.Model_Pytorch.common.data import load_pkl_file ,normalize_coordinates
-from backend.Model_Pytorch.AdvancedModel.model import TargetedWeatherPredictionModel
-from backend.Model_Pytorch.AdvancedModel.parameters import PARAMS, WINDOW_PARAMS, ADVANCED_MODEL_PARAMS, STATIONS_COORDINATES, STATIONS_LIST,INFERENCE_PARAMS
-from backend.Model_Pytorch.common.import_and_process_data import get_prccessed_latest_data_by_hour_and_station
+from Backend.Model_Pytorch.common.data import load_pkl_file ,normalize_coordinates
+from Backend.Model_Pytorch.AdvancedModel.model import TargetedWeatherPredictionModel
+from Backend.Model_Pytorch.AdvancedModel.parameters import PARAMS, WINDOW_PARAMS, ADVANCED_MODEL_PARAMS, STATIONS_COORDINATES, STATIONS_LIST,INFERENCE_PARAMS
+from Backend.Model_Pytorch.common.import_and_process_data import get_prccessed_latest_data_by_hour_and_station
 
 def load_params(params_path):
     # Convert path to absolute if it's relative
@@ -257,7 +257,7 @@ if __name__ == "__main__":
 
 
     """
-    inference_mode = 'analyze'  # Options: 'live', 'analyze'
+    inference_mode = 'live'  # Options: 'live', 'analyze'
     analyze_stop_at = 0  # Number of predictions to analyze
 
     parameters_files = [] # load parameters files
