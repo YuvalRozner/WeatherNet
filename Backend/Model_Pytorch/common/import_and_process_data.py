@@ -615,6 +615,7 @@ def main():
 
   if save_data_to_pickles_in_the_end:
     save_dataframes_to_pickles(dataframes, DATA_DIRECTORY)
-
+"""
 if __name__ == "__main__":
     main()
+"""

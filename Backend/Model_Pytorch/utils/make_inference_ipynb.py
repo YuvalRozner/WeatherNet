@@ -175,8 +175,13 @@ zip_file_path = "/content/models_for_inference.zip"
 with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
     zip_ref.extractall("/content/models_for_inference")
 """
+    get_weights_from_git= """### Get Models and Weights"""
+    code_6 = """
+!wget https://raw.githubusercontent.com/YuvalRozner/WeatherNet/main/Backend/Model_Pytorch/utils/models_for_inference.zip
+    """
     # Initialize initial_code_blocks with defined markdown and code
     initial_code_blocks = [
+        (get_weights_from_git,code_6),
         (unzip_weights,code_5)
         #(markdown_1, code_1),
         #(markdown_1, code_2),
