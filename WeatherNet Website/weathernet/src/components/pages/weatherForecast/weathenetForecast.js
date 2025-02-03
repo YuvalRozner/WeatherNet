@@ -3,13 +3,13 @@ import {
   chartSeriesWeatherNet,
   processWeatherNerForecastDataMergeWithImsTrueData,
 } from "../../../utils/dataManipulations.js";
-import { templateDataOur } from "../../../utils/forecast.js";
+import forecastData from "../../../utils/forecast.json";
 import WeatherChart from "../../dataDisplays/weatherChart.js";
 import PeriodSlider from "../../dataDisplays/periodSlider.js";
 import { ChooseCityAndPeriodBox, MapContainer } from "./weatherForecast.style";
 import { getImsTrueData } from "../../../utils/network/gateway.js";
 import ImageDialog from "../../dataDisplays/imageDialog.js";
-import { Skeleton, Tooltip, Typography, Box } from "@mui/material";
+import { Skeleton, Tooltip, Typography, Box, Button } from "@mui/material";
 
 const WeathernetForecast = () => {
   const [ourDataJson, setOurDataJson] = useState(null);
@@ -32,7 +32,19 @@ const WeathernetForecast = () => {
   };
 
   const fetchData = useCallback(() => {
-    setOurDataJson(templateDataOur);
+    // Check if uploaded forecast exists in sessionStorage
+    const storedForecast = sessionStorage.getItem("uploadedForecast");
+    if (storedForecast) {
+      try {
+        const json = JSON.parse(storedForecast);
+        setOurDataJson(json);
+      } catch (error) {
+        console.error("Invalid JSON data in sessionStorage");
+        setOurDataJson(forecastData);
+      }
+    } else {
+      setOurDataJson(forecastData);
+    }
     getImsTrueData(13).then((data) => setTrueDataJson(data));
   }, []);
 

@@ -71,7 +71,7 @@ export const StyledGitHubIconButton = styled(IconButton)`
   width: 45px;
   height: 45px;
   padding: 0px !important;
-  margin: 0px !important;
+  margin: 0 0 0 8px !important;
 `;
 
 export const IconAndTitleContainer = styled.div`

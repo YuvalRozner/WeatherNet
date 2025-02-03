@@ -7,8 +7,8 @@ import {
 import PeriodSlider from "../../dataDisplays/periodSlider.js";
 import { ChooseCityAndPeriodBox } from "./weatherForecast.style.js";
 import WeatherChart from "../../dataDisplays/weatherChart.js";
-import { templateDataOur } from "../../../utils/forecast.js";
 import { chartSeriesMerged } from "../../../utils/dataManipulations.js";
+import forecastData from "../../../utils/forecast.json";
 
 const ComparingChart = () => {
   const [dataJsonIms, setDataJsonIms] = useState(null);
@@ -23,9 +23,21 @@ const ComparingChart = () => {
 
   const fetchData = useCallback(() => {
     // Get IMS forecast data when city is changed
-    getImsForecast(44).then((data) => setDataJsonIms(data));
-    getImsTrueData(13).then((data) => setDataJsonTrue(data));
-    setDataJsonOur(templateDataOur);
+    getImsForecast(44).then((data) => setDataJsonIms(data)); // default is Nof Hagalil
+    getImsTrueData(13).then((data) => setDataJsonTrue(data)); // default is Tavor Kadoorie
+    // Check if uploaded forecast exists in sessionStorage
+    const storedForecast = sessionStorage.getItem("uploadedForecast");
+    if (storedForecast) {
+      try {
+        const json = JSON.parse(storedForecast);
+        setDataJsonOur(json);
+      } catch (error) {
+        console.error("Invalid JSON data in sessionStorage");
+        setDataJsonOur(forecastData);
+      }
+    } else {
+      setDataJsonOur(forecastData);
+    }
   }, []);
 
   useEffect(() => {

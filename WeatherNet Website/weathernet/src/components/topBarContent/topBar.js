@@ -12,6 +12,7 @@ import GitHubButton from "./githubContainer.js";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import Skeleton from "@mui/material/Skeleton";
+import Settings from "./settings.js";
 
 export function AppTitle() {
   const navigate = useNavigate();
@@ -51,8 +52,10 @@ export function AppTitle() {
 export function ToolbarActions() {
   const shareUrl = window.location.href; // URL to share
   const title = "Check out WeatherNet!";
+
   return (
     <>
+      <Settings />
       <ThemeSwitcher sx={{ margin: "0px", padding: "0px" }} />
       <GitHubButton style={{ margin: "0px", padding: "0px" }} />
       <InvisibleDiv />
