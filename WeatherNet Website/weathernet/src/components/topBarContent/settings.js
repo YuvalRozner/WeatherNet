@@ -30,7 +30,7 @@ const Settings = () => {
           const json = JSON.parse(e.target.result);
           // Save the uploaded JSON to sessionStorage
           sessionStorage.setItem("uploadedForecast", JSON.stringify(json));
-          notifications.show("Forecast JSON uploaded successfully!", {
+          notifications.show("Forecast JSON uploaded successfully !", {
             severity: "success",
             autoHideDuration: 3000,
           });
