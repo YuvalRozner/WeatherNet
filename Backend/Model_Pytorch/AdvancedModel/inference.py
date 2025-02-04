@@ -12,6 +12,7 @@ from datetime import datetime, timedelta
 import importlib.util
 import sys
 from pathlib import Path
+import pytz
 
 from Model_Pytorch.common.data import load_pkl_file, normalize_coordinates
 from Model_Pytorch.common.import_and_process_data import get_prccessed_latest_data_by_hour_and_station
@@ -247,25 +248,27 @@ def predict(model, input_window, lat, lon, device='cpu'):
 
 
 if __name__ == "__main__":
-
-
     """
     1. define INFERENCE_PARAMS in your file - all the INFERENCE_PARAMS are mandatory in addition to that all the parameters that are in section 2
 
     2. there is an assumption that yours parameters file (not what define in the infarance parameters nor what in the folders)
         has the same values in these parameters:
-
         PARAMS['fileNames'] - list of the stations names, if you have different names it wont make sense 
         PARAMS['target_station_id'] - the index of the target station in the list of stations
         ADVANCED_MODEL_PARAMS['target_station_idx'] - the index of the target station in the list of stations
         WINDOW_PARAMS['label_columns'] - the label column
         PARAMS['device']
-    3.  WINDOW_PARAMS['input_width'] - the window size - support deterrent sizes - didn't checked yet
     """
     inference_mode = 'live'  # Options: 'live', 'analyze'
     analyze_stop_at = 0  # Number of predictions to analyze
-
+    local_tz = pytz.timezone('Asia/Jerusalem')
+    delta = timedelta(hours=0)
+    start_time_to_predict =  datetime.now(local_tz) - delta
+    print(f"start_time_to_predict: {start_time_to_predict}")
+    print(f"delta: {delta}")
     verbos_get_prccessed_latest_data_by_hour_and_station = False
+
+
     parameters_files = [] # load parameters files
     for path in INFERENCE_PARAMS['params_path']:
         parameters_files.append(load_params(path))
@@ -303,9 +306,6 @@ if __name__ == "__main__":
     device = PARAMS['device']
     target_station_idx = PARAMS['target_station_id']
 
-    #begin_forecast_time = datetime.now()
-    #end_datetime = begin_forecast_time.replace(minute=0, second=0, microsecond=0)
-    #start_datetime = end_datetime - pd.Timedelta(days=3)  # 7 days back
     if inference_mode == 'live':        
         dataframes, last_hour, last_date, success = get_prccessed_latest_data_by_hour_and_station(STATIONS_LIST, max_input_width)
         last_hour = int(last_hour.split(':')[0])
