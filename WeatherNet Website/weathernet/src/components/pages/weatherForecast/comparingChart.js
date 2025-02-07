@@ -16,8 +16,8 @@ const ComparingChart = () => {
   const [dataJsonTrue, setDataJsonTrue] = useState(null);
   const [dataset, setDataset] = useState([]);
   const [slicedDataset, setSlicedDataset] = useState([]);
-  const [chosenTimePeriod, setChosenTimePeriod] = useState([51, 114]);
   const [maxPeriod, setMaxPeriod] = useState(93);
+  const [chosenTimePeriod, setChosenTimePeriod] = useState([0, 999999]); // 51 , 114
   const [minValue, setMinValue] = useState(null);
   const [maxValue, setMaxValue] = useState(null);
 

@@ -5,6 +5,7 @@ import ComparingChart from "../weatherForecast/comparingChart.js";
 import { Divider, Skeleton, Tooltip, useTheme } from "@mui/material";
 import { ForecastContainer, ArchitectureContainer } from "./home.style.js";
 import ImageDialog from "../../dataDisplays/imageDialog.js";
+import { Typography } from "@mui/material";
 
 export function Home() {
   const [mapImageLoaded, setMapImageLoaded] = useState(false);
@@ -37,10 +38,19 @@ export function Home() {
       <Divider
         textAlign="left"
         variant="middle"
-        sx={{ margin: "1.2rem 0 2.7rem 0" }}
+        sx={{ margin: "1.2rem 0 1rem 0" }}
       >
         <b style={{ fontSize: "1.6em" }}>Weather Forecast</b>
       </Divider>
+      <div style={{ fontSize: "1.2rem", marginBottom: "2rem" }}>
+        You are now viewing the forecasts made on the 31/01/2025 15:00 and on
+        the 03/02/2025 01:00.
+        <br />
+        If you want to view the forecasts made on the current date, please use
+        the colab inference notbook via the settings and upload the forecast
+        json file.
+      </div>
+
       <ForecastContainer
         style={{ display: "flex", flexDirection: "row", alignItems: "center" }}
       >

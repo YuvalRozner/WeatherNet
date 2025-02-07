@@ -50,8 +50,9 @@ exports.getImsTrueData = onRequest({ region }, (req, res) => {
     return `${year}${month}${day}${hours}${minutes}`;
   };
 
-  const formatted_start_date = formatDate(start_date);
+  // const formatted_start_date = formatDate(start_date);
   const formatted_end_date = formatDate(end_date);
+  const formatted_start_date = "202501270000";
   const url = `https://ims.gov.il/he/envista_station_all_data_time_range/${station_id}/BP%26DiffR%26Grad%26NIP%26RH%26TD%26TDmax%26TDmin%26TW%26WD%26WDmax%26WS%26WS1mm%26Ws10mm%26Ws10maxEnd%26WSmax%26STDwd%26Rain/${formatted_start_date}/${formatted_end_date}/1/S`;
 
   fetch(url)
