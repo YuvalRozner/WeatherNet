@@ -23,13 +23,13 @@ scalers_path = os.path.join(output_path, 'scalers')
 inference_output_path = os.path.join(output_path, 'inference_output')
 
 STATIONS_COORDINATES = {
-    'Tavor Kadoorie':           (238440, 734540),
-    'Newe Yaar':                (217010, 734820),
-    'Yavneel':                  (248110, 733730),
-    'En Hashofet':              (209310, 723170),
-    'Eden Farm':                (246190, 708240),
-    'Eshhar':                   (228530, 754390),
-    'Afula Nir Haemeq':         (226260, 722410)
+    'Tavor Kadoorie':           (238440, 734540), #station id: 13
+    'Newe Yaar':                (217010, 734820), #station id: 186
+    'Yavneel':                  (248110, 733730), #station id: 11
+    'En Hashofet':              (209310, 723170), #station id: 67
+    'Eden Farm':                (246190, 708240), #station id: 206
+    'Eshhar':                   (228530, 754390), #station id: 205
+    'Afula Nir Haemeq':         (226260, 722410)  #station id: 16
 }
 
 STATIONS_COORDINATES_COLAB = {
